@@ -36,7 +36,7 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
 - T5 — [S5] ABM de producto (alta/edición) con unidad, contenido neto, granel AD-014 y artículo opcional. ✅ commits de esta fase — 29/29 tests verdes (5 widget del formulario + integración escáner→crear)
 - T6 — [S6] Administración de artículos: alta (con unidad base), renombre y conteo de productos por artículo. ✅ commits de esta fase — 32/32 tests verdes (creación, renombre, conteo; la unidad base no cambia al renombrar)
 - T7 — [S7] Alta de comercio en el momento: diálogo reutilizable (nombre obligatorio, tipo y dirección opcionales) + sección Comercios con listado. ✅ commits de esta fase — 36/36 tests verdes (4 de comercios)
-- T8 — [S8] Registro de precio con fecha de toma. → commit `feat`
+- T8 — [S8] Registro de precio con fecha de toma: precio validado (> 0, 2 decimales), comercio existente o creado en el momento, fecha editable sin futuras. ✅ commit `7d7eeb9` — 40/40 tests verdes (4 widget del registro)
 - T9 — [S9] Comparador con jerarquía (R13) y $/unidad. → commit `feat`
 - T10 — [S10] Historial con variación %. → commit `feat`
 - T11 — [S11] Agregados por artículo (ventana 30 días / histórico). → commit `feat`
