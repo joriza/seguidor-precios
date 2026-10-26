@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../precios/registro_precio_screen.dart';
 import '../productos/producto_form_screen.dart';
 
 /// S4 (R6): escáner con cámara (ML Kit, on-device) + ingreso manual del código.
@@ -26,6 +27,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
   final TextEditingController _controladorCodigo = TextEditingController();
   bool _buscando = false;
   String? _mensaje;
+  Producto? _productoEncontrado;
 
   @override
   void dispose() {
@@ -56,9 +58,27 @@ class _EscanerScreenState extends State<EscanerScreen> {
 
     setState(() {
       _buscando = false;
+      _productoEncontrado = producto;
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo desde la sección Artículos (Fase 1.5).'
           : 'Producto encontrado: ${producto.nombre}';
+    });
+  }
+
+  Future<void> _registrarPrecio() async {
+    final Producto? producto = _productoEncontrado;
+    if (producto == null) return;
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => RegistroPrecioScreen(
+          baseDeDatos: widget.baseDeDatos,
+          producto: producto,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    setState(() {
+      _mensaje = 'Precio registrado ✓';
     });
   }
 
@@ -116,6 +136,13 @@ class _EscanerScreenState extends State<EscanerScreen> {
           FilledButton.tonal(
             onPressed: _crearProducto,
             child: const Text('Crear producto'),
+          ),
+        ],
+        if (_productoEncontrado != null) ...<Widget>[
+          const SizedBox(height: 12),
+          FilledButton.tonal(
+            onPressed: _registrarPrecio,
+            child: const Text('Registrar precio'),
           ),
         ],
       ],
