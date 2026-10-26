@@ -31,8 +31,8 @@ internet** (los datos viven en tu teléfono) y, si querés, comparte tus aportes
 ## Productos sin código de barras
 
 Para carnicería, verdulería, madera o construcción: creá el producto sin código, elegí la unidad
-(kg, unidad, m, L) y, si aplica, el contenido neto. Ejemplos: "Asado" (kg), "Tornillo de 2
-pulgadas" (unidad), " listón de madera" (m).
+(kg, g, L, mL, unidad, m) y, si aplica, el contenido neto. Ejemplos: "Asado" (kg), "Tornillo de 2
+pulgadas" (unidad), "Listón de madera" (m).
 
 ## Comparar por artículo: el ejemplo de la mayonesa
 

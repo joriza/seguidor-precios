@@ -92,13 +92,14 @@ sequenceDiagram
 ### Reglas de sincronización
 
 1. **Identificadores:** UUID generados en el dispositivo → no hay colisiones entre usuarios y el merge es trivial.
-2. **Outbox:** todo cambio local (artículos, productos, comercios, precios) se encola; el push sube por lotes cuando hay red (automático o manual).
-3. **Pull incremental:** cada tabla se consulta por `actualizado_en > ultimo_sync`; se guarda un marcador por tabla.
+2. **Outbox:** todo cambio local (artículos, productos, comercios, precios, usuarios) se encola; el push sube por lotes cuando hay red **y el usuario autorizó la sincronización** (R15); la sync manual está siempre disponible.
+3. **Pull incremental:** cada tabla se consulta por `actualizado_en > ultimo_sync`; `precio` (append-only) usa su `cargado_en` como cursor, normalizado por el servidor al recibir el push para evitar sesgos de reloj entre dispositivos. Hay dos marcas: el cursor por tabla (pull) y una marca global de última sesión de sync exitosa (alimenta la condición de R15).
 4. **Conflictos:** *última escritura gana* por fila, con la marca de tiempo del servidor como árbitro. Los precios son append-only: nunca hay conflicto de precio.
 5. **Borrado:** lógico (`borrado_en`), nunca físico, para que el borrado se propague a otros dispositivos.
-6. **Dedup por EAN:** si subo un producto cuyo código de barras ya existe en el servidor, el backend devuelve el id existente y el dispositivo re-apunta sus precios a ese producto (transacción local).
+6. **Dedup por EAN:** si subo un producto cuyo código de barras ya existe en el servidor, el backend devuelve el id existente y el dispositivo re-apunta sus precios a ese producto (transacción local). La inmutabilidad del precio cubre valor, comercio y fecha; el re-apunte ajusta solo el puntero `producto_id`.
 7. **Agrupación por artículo:** los `articulo_id` se sincronizan como cualquier campo; si dos usuarios clasifican el mismo producto en artículos distintos, gana la escritura más reciente y el resto puede reasignarse desde la UI.
-8. **Estado local de sync:** la cola outbox y la marca `ultimo_sync` (por tabla) viven solo en el dispositivo; alimentan la condición del aviso de sincronización (R15).
+8. **Estado local de sync:** la cola outbox, el cursor por tabla y la marca global de última sesión exitosa viven solo en el dispositivo; la global alimenta la condición del aviso (R15).
+9. **Identidad offline:** `usuario.id` es el id local del dispositivo; la columna `auth_uid` (nullable) se completa en el primer login anónimo y el servidor resuelve `creado_por`/`cargado_por` contra ese mapeo.
 
 ### Política de sincronización al iniciar (R15)
 
@@ -114,7 +115,7 @@ cualquier conectividad.
 
 ## Seguridad y acceso
 
-- **RLS en todas las tablas:** cualquiera puede **leer** e **insertar** (ese es el fin colaborativo); **editar nombre/categoría** solo quien lo creó; **borrar** (lógico) solo quien lo creó. Precios: solo insert.
+- **RLS en todas las tablas:** cualquiera puede **leer** e **insertar** (ese es el fin colaborativo) y **corregir campos de clasificación** (`articulo_id`, `categoria`, nombre, marca: son datos colaborativos); **borrar (lógico)** solo quien lo creó. Precios: solo inserción de datos nuevos (el re-apunte por dedup lo ejecuta el servidor). **Administrador (R18):** el dueño edita todo mediante una regla RLS dedicada con su **uid fijo** (AD-015).
 - **Auth de Supabase:** cada instalación obtiene un usuario estable sin datos personales (`signInAnonymously`); la atribución de aportes en la etapa de pruebas es por **etiqueta de aportante** (R17). El login por email (enlace mágico), que convierte al usuario en cuenta real para sync multi-dispositivo, queda **diferido a Fase 3**.
 - **Mantenimiento (R18):** en pruebas vía Supabase Studio; la web de administración del dueño (cliente liviano del mismo Supabase, RLS de admin, siempre conectada) se construye cuando el panel quede corto (AD-013).
 - **Claves:** la clave anónima de Supabase va embebida en la app (está diseñada para eso; la protección real es la RLS).

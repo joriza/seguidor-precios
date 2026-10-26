@@ -107,12 +107,12 @@ aceptación verificables.
   - Por artículo se muestra el precio mínimo, promedio y máximo del precio por unidad de medida.
   - Los agregados se calculan por defecto sobre los precios de los últimos 30 días, con opción de ver todo el histórico.
   - Los agregados pueden filtrarse por comercio.
-  - Los productos sin contenido neto declarado no participan de la comparación normalizada (pero sí del historial).
+  - Los productos sin contenido neto declarado (que no sean a granel) no participan de la comparación normalizada (pero sí del historial); los bienes a granel se tratan con contenido neto = 1 ([AD-014](decisiones.md#ad-014--bienes-a-granel-contenido-neto-implícito--1)).
 
 ## R13 — Jerarquía de comparación: mismo código primero
 
 - **Requisito (verbatim):** "La comparación si el producto con el mismo código existe, es la que más vale, pero sino solo por tipo de producto."
-- **Interpretación:** la comparación más valiosa/confiable es la del **producto exacto** (mismo EAN, entre comercios); la comparación por **artículo** (tipo de producto) es la vía cuando no existe coincidencia por código o el producto no tiene código.
+- **Interpretación (confirmada por el dueño, D4):** la comparación más valiosa/confiable es la del **producto exacto** (mismo EAN, entre comercios) y es la comparación principal de la app; la comparación por **artículo** (tipo de producto) es la vía cuando no existe coincidencia por código o el producto no tiene código.
 - **Aceptación:**
   - Si el producto con ese EAN ya existe, el comparador muestra primero la comparación de ese producto entre comercios.
   - Si no hay coincidencia por código (o el producto no tiene código), la comparación es solo por artículo.

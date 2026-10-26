@@ -66,7 +66,9 @@ erDiagram
     USUARIO {
         uuid id PK "dispositivo o auth anonimo"
         text etiqueta "nombre del aportante, pedido en el primer inicio"
+        text auth_uid "nullable; del login anonimo (Fase 3)"
         timestamptz creado_en
+        timestamptz actualizado_en
     }
 ```
 
@@ -94,7 +96,7 @@ erDiagram
 | `marca` | TEXT | opcional ("Hellmann's", "Marca B") |
 | `categoria` | TEXT | opcional |
 | `unidad` | TEXT | `kg`, `g`, `L`, `mL`, `unidad`, `m` — la unidad en que se vende (R7, R12) |
-| `contenido_neto` | NUMERIC | nullable; cantidad de producto en `unidad` (ej. 500 g → `500`, unidad `g`) |
+| `contenido_neto` | NUMERIC | nullable; cantidad de producto en `unidad` (ej. 500 g → `500`, unidad `g`); granel: implícito = 1 (AD-014) |
 | `notas` | TEXT | opcional |
 | `creado_por` | UUID | FK → usuario |
 | `creado_en` / `actualizado_en` / `borrado_en` | TIMESTAMP | columnas de sync; `borrado_en` = soft delete |
@@ -119,13 +121,15 @@ erDiagram
 | `precio` | NUMERIC(12,2) | obligatorio, mayor a 0 |
 | `fecha_toma` | DATE | fecha declarada por el usuario (R8); hoy por defecto, editable |
 | `cargado_por` | UUID | FK → usuario |
-| `cargado_en` | TIMESTAMP | fecha real de carga; **nunca se actualiza ni borra** |
+| `cargado_en` | TIMESTAMP | fecha de carga; el servidor la normaliza al recibir el push y es el **cursor de pull** de la tabla; nunca se actualiza ni borra |
 
 ### usuario
 
 Representa una instalación de la app (id de dispositivo) o, a futuro, una cuenta real vinculada
 (diferida, Fase 3). En la etapa de pruebas lleva la **etiqueta del aportante**, que se pide en el
-primer inicio y viaja con cada dato cargado (R17/R18).
+primer inicio y viaja con cada dato cargado (R17/R18). La etiqueta se **sincroniza** para que el
+grupo vea quién aportó; `auth_uid` (nullable) se completa en el primer login anónimo y resuelve la
+identidad de los datos creados offline (regla de sync 9).
 
 ## Precio por unidad de medida (normalización) — R11
 
@@ -178,15 +182,17 @@ Vista `resumen_articulo` (SQL local; en Postgres, vista o materializada en Fase 
 - Calculado sobre el **último precio conocido por producto+comercio** dentro de la ventana (evita sesgo por precios repetidos).
 - Filtro opcional por comercio.
 - Los productos sin `contenido_neto` o sin `articulo_id` no participan del agregado (R12).
+- **Granel (AD-014):** los bienes vendidos por kg/L/m/unidad sin contenido neto fijo (asado, verdulería, madera) se tratan con **contenido neto = 1 implícito**: su precio por unidad es el precio tal cual.
+- **Ventana vacía:** si ningún precio del artículo entra en la ventana, el comparador muestra el estado vacío con acceso directo a "todo el histórico" (no desaparece silenciosamente).
 
 ## Reglas de integridad
 
-1. **Precios append-only:** ni el usuario ni la sync modifican ni borran precios; el historial (R8) es inmutable.
+1. **Precios append-only:** ni el usuario ni la sync modifican el **valor, el comercio ni la fecha** de un precio; el historial (R8) es inmutable. Única excepción: el re-apunte de `producto_id` durante la dedup por EAN (ajusta el puntero, no el dato).
 2. **Código de barras único:** índice único parcial sobre `producto.codigo_barras WHERE codigo_barras IS NOT NULL`. Es la base de la dedup colaborativa.
-3. **Comparabilidad normalizada (R11):** el precio por unidad solo se calcula si el producto tiene `contenido_neto` y su `unidad` puede normalizarse a la `unidad_base` de su artículo; sin eso, el producto va al historial pero no al comparador.
+3. **Comparabilidad normalizada (R11):** el precio por unidad solo se calcula si el producto tiene `contenido_neto` (o es a granel: implícito = 1, AD-014) y su `unidad` puede normalizarse a la `unidad_base` de su artículo; sin eso, el producto va al historial pero no al comparador.
 4. **Asignación de artículo (R11):** `producto.articulo_id` puede quedar NULL hasta clasificar; la asignación es manual o sugerida por categoría/nombre (coincidencia difusa en Fase 3).
 5. **Borrado lógico:** productos, artículos y comercios no se borran físicamente; se marca `borrado_en`, desaparecen de las listas y conservan su historial.
-6. **Columnas de sync:** todas las tablas sincronizadas llevan `creado_en`, `actualizado_en` y `borrado_en`.
+6. **Columnas de sync:** todas las tablas sincronizadas llevan `creado_en`, `actualizado_en` y `borrado_en`, **excepto `precio`** (append-only: solo `cargado_en`, su cursor de pull).
 
 ## Índices principales
 

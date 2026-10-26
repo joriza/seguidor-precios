@@ -72,13 +72,15 @@ marca o la presentación: aceite por litro, arroz por kilo, tornillos por unidad
 seguidor-precios/
 ├── README.md                ← este archivo
 ├── docs/
-│   ├── requisitos.md        ← qué debe hacer la app (R1–R12) con criterios de aceptación
+│   ├── requisitos.md        ← qué debe hacer la app (R1–R18) con criterios de aceptación
 │   ├── arquitectura.md      ← principio local-first, componentes, semilla y sincronización
 │   ├── modelo-de-datos.md   ← tablas, campos, normalización y agregados
 │   ├── decisiones.md        ← decisiones de diseño y su justificación (ADR)
 │   ├── hoja-de-ruta.md      ← fases, tareas y riesgos
 │   ├── desarrollo.md        ← preparación del entorno y convenciones
 │   └── uso.md               ← manual de usuario (flujos previstos)
+├── admin/                   ← (Fase 2, condicional) web de mantenimiento del dueño
+├── supabase/                ← (Fase 2) migraciones SQL del esquema
 ├── tools/                   ← (Fase 1) script generador del pack semilla
 └── app/                     ← (Fase 0) código Flutter
 ```
@@ -87,12 +89,12 @@ seguidor-precios/
 
 | Documento | Contenido |
 | --- | --- |
-| [Requisitos](docs/requisitos.md) | R1–R12: qué debe hacer la app y cómo se acepta cada requisito |
+| [Requisitos](docs/requisitos.md) | R1–R18: qué debe hacer la app y cómo se acepta cada requisito |
 | [Uso](docs/uso.md) | Manual del usuario: pantallas y flujos previstos |
 | [Arquitectura](docs/arquitectura.md) | Local-first, componentes, semilla, sincronización y seguridad |
 | [Modelo de datos](docs/modelo-de-datos.md) | Tablas, relaciones, normalización de unidades y agregados |
 | [Decisiones](docs/decisiones.md) | Por qué Flutter, Supabase, Open Food Facts, etc. (ADRs) |
-| [Hoja de ruta](docs/hoja-de-ruta.md) | Fases 0–3 con tareas, criterios de salida y riesgos |
+| [Hoja de ruta](docs/hoja-de-ruta.md) | Fases 0–4 con tareas, criterios de salida y riesgos |
 | [Desarrollo](docs/desarrollo.md) | Entorno, comandos y convenciones del proyecto |
 
 ## Licencia

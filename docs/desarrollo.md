@@ -55,8 +55,11 @@ seguidor-precios/
 │   │   │   └── historial/
 │   │   └── shared/           # widgets y utilidades comunes
 │   └── test/
-└── tools/
-    └── seed/                 # generador del pack semilla (Fase 1)
+├── tools/
+│   └── seed/                 # generador del pack semilla (Fase 1)
+├── supabase/
+│   └── migrations/           # esquema SQL versionado (Fase 2)
+└── admin/                    # web de mantenimiento del dueño (Fase 2, condicional)
 ```
 
 ## Semilla del catálogo (`tools/seed`)

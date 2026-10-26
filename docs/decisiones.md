@@ -1,7 +1,9 @@
 # Decisiones de diseño (ADR)
 
 Formato: cada decisión registra contexto, decisión y consecuencias. Las decisiones aprobadas
-explícitamente por el dueño se marcan así.
+explícitamente por el dueño se marcan así. Los ADRs sin marca fueron decisiones técnicas acordadas
+al confeccionar el plan; las decisiones pendientes están listadas en Decisiones abiertas (queda
+abierta D3, con postergación a Fase 4 aceptada por el dueño).
 
 ## AD-001 — Flutter como framework de la app ✅ aprobado
 
@@ -19,7 +21,7 @@ explícitamente por el dueño se marcan así.
 
 - **Contexto:** colaboración sin fricción (uso familiar/amistoso) versus control y moderación; con la reevaluación multi-dispositivo, el dueño eligió mantener anonimato por defecto y sumar la posibilidad de sincronizar sus propios dispositivos.
 - **Decisión:** cada instalación empieza **anónima** (auth anónimo de Supabase, `signInAnonymously`) y un id local; los aportes se atribuyen a ese usuario anónimo. **Revisión (R17):** desde ajustes se puede iniciar sesión por email con **enlace mágico** (`signInWithOtp`), lo que convierte el usuario anónimo en cuenta real **sin migrar datos**; con la misma cuenta en otro dispositivo, el historial y los aportes propios siguen a la persona.
-- **Consecuencias:** + cero fricción por defecto y sync multi-dispositivo para quien quiera. − el login opcional suma una tarea en Fase 2 y una superficie de auth a cuidar; la política de sync (R15) sigue mandando.
+- **Consecuencias:** + cero fricción por defecto y sync multi-dispositivo para quien quiera. − el login opcional (diferido a Fase 3) será una superficie de auth a cuidar; la política de sync (R15) sigue mandando.
 - **Etapa de pruebas (revisión R17/R18):** el login por enlace mágico queda **diferido**; la atribución de aportes se hace con una **etiqueta de aportante** elegida en el dispositivo (sin seguridad real, aceptado en grupo de confianza).
 
 ## AD-004 — SQLite vía `drift` como base local
@@ -56,7 +58,7 @@ explícitamente por el dueño se marcan así.
 - **Contexto:** comparar marcas y presentaciones distintas de un mismo tipo de producto exige un nivel de agrupación que el producto alone no da.
 - **Decisión:** nueva entidad `articulo` (tipo de producto genérico con `unidad_base`); cada `producto` (marca + presentación) pertenece opcionalmente a un artículo. La comparación usa el **precio por unidad de medida normalizado**; artículos sin clasificar quedan fuera del comparador, no del historial.
 - **Consecuencias:** + comparaciones justas entre presentaciones (500 g contra 1 kg) y agregados (mínimo/promedio/máximo) por artículo. − un paso extra de clasificación, aliviado con sugerencias por categoría/nombre y con los datos del pack semilla (que ya traen categoría).
-- **Jerarquía (R13):** si existe el producto con el mismo código, la comparación más valiosa es la del producto exacto entre comercios; solo si no hay coincidencia por código (o no hay código) se compara por artículo.
+- **Jerarquía (R13):** si existe el producto con el mismo código, la comparación más valiosa es la del producto exacto entre comercios; solo si no hay coincidencia por código (o no hay código) se compara por artículo. Interpretación **confirmada por el dueño** (D4): es la comparación principal de la app.
 
 ## AD-010 — Política de red al iniciar: ping anti-pausa y sync bajo confirmación ✅ aprobada
 
@@ -73,7 +75,7 @@ explícitamente por el dueño se marcan así.
 ## AD-012 — Alternativa PWA evaluada y descartada (por ahora)
 
 - **Contexto:** el dueño consultó por una PWA para usar la app desde cualquier dispositivo, incluso PC; se reevaluó el stack completo.
-- **Análisis:** es técnicamente viable — SQLite WASM sobre OPFS para el modo offline (verificado 2026: WAL soportado; Chromium reserva hasta 60% del disco; Safari ~1 GB y borra datos de pestañas tras 7 días sin uso, la PWA instalada está exenta), escaneo con BarcodeDetector API (Chrome/Edge) más ZXing.js como alternativa en Safari/Firefox, hosting gratuito en GitHub/Cloudflare Pages y actualización instantánea. iOS es el eslabón débil; y el multi-dispositivo real exige cuenta opcional (adoptada, ver AD-003).
+- **Análisis:** es técnicamente viable — SQLite WASM sobre OPFS para el modo offline (verificado 2026: WAL soportado; Chromium reserva hasta 60% del disco; Safari ~1 GB y borra datos de pestañas tras 7 días sin uso, la PWA instalada está exenta), escaneo con BarcodeDetector API (Chrome/Edge) más ZXing.js como alternativa en Safari/Firefox, hosting gratuito en GitHub/Cloudflare Pages y actualización instantánea. iOS es el eslabón débil; y el multi-dispositivo real exige cuenta opcional (adoptada en su momento, hoy diferida a Fase 3; ver AD-003).
 - **Decisión:** **mantener Flutter** Android-first; la PC queda fuera del alcance por ahora. Flutter web se descartó expresamente: `mobile_scanner` no soporta web y el bundle es pesado.
 - **Condición de revisión:** si vuelve a ser requisito usar la app desde PC, el camino recomendado es PWA con SvelteKit + SQLite WASM + BarcodeDetector/ZXing — **no** Flutter web. Este ADR conserva el análisis para no rehacerlo.
 
@@ -82,6 +84,18 @@ explícitamente por el dueño se marcan así.
 - **Contexto:** el dueño planteó separar el mantenimiento de datos (solo él, desde la PC) de la app de usuarios — preservando el escáner nativo, requisito de mayor utilidad — e identificar al aportante sin contraseñas durante las pruebas.
 - **Decisión:** (1) **Atribución:** etiqueta de aportante elegida en el primer inicio, guardada en el dispositivo y viajando con cada dato; el login por enlace mágico (cuenta multi-dispositivo, R17) queda diferido a Fase 3. (2) **Mantenimiento:** en pruebas, **Supabase Studio** (panel incluido, cero código); la **web de administración del dueño** — cliente liviano del mismo Supabase, solo dueño vía RLS de admin, siempre conectada, en `admin/` del repo — se construye cuando el panel quede corto.
 - **Consecuencias:** + el escáner nativo queda intacto; mantenimiento cómodo desde la PC sin backend nuevo; cero fricción de email. − atribución sin seguridad real (aceptado en grupo de confianza); Studio es CRUD crudo para trabajo en lote (mitigado: la web admin a medida llega cuando haga falta).
+
+## AD-014 — Bienes a granel: contenido neto implícito = 1 ✅ aprobada (D1)
+
+- **Contexto:** los bienes vendidos por kg/L/m sin contenido neto fijo (asado, verdulería, madera) no pueden declarar un `contenido_neto` fijo; sin semántica, quedaban fuera del comparador, contradiciendo R7.
+- **Decisión:** para productos a granel cuya `unidad` coincide con la de venta (kg, L, m, unidad), el contenido neto se trata como **1 implícito**: `precio_unitario = precio`. No necesitan declarar contenido neto ni quedan excluidos.
+- **Consecuencias:** + carnicería/verdulería/madera comparables por $/kg, $/L, $/m desde el día uno (R7/R11/R12). − los precios de granel dependen de que la unidad declarada sea la correcta; el pack semilla no los trae (son de carga manual/colaborativa).
+
+## AD-015 — Administrador: uid fijo del dueño ✅ aprobada (D2)
+
+- **Contexto:** la web de mantenimiento (R18) requiere una regla RLS de administrador, pero no existía mecanismo de rol.
+- **Decisión:** para la etapa de pruebas y grupo reducido, el administrador se identifica por **uid fijo del dueño** en la regla RLS (el `auth_uid` de la primera instalación del dueño). Sin tabla de roles.
+- **Consecuencias:** + una línea de SQL, cero superficie extra. − sumar administradores exigirá migrar a tabla de roles (recién evaluable en Fase 4 si hiciera falta).
 
 ## Decisiones abiertas
 
@@ -94,3 +108,8 @@ explícitamente por el dueño se marcan así.
 | Coincidencia difusa de productos sin EAN | abierta | Fase 3 |
 | Distribución pública (APK directo vs Play Store) | abierta | Fase 4 |
 | Infraestructura propia (VPS/proveedor y costos) | abierta | Fase 4 |
+| Semántica de granel: contenido neto de bienes vendidos por kg/L/m (D1) | abierta | Fase 1, antes del comparador |
+| Mecanismo de administrador: uid fijo vs tabla de roles (D2) | abierta | Fase 2, antes de la web admin |
+| Licencia de la base colaborativa derivada (mezcla ODbL + aportes) (D3) | abierta — el dueño aceptó decidirla en Fase 4 | Fase 4, antes de publicarla |
+| Confirmación de la interpretación de R13: producto por EAN como comparación primaria (D4) | ✅ confirmada por el dueño | registrada en R13 y AD-009 |
+| Disparador para construir la web admin del dueño | abierta | Fase 2, cuando Studio quede corto |
