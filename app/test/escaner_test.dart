@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/features/escaner/escaner_screen.dart';
+import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 
 void main() {
   late BaseDeDatos db;
@@ -72,5 +73,35 @@ void main() {
 
     expect(find.textContaining('No existe'), findsNothing);
     expect(find.textContaining('Producto encontrado'), findsNothing);
+  });
+
+  testWidgets('si el producto no existe, permite crearlo desde el escáner', (tester) async {
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+
+    await tester.enterText(find.byType(TextField), '7790001001999');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Crear producto'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byType(ProductoFormScreen),
+        matching: find.text('7790001001999'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Nombre del producto *'),
+      'Nuevo desde escáner',
+    );
+    await tester.tap(find.text('Guardar producto'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Nuevo desde escáner'), findsOneWidget);
   });
 }

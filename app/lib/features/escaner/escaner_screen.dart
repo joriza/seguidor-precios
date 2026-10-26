@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../productos/producto_form_screen.dart';
 
 /// S4 (R6): escáner con cámara (ML Kit, on-device) + ingreso manual del código.
 ///
@@ -61,6 +62,21 @@ class _EscanerScreenState extends State<EscanerScreen> {
     });
   }
 
+  Future<void> _crearProducto() async {
+    final guardado = await Navigator.of(context).push<Producto>(
+      MaterialPageRoute<Producto>(
+        builder: (_) => ProductoFormScreen(
+          baseDeDatos: widget.baseDeDatos,
+          codigoBarrasInicial: _controladorCodigo.text.trim(),
+        ),
+      ),
+    );
+    if (guardado != null) {
+      _controladorCodigo.text = guardado.codigoBarras ?? '';
+      _buscar();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -94,6 +110,13 @@ class _EscanerScreenState extends State<EscanerScreen> {
         if (_mensaje != null) ...<Widget>[
           const SizedBox(height: 16),
           Text(_mensaje!),
+        ],
+        if (_mensaje != null && _mensaje!.startsWith('No existe')) ...<Widget>[
+          const SizedBox(height: 12),
+          FilledButton.tonal(
+            onPressed: _crearProducto,
+            child: const Text('Crear producto'),
+          ),
         ],
       ],
     );

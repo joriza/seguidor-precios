@@ -6,6 +6,9 @@
 /// no es comparable (sin contenido neto utilizable o conversión imposible).
 library;
 
+/// Unidades de venta aceptadas en formularios (S5).
+const List<String> unidadesDeVenta = <String>['kg', 'g', 'L', 'mL', 'unidad', 'm'];
+
 const Map<String, String> _unidadBase = <String, String>{
   'g': 'kg',
   'kg': 'kg',
