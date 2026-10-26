@@ -42,7 +42,7 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
 - T11 — [S11] Agregados por artículo (ventana 30 días / histórico). ✅ commit `a788255` — 73/73 tests verdes (10 nuevos: 6 puros de agregar/inicioDeVentana, 4 widget de la sección de agregados; los 3 de T9 intactos), analyze limpio
 - T12 — [S12] Búsqueda/listado producto y artículo. ✅ commit `c766b51` — 82/82 tests verdes (9 nuevos de búsqueda + navegación actualizada 5→6 destinos), analyze limpio
 - T13 — [S13] Backup export/import JSON + CSV. ✅ commit `3408d2c` — 93/93 tests verdes (11 nuevos: 6 backup JSON, 2 CSV, 3 UI de Inicio), analyze limpio
-- T14 — [S14] Etiqueta de aportante en primer inicio. ✅ commit `feat` — 99/99 tests verdes (6 nuevos de etiqueta), analyze limpio
+- T14 — [S14] Etiqueta de aportante en primer inicio. ✅ commit `82ba774` — 99/99 tests verdes (6 nuevos de etiqueta), analyze limpio
 - T15 — [S15] Release del APK (GitHub Releases). → commit/tag
 
 ## Log
