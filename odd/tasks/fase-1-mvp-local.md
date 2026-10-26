@@ -40,7 +40,7 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
 - T9 — [S9] Comparador completo: lógica pura + `ArticuloDetalleScreen` (por artículo) + `ProductoComparacionScreen` (por EAN — la principal según R13) + botón "Comparar precios" en el escáner. ✅ commits de esta fase — 52/52 tests verdes
 - T10 — [S10] Historial con variación %. ✅ commit `5d65cbb` — 63/63 tests verdes (11 nuevos: 4 de variacionPorcentual, 4 de HistorialScreen, 3 de HistorialProductoScreen), analyze limpio
 - T11 — [S11] Agregados por artículo (ventana 30 días / histórico). ✅ commit `a788255` — 73/73 tests verdes (10 nuevos: 6 puros de agregar/inicioDeVentana, 4 widget de la sección de agregados; los 3 de T9 intactos), analyze limpio
-- T12 — [S12] Búsqueda/listado producto y artículo. ✅ commit `feat` — 82/82 tests verdes (9 nuevos de búsqueda + navegación actualizada 5→6 destinos), analyze limpio
+- T12 — [S12] Búsqueda/listado producto y artículo. ✅ commit `c766b51` — 82/82 tests verdes (9 nuevos de búsqueda + navegación actualizada 5→6 destinos), analyze limpio
 - T13 — [S13] Backup export/import JSON + CSV. → commit `feat`
 - T14 — [S14] Etiqueta de aportante en primer inicio. → commit `feat`
 - T15 — [S15] Release del APK (GitHub Releases). → commit/tag
