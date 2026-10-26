@@ -30,7 +30,7 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
 ## Tasks
 
 - T1 — [S1] Esquema local v1 (drift) + índices + normalización + tests DAO en memoria. ✅ commit `564555d` — 18/18 tests verdes (6 esquema, 11 normalización, 1 navegación), analyze limpio
-- T2 — [S2] Script `tools/seed` (CLI Dart): dump OFF/OPF → pack JSON Argentina. → commit `feat`
+- T2 — [S2] Script `tools/seed` (CLI Dart): CSV OFF/OPF → pack JSON Argentina con atribución (fuente/ODbL). ✅ commits de esta fase — 19/19 tests del paquete (EAN, cantidades, marcas, filtros, límites, metadata)
 - T3 — [S3] Servicio de import del pack en primer arranque + tests. → commit `feat`
 - T4 — [S4] Escáner (mobile_scanner) + pantalla con campo manual. → commit `feat`
 - T5 — [S5] ABM de producto con unidad/contenido/artículo sugerido. → commit `feat`
@@ -56,4 +56,5 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
   barra como TEXT (EAN-13/EAN-8/UPC-A); fechas como TEXT ISO-8601 para portabilidad SQL;
   precio en REAL redondeado a 2 decimales por la capa de datos (equivalente funcional a
   NUMERIC(12,2) en SQLite).
-- L3 — Progreso (2026-10-26): T1 completa. Esquema v1 con 5 tablas, índices, FKs con `PRAGMA foreign_keys`, CHECK `precio > 0`, EAN único con NULL permitidos, y la normalización R11/R12 + granel AD-014 como función pura testeada. Nota de entorno: sqlite3 3.x usa **native assets** (el hook compila SQLite con MSVC en el host) — la estrategia de DLL manual quedó obsoleta y se eliminó. Siguiente: T2 `tools/seed`.
+- L3 — Progreso (2026-10-26): T1 completa. Esquema v1 con 5 tablas, índices, FKs con `PRAGMA foreign_keys`, CHECK `precio > 0`, EAN único con NULL permitidos, y la normalización R11/R12 + granel AD-014 como función pura testeada. Nota de entorno: sqlite3 3.x usa **native assets** (el hook compila SQLite con MSVC en el host) — la estrategia de DLL manual quedó obsoleta y se eliminó.
+- L4 — T2 completa: `tools/seed/` como paquete Dart independiente (`seed_builder`, deps: csv + args). Reglas: solo EAN-13, filas sin nombre o sin cantidad interpretable se descartan, países no-argentina se descartan, cantidades normalizadas a g/mL/unidad (kg/L/cl convertidos), dedup por EAN, pack con metadatos fuente/ODbL. La descarga del dump queda como paso documentado del operador (README del paquete); el script transforma archivos locales .csv/.gz. 19/19 tests.
