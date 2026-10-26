@@ -1,0 +1,12 @@
+# Archivos personales del dueño: pdt-*.md son notas personales (no versionar)
+pdt-*.md
+
+# Directorio local de herramientas del agente
+.atl/
+
+# Flutter / Dart (la Fase 0 ampliará con el estándar de `flutter create`)
+.dart_tool/
+build/
+*.iml
+.idea/
+.vscode/
