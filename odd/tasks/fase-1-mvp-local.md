@@ -39,7 +39,7 @@ unidad con mínimo y promedio; el backup restaura en otra instalación."
 - T8 — [S8] Registro de precio con fecha de toma: precio validado (> 0, 2 decimales), comercio existente o creado en el momento, fecha editable sin futuras. ✅ commit `7d7eeb9` — 40/40 tests verdes (4 widget del registro)
 - T9 — [S9] Comparador completo: lógica pura + `ArticuloDetalleScreen` (por artículo) + `ProductoComparacionScreen` (por EAN — la principal según R13) + botón "Comparar precios" en el escáner. ✅ commits de esta fase — 52/52 tests verdes
 - T10 — [S10] Historial con variación %. ✅ commit `5d65cbb` — 63/63 tests verdes (11 nuevos: 4 de variacionPorcentual, 4 de HistorialScreen, 3 de HistorialProductoScreen), analyze limpio
-- T11 — [S11] Agregados por artículo (ventana 30 días / histórico). ✅ commit `feat` — 73/73 tests verdes (10 nuevos: 6 puros de agregar/inicioDeVentana, 4 widget de la sección de agregados; los 3 de T9 intactos), analyze limpio
+- T11 — [S11] Agregados por artículo (ventana 30 días / histórico). ✅ commit `a788255` — 73/73 tests verdes (10 nuevos: 6 puros de agregar/inicioDeVentana, 4 widget de la sección de agregados; los 3 de T9 intactos), analyze limpio
 - T12 — [S12] Búsqueda/listado producto y artículo. → commit `feat`
 - T13 — [S13] Backup export/import JSON + CSV. → commit `feat`
 - T14 — [S14] Etiqueta de aportante en primer inicio. → commit `feat`
