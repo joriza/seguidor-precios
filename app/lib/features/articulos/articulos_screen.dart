@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
+import 'articulo_detalle_screen.dart';
 
 /// S6 (R11): administración de artículos — alta, renombre y conteo de
 /// productos asignados. La asignación producto ↔ artículo también puede
@@ -183,6 +184,17 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
                       subtitle: Text(
                         '${a.unidadBase} · $cantidad producto(s)',
                       ),
+                      onTap: () async {
+                        await Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (_) => ArticuloDetalleScreen(
+                              baseDeDatos: widget.baseDeDatos,
+                              articulo: a,
+                            ),
+                          ),
+                        );
+                        await _cargar();
+                      },
                       trailing: IconButton(
                         icon: const Icon(Icons.edit),
                         tooltip: 'Renombrar',
