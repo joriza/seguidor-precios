@@ -47,7 +47,7 @@ class _HomeShellState extends State<HomeShell> {
   List<Widget> _pantallas() => <Widget>[
         const InicioScreen(),
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
-        const ArticulosScreen(),
+        ArticulosScreen(baseDeDatos: widget.baseDeDatos),
         const HistorialScreen(),
         const ComerciosScreen(),
       ];

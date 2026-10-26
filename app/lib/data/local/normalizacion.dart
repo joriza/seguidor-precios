@@ -9,6 +9,9 @@ library;
 /// Unidades de venta aceptadas en formularios (S5).
 const List<String> unidadesDeVenta = <String>['kg', 'g', 'L', 'mL', 'unidad', 'm'];
 
+/// Unidades base posibles para un artículo (S6).
+const List<String> unidadesBaseDeArticulo = <String>['kg', 'L', 'unidad', 'm'];
+
 const Map<String, String> _unidadBase = <String, String>{
   'g': 'kg',
   'kg': 'kg',
