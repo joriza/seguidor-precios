@@ -32,7 +32,7 @@ pantallas vacías; CI en verde."
 - T2 — [S2] `flutter create` en `app/` + reorganización feature-first + smoke test. ✅ commit `8c764ba` (baseline; estructura y smoke test en `9ca1f88`)
 - T3 — [S3] Shell de navegación + 5 pantallas placeholder. ✅ commit `9ca1f88`
 - T4 — [S4] Workflow de CI. ✅ commit `7bf929c` — CI verde en GitHub para ese sha (conclusión `success`, ~3 min: analyze + test + apk --debug)
-- T5 — [S5] `apk --debug` compilado en CI ✅; validación en dispositivo/emulador ⏳ **pendiente de hardware** (sin Android SDK local)
+- T5 — [S5] `apk --debug` compilado en CI ✅ y **validado por el dueño en su teléfono** (descarga por Telegram, modo avión, sin errores, navegación entre las 5 secciones correcta). ✅ **CERRADA**
 
 ## Log
 
@@ -43,3 +43,4 @@ pantallas vacías; CI en verde."
   `--org com.seguidorprecios --project-name seguidor_precios` en `app/`; Material 3;
   NavigationBar inferior; CI con `subosito/flutter-action`.
 - L3 — Resultados (2026-10-26): Flutter 3.47.8 stable instalado en `D:/Desarrollo/flutter` (sin Android SDK local; `flutter doctor` marca solo Android toolchain ausente). `flutter analyze` sin issues; `flutter test` 1/1 verde (navegación entre las 5 secciones en el shell). CI de GitHub en verde (analyze + test + apk --debug). **Criterio de salida: parcial** — navegable verificado por pruebas de widget; la corrida en dispositivo/emulador queda pendiente de hardware (T5).
+- L4 — **Fase 0 CERRADA y aprobada**: el dueño instaló el APK (artifact de CI, descargado vía Telegram) y validó en su teléfono: modo avión, sin errores, barra inferior funcional cambiando el título por sección. Criterio de salida cumplido en su totalidad.
