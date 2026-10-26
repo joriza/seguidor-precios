@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - uses: subosito/flutter-action@v2
         with:
@@ -31,3 +31,10 @@ jobs:
       - name: Build APK (debug) — evidencia mínima del target Android (S5)
         run: flutter build apk --debug
         working-directory: app
+
+      - name: Upload APK (debug) para pruebas en teléfono (S5/T5)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: seguidor-precios-debug
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
