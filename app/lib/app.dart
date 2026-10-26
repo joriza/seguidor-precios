@@ -49,7 +49,7 @@ class _HomeShellState extends State<HomeShell> {
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
         ArticulosScreen(baseDeDatos: widget.baseDeDatos),
         const HistorialScreen(),
-        const ComerciosScreen(),
+        ComerciosScreen(baseDeDatos: widget.baseDeDatos),
       ];
 
   @override
