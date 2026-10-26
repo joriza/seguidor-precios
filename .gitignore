@@ -4,9 +4,12 @@ pdt-*.md
 # Directorio local de herramientas del agente
 .atl/
 
-# Flutter / Dart (la Fase 0 ampliará con el estándar de `flutter create`)
+# Flutter / Dart — estándar (complementa app/.gitignore que genera flutter create)
 .dart_tool/
 build/
+.flutter-plugins
+.flutter-plugins-dependencies
 *.iml
 .idea/
 .vscode/
+*.log
