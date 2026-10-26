@@ -3,8 +3,9 @@
 Fuente: pedido original del dueño del proyecto. R1–R9 provienen del pedido inicial; R10–R12 se
 agregaron en la revisión del plan (catálogo inicial y comparación por artículo), R13–R15 en la
 siguiente (jerarquía de comparación y política de conexión), R16 al proyectar la escala pública y
-R17 al definir la identidad multi-dispositivo. Los requisitos se transcriben textualmente; cada
-uno incluye su interpretación y criterios de aceptación verificables.
+R17–R18 al definir la etapa de pruebas (identidad del aportante y mantenimiento de datos). Los
+requisitos se transcriben textualmente; cada uno incluye su interpretación y criterios de
+aceptación verificables.
 
 ## R1 — Control personal de precios
 
@@ -146,12 +147,22 @@ uno incluye su interpretación y criterios de aceptación verificables.
   - El camino de migración está planificado como [Fase 4](hoja-de-ruta.md#fase-4--público-e-infraestructura-propia-condicional-r16), **condicional** a la adopción real.
   - En la etapa de grupo reducido el costo sigue siendo $0 (R5).
 
-## R17 — Cuenta opcional para multi-dispositivo
+## R17 — Identificación del aportante (revisada en la etapa de pruebas)
 
-- **Requisito (verbatim):** "Anónimo + cuenta opcional: cada instalación empieza anónima; login opcional por email (enlace mágico) para que tus datos te sigan entre PC y teléfono."
+- **Requisito original (verbatim):** "Anónimo + cuenta opcional: cada instalación empieza anónima; login opcional por email (enlace mágico) para que tus datos te sigan entre PC y teléfono."
+- **Revisión (etapa de pruebas):** la identificación del aportante se hace con una **etiqueta elegida en el dispositivo**; el login por enlace mágico y la cuenta multi-dispositivo quedan **diferidos** hasta que se necesiten ([Fase 3](hoja-de-ruta.md#fase-3--valor-agregado-post-mvp)).
+- **Aceptación (etiqueta):**
+  - En el primer inicio la app pide un nombre o apodo y lo guarda en el dispositivo.
+  - Cada precio y producto cargado queda atribuido a esa etiqueta (visible para el grupo).
+  - No requiere email, registro ni conexión; se puede cambiar desde ajustes.
+- **Diferido (cuenta con enlace mágico):** al implementarse, convertirá el usuario anónimo en cuenta real sin migrar datos, y permitirá que los datos sigan a la persona entre dispositivos.
+
+## R18 — Mantenimiento de datos por el dueño
+
+- **Requisito (verbatim):** "Seguir con flutter como está acordado y realizar una aplicación web para el mantenimiento de los datos que solo lo realizará el dueño de la aplicación."
+- **Interpretación:** dos clientes sobre el mismo backend: la app Flutter (usuarios, escáner) y el mantenimiento (solo dueño, desde la PC).
 - **Aceptación:**
-  - Por defecto la app funciona 100% anónima, sin registro (AD-003).
-  - Desde ajustes puedo iniciar sesión con mi email mediante un enlace mágico, sin contraseña.
-  - Al iniciar sesión, los aportes hechos en ese dispositivo (usuario anónimo) quedan vinculados a la cuenta.
-  - En otro dispositivo, al iniciar sesión con la misma cuenta, recupero mis datos propios.
-  - Cerrar sesión vuelve al modo anónimo sin perder datos.
+  - En la etapa de pruebas el mantenimiento se hace con **Supabase Studio** (panel incluido, sin desarrollo).
+  - La **web de administración del dueño** se construye solo cuando el panel quede corto (asignar artículos en lote, corregir duplicados con comodidad).
+  - Acceso exclusivo del dueño vía login + regla RLS de administrador; siempre conectada, sin modo offline.
+  - No agrega backend: es un cliente más del mismo Supabase (hereda R16).

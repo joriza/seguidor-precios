@@ -73,12 +73,14 @@ entre tomas consecutivas.
 - Además, al iniciar la app manda en silencio una **consulta mínima** al backend para mantener
   activa la base gratuita; no sincroniza datos ni consume tu plan.
 
-## Mi cuenta (opcional)
+## Tu nombre de aportante
 
-Por defecto usás la app anónimamente. Si querés que tus datos te sigan entre dispositivos (por
-ejemplo, cambiaste de teléfono), en **Ajustes → Mi cuenta** iniciás sesión solo con tu email: te
-llega un **enlace mágico**, sin contraseña. Tus aportes anteriores quedan vinculados a tu cuenta y,
-en el otro dispositivo, al iniciar sesión con la misma cuenta, los recuperás.
+La primera vez que abrís la app te pide un **nombre o apodo**: es la etiqueta con la que se
+identifica cada precio que cargás, para que el grupo sepa quién aportó qué. No necesita email ni
+registro, y lo podés cambiar desde ajustes.
+
+> La cuenta con email (para que tus datos te sigan entre dispositivos) llegará en una etapa
+> posterior.
 
 ## Copia de seguridad
 
@@ -86,8 +88,8 @@ Exportá todos tus datos a JSON/CSV y restauralos en otro teléfono.
 
 ## Preguntas frecuentes
 
-- **¿Tengo que registrarme?** No. La cuenta es opcional: solo sirve si querés que tus datos te sigan
-  entre dispositivos.
+- **¿Tengo que registrarme?** No: solo te pide un nombre o apodo para identificar tus aportes ante
+  el grupo. La cuenta con email llegará más adelante, como opción.
 - **¿Necesito internet?** No, salvo para sincronizar o precargar un producto desconocido; y la
   propuesta de sincronizar solo aparece con WiFi y cuando hay novedades (o pasaron más de 7 días).
 - **¿De dónde salen los productos que ya están cargados?** De bases de datos abiertas (Open Food

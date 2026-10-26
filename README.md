@@ -18,7 +18,7 @@ Aplicación Android para llevar el control personal de precios de productos de c
 - 🕘 **Historial de precios** con fecha de toma del dato y variación porcentual entre tomas.
 - 🏪 **Comercios** con alta en el momento, sin salir de la pantalla de registro de precio.
 - ☁️ **Colaboración bajo tu control** — sincronización con un repositorio central (Supabase): aviso solo por WiFi y cuando hay novedades, siempre preguntando antes; un ping mínimo mantiene activa la base gratuita (R14, R15).
-- 👤 **Cuenta opcional** — empezás anónimo; si querés, iniciás sesión con tu email (enlace mágico, sin contraseña) y tus datos te siguen entre dispositivos (R17).
+- 👤 **Aportantes identificados** — cada uno elige su nombre o apodo la primera vez y cada precio queda atribuido, sin registro ni email (R17/R18).
 - 💸 **Recursos gratuitos y perdurables** — sin costos recurrentes y con datos siempre exportables.
 
 ## Stack

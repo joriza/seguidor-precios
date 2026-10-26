@@ -20,6 +20,7 @@ explícitamente por el dueño se marcan así.
 - **Contexto:** colaboración sin fricción (uso familiar/amistoso) versus control y moderación; con la reevaluación multi-dispositivo, el dueño eligió mantener anonimato por defecto y sumar la posibilidad de sincronizar sus propios dispositivos.
 - **Decisión:** cada instalación empieza **anónima** (auth anónimo de Supabase, `signInAnonymously`) y un id local; los aportes se atribuyen a ese usuario anónimo. **Revisión (R17):** desde ajustes se puede iniciar sesión por email con **enlace mágico** (`signInWithOtp`), lo que convierte el usuario anónimo en cuenta real **sin migrar datos**; con la misma cuenta en otro dispositivo, el historial y los aportes propios siguen a la persona.
 - **Consecuencias:** + cero fricción por defecto y sync multi-dispositivo para quien quiera. − el login opcional suma una tarea en Fase 2 y una superficie de auth a cuidar; la política de sync (R15) sigue mandando.
+- **Etapa de pruebas (revisión R17/R18):** el login por enlace mágico queda **diferido**; la atribución de aportes se hace con una **etiqueta de aportante** elegida en el dispositivo (sin seguridad real, aceptado en grupo de confianza).
 
 ## AD-004 — SQLite vía `drift` como base local
 
@@ -75,6 +76,12 @@ explícitamente por el dueño se marcan así.
 - **Análisis:** es técnicamente viable — SQLite WASM sobre OPFS para el modo offline (verificado 2026: WAL soportado; Chromium reserva hasta 60% del disco; Safari ~1 GB y borra datos de pestañas tras 7 días sin uso, la PWA instalada está exenta), escaneo con BarcodeDetector API (Chrome/Edge) más ZXing.js como alternativa en Safari/Firefox, hosting gratuito en GitHub/Cloudflare Pages y actualización instantánea. iOS es el eslabón débil; y el multi-dispositivo real exige cuenta opcional (adoptada, ver AD-003).
 - **Decisión:** **mantener Flutter** Android-first; la PC queda fuera del alcance por ahora. Flutter web se descartó expresamente: `mobile_scanner` no soporta web y el bundle es pesado.
 - **Condición de revisión:** si vuelve a ser requisito usar la app desde PC, el camino recomendado es PWA con SvelteKit + SQLite WASM + BarcodeDetector/ZXing — **no** Flutter web. Este ADR conserva el análisis para no rehacerlo.
+
+## AD-013 — Etapa de pruebas: atribución por etiqueta y mantenimiento vía Studio
+
+- **Contexto:** el dueño planteó separar el mantenimiento de datos (solo él, desde la PC) de la app de usuarios — preservando el escáner nativo, requisito de mayor utilidad — e identificar al aportante sin contraseñas durante las pruebas.
+- **Decisión:** (1) **Atribución:** etiqueta de aportante elegida en el primer inicio, guardada en el dispositivo y viajando con cada dato; el login por enlace mágico (cuenta multi-dispositivo, R17) queda diferido a Fase 3. (2) **Mantenimiento:** en pruebas, **Supabase Studio** (panel incluido, cero código); la **web de administración del dueño** — cliente liviano del mismo Supabase, solo dueño vía RLS de admin, siempre conectada, en `admin/` del repo — se construye cuando el panel quede corto.
+- **Consecuencias:** + el escáner nativo queda intacto; mantenimiento cómodo desde la PC sin backend nuevo; cero fricción de email. − atribución sin seguridad real (aceptado en grupo de confianza); Studio es CRUD crudo para trabajo en lote (mitigado: la web admin a medida llega cuando haga falta).
 
 ## Decisiones abiertas
 

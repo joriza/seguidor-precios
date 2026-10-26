@@ -65,7 +65,7 @@ erDiagram
     }
     USUARIO {
         uuid id PK "dispositivo o auth anonimo"
-        text etiqueta "nombre opcional del dispositivo"
+        text etiqueta "nombre del aportante, pedido en el primer inicio"
         timestamptz creado_en
     }
 ```
@@ -123,7 +123,9 @@ erDiagram
 
 ### usuario
 
-Representa una instalación de la app (id de dispositivo) o, a futuro, una cuenta real vinculada.
+Representa una instalación de la app (id de dispositivo) o, a futuro, una cuenta real vinculada
+(diferida, Fase 3). En la etapa de pruebas lleva la **etiqueta del aportante**, que se pide en el
+primer inicio y viaja con cada dato cargado (R17/R18).
 
 ## Precio por unidad de medida (normalización) — R11
 
