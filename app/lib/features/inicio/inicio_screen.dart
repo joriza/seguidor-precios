@@ -4,13 +4,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/backup.dart';
+import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
 
-/// Inicio (S13): acceso a datos y backup — export JSON/CSV e importación.
-class InicioScreen extends StatelessWidget {
+/// Inicio (S13/S14): acceso a datos, backup y etiqueta de aportante.
+class InicioScreen extends StatefulWidget {
   const InicioScreen({super.key, required this.baseDeDatos});
 
   final BaseDeDatos baseDeDatos;
+
+  @override
+  State<InicioScreen> createState() => _InicioScreenState();
+}
+
+class _InicioScreenState extends State<InicioScreen> {
+  Usuario? _usuario;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarUsuario();
+  }
+
+  Future<void> _cargarUsuario() async {
+    // Solo lectura: la creación del usuario es del primer inicio (shell).
+    final Usuario? u = await leerUsuario(widget.baseDeDatos);
+    if (!mounted) return;
+    setState(() => _usuario = u);
+  }
+
+  Future<void> _cambiarEtiqueta(BuildContext context) async {
+    final TextEditingController controlador =
+        TextEditingController(text: _usuario?.etiqueta);
+    final String? nueva = await showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Etiqueta de aportante'),
+        content: TextField(
+          key: const ValueKey('campo-cambiar-etiqueta'),
+          controller: controlador,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Nombre o apodo',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(controlador.text.trim()),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+    if (nueva == null || nueva.isEmpty) return;
+    await cambiarEtiqueta(widget.baseDeDatos, nueva);
+    await _cargarUsuario();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Etiqueta actualizada a «$nueva»')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +101,15 @@ class InicioScreen extends StatelessWidget {
                   'importalo en otra instalación.',
                 ),
                 const SizedBox(height: 12),
+                ListTile(
+                  key: const ValueKey('btn-etiqueta'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.badge_outlined),
+                  title: const Text('Etiqueta de aportante'),
+                  subtitle: Text(_usuario?.etiqueta ?? 'Aún sin etiqueta'),
+                  trailing: const Icon(Icons.edit_outlined),
+                  onTap: () => _cambiarEtiqueta(context),
+                ),
                 FilledButton.icon(
                   key: const ValueKey('btn-exportar-json'),
                   icon: const Icon(Icons.download),
@@ -72,13 +140,13 @@ class InicioScreen extends StatelessWidget {
 
   Future<void> _exportarJson(BuildContext context) async {
     final String json =
-        JsonEncoder.withIndent('  ').convert(await exportarBackup(baseDeDatos));
+        JsonEncoder.withIndent('  ').convert(await exportarBackup(widget.baseDeDatos));
     if (!context.mounted) return;
     _mostrarTexto(context, 'Backup JSON', json);
   }
 
   Future<void> _exportarCsv(BuildContext context) async {
-    final String csv = await exportarPreciosCsv(baseDeDatos);
+    final String csv = await exportarPreciosCsv(widget.baseDeDatos);
     if (!context.mounted) return;
     _mostrarTexto(context, 'Precios CSV', csv);
   }
@@ -156,7 +224,7 @@ class InicioScreen extends StatelessWidget {
 
     try {
       final ResumenImportacion resumen =
-          await importarBackup(baseDeDatos, controlador.text);
+          await importarBackup(widget.baseDeDatos, controlador.text);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

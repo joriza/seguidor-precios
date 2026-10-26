@@ -10,6 +10,12 @@ void main() {
     addTearDown(db.close);
 
     await tester.pumpWidget(SeguidorPreciosApp(baseDeDatos: db));
+    await tester.pumpAndSettle();
+
+    // Primer inicio: pide la etiqueta de aportante (S14).
+    await tester.enterText(find.byKey(const ValueKey('campo-etiqueta')), 'Vale');
+    await tester.tap(find.byKey(const ValueKey('btn-guardar-etiqueta')));
+    await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationDestination), findsNWidgets(6));

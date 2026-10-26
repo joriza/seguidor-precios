@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
 
 const List<String> tiposComercio = <String>[
@@ -79,6 +80,7 @@ Future<Comercio?> mostrarAltaComercio(
               if (!formKey.currentState!.validate()) return;
               final ahora = DateTime.now().toUtc().toIso8601String();
               final direccion = direccionController.text.trim();
+              final usuario = await usuarioActual(db);
               final Comercio comercio =
                   await db.into(db.comercios).insertReturning(
                         ComerciosCompanion.insert(
@@ -87,7 +89,7 @@ Future<Comercio?> mostrarAltaComercio(
                           tipo: Value(tipo),
                           direccion:
                               Value(direccion.isEmpty ? null : direccion),
-                          creadoPor: 'local',
+                          creadoPor: usuario.id,
                           creadoEn: ahora,
                           actualizadoEn: ahora,
                         ),

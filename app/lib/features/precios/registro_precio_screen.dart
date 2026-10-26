@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
 import '../comercios/alta_comercio_dialog.dart';
 
@@ -97,6 +98,7 @@ class _RegistroPrecioScreenState extends State<RegistroPrecioScreen> {
     final id = const Uuid().v4();
 
     try {
+      final usuario = await usuarioActual(widget.baseDeDatos);
       await widget.baseDeDatos.into(widget.baseDeDatos.precios).insert(
             PreciosCompanion.insert(
               id: id,
@@ -104,7 +106,7 @@ class _RegistroPrecioScreenState extends State<RegistroPrecioScreen> {
               comercioId: _comercioId!,
               precio: precio,
               fechaToma: _fechaController.text,
-              cargadoPor: 'local',
+              cargadoPor: usuario.id,
               cargadoEn: DateTime.now().toUtc().toIso8601String(),
             ),
           );

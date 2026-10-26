@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
 
@@ -118,6 +119,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
             .getSingle();
       } else {
         final id = const Uuid().v4();
+        final usuario = await usuarioActual(widget.baseDeDatos);
         await widget.baseDeDatos.into(widget.baseDeDatos.productos).insert(
               ProductosCompanion.insert(
                 id: id,
@@ -128,7 +130,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                 marca: Value(marca.isEmpty ? null : marca),
                 categoria: Value(categoria.isEmpty ? null : categoria),
                 articuloId: Value(_articuloId),
-                creadoPor: 'local',
+                creadoPor: usuario.id,
                 creadoEn: ahora,
                 actualizadoEn: ahora,
               ),

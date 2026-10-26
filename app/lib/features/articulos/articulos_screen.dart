@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
 import 'articulo_detalle_screen.dart';
@@ -122,12 +123,13 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
     final nombre = nombreController.text.trim();
 
     if (existente == null) {
+      final usuario = await usuarioActual(widget.baseDeDatos);
       await widget.baseDeDatos.into(widget.baseDeDatos.articulos).insert(
             ArticulosCompanion.insert(
               id: const Uuid().v4(),
               nombre: nombre,
               unidadBase: unidadBase,
-              creadoPor: 'local',
+              creadoPor: usuario.id,
               creadoEn: ahora,
               actualizadoEn: ahora,
             ),

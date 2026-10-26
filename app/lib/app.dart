@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'data/local/base_de_datos.dart';
+import 'data/identidad.dart';
 import 'features/articulos/articulos_screen.dart';
 import 'features/busqueda/busqueda_screen.dart';
 import 'features/comercios/comercios_screen.dart';
@@ -37,6 +38,61 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _pedirEtiquetaSiFalta());
+  }
+
+  /// S14 (R17): en el primer inicio pide el nombre o apodo del aportante y
+  /// lo guarda en el dispositivo. Sin email ni conexión.
+  Future<void> _pedirEtiquetaSiFalta() async {
+    if (await hayUsuario(widget.baseDeDatos)) return;
+    if (!mounted) return;
+
+    final TextEditingController controlador = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Bienvenida/o'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Text(
+              '¿Cómo te llamamos? Tu etiqueta de aportante queda guardada '
+              'en el dispositivo y viaja con cada precio que cargás.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              key: const ValueKey('campo-etiqueta'),
+              controller: controlador,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Nombre o apodo',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          FilledButton(
+            key: const ValueKey('btn-guardar-etiqueta'),
+            onPressed: () async {
+              final String etiqueta = controlador.text.trim();
+              await crearUsuarioConEtiqueta(
+                widget.baseDeDatos,
+                etiqueta.isEmpty ? 'Anónimo' : etiqueta,
+              );
+              if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
 
   static const List<String> _titles = <String>[
     'Inicio',
