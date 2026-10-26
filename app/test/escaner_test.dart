@@ -76,6 +76,12 @@ void main() {
   });
 
   testWidgets('si el producto no existe, permite crearlo desde el escáner', (tester) async {
+    // El formulario es más alto que el surface: ampliamos para que el
+    // botón Guardar sea alcanzable (evita taps fuera de los límites).
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(envolver(
       EscanerScreen(baseDeDatos: db, mostrarCamara: false),
     ));
@@ -102,6 +108,11 @@ void main() {
     await tester.tap(find.text('Guardar producto'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Nuevo desde escáner'), findsOneWidget);
+    // El formulario se cerró (guardó) y el escáner re-buscó: ahora encuentra.
+    expect(find.byType(ProductoFormScreen), findsNothing);
+    expect(
+      find.textContaining('Producto encontrado: Nuevo desde escáner'),
+      findsOneWidget,
+    );
   });
 }
