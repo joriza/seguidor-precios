@@ -15,11 +15,11 @@ explícitamente por el dueño se marcan así.
 - **Decisión:** Supabase, plan gratuito (Postgres + Auth + RLS).
 - **Consecuencias:** datos en Postgres estándar, exportables y migrables; API y reglas de acceso incluidas. Contra: **el plan gratuito pausa el proyecto tras ~7 días sin actividad**; mitigación con ping al iniciar (R14) o reactivación manual sin costo. La app local nunca depende del backend (R3). Camino propio (R16): si el proyecto escala a público, Supabase self-hosted o Postgres + PostgREST corren en infraestructura propia sin reescribir la app (ver AD-011).
 
-## AD-003 — Identidad anónima + ID de dispositivo ✅ aprobado
+## AD-003 — Identidad anónima + ID de dispositivo ✅ aprobado (revisado: + cuenta opcional)
 
-- **Contexto:** colaboración sin fricción (uso familiar/amistoso) versus control y moderación.
-- **Decisión:** sin registro. Cada instalación usa el **auth anónimo de Supabase** (`signInAnonymously`) y un id local; los aportes se atribuyen a ese usuario anónimo.
-- **Consecuencias:** cero fricción para cargar precios. Contra: sin sincronización multi-dispositivo del mismo usuario (futuro: login opcional que convierte el usuario anónimo en cuenta real, sin migrar datos) y moderación limitada.
+- **Contexto:** colaboración sin fricción (uso familiar/amistoso) versus control y moderación; con la reevaluación multi-dispositivo, el dueño eligió mantener anonimato por defecto y sumar la posibilidad de sincronizar sus propios dispositivos.
+- **Decisión:** cada instalación empieza **anónima** (auth anónimo de Supabase, `signInAnonymously`) y un id local; los aportes se atribuyen a ese usuario anónimo. **Revisión (R17):** desde ajustes se puede iniciar sesión por email con **enlace mágico** (`signInWithOtp`), lo que convierte el usuario anónimo en cuenta real **sin migrar datos**; con la misma cuenta en otro dispositivo, el historial y los aportes propios siguen a la persona.
+- **Consecuencias:** + cero fricción por defecto y sync multi-dispositivo para quien quiera. − el login opcional suma una tarea en Fase 2 y una superficie de auth a cuidar; la política de sync (R15) sigue mandando.
 
 ## AD-004 — SQLite vía `drift` como base local
 
@@ -68,6 +68,13 @@ explícitamente por el dueño se marcan así.
 - **Contexto (R16):** la app nace para un grupo reducido, pero si tiene aceptación se liberaría al público; el dueño exige contemplar alojamiento en infraestructura propia con base de datos propia.
 - **Decisión:** todo el backend es open source y self-hosteable: Supabase completo (Docker Compose propio) o Postgres + PostgREST en un VPS. La app configura URL + clave del backend en un único punto, sin tocar su lógica; las migraciones SQL del repo son el esquema canónico y `pg_dump`/`restore` es la vía de migración de datos.
 - **Consecuencias:** + cero reescritura al migrar, datos siempre exportables (R5), costo $0 en la etapa de grupo reducido. − la operación propia (backups, monitoreo, seguridad del servidor) queda a cargo del dueño cuando llegue esa etapa; se planifica condicionalmente en la Fase 4.
+
+## AD-012 — Alternativa PWA evaluada y descartada (por ahora)
+
+- **Contexto:** el dueño consultó por una PWA para usar la app desde cualquier dispositivo, incluso PC; se reevaluó el stack completo.
+- **Análisis:** es técnicamente viable — SQLite WASM sobre OPFS para el modo offline (verificado 2026: WAL soportado; Chromium reserva hasta 60% del disco; Safari ~1 GB y borra datos de pestañas tras 7 días sin uso, la PWA instalada está exenta), escaneo con BarcodeDetector API (Chrome/Edge) más ZXing.js como alternativa en Safari/Firefox, hosting gratuito en GitHub/Cloudflare Pages y actualización instantánea. iOS es el eslabón débil; y el multi-dispositivo real exige cuenta opcional (adoptada, ver AD-003).
+- **Decisión:** **mantener Flutter** Android-first; la PC queda fuera del alcance por ahora. Flutter web se descartó expresamente: `mobile_scanner` no soporta web y el bundle es pesado.
+- **Condición de revisión:** si vuelve a ser requisito usar la app desde PC, el camino recomendado es PWA con SvelteKit + SQLite WASM + BarcodeDetector/ZXing — **no** Flutter web. Este ADR conserva el análisis para no rehacerlo.
 
 ## Decisiones abiertas
 

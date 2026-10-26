@@ -25,7 +25,7 @@ flowchart TD
     subgraph Nube["Supabase (plan gratuito)"]
         PG[("Postgres")]
         RLS["Reglas de acceso (RLS)"]
-        AUTH["Auth anónimo (signInAnonymously)"]
+        AUTH["Auth: anónimo + login opcional<br/>(signInAnonymously / magic link)"]
     end
 
     UI --> REPO
@@ -47,7 +47,7 @@ flowchart TD
 | Escáner | ML Kit on-device | Funciona offline, sin costo, sin servidores ([AD-005](decisiones.md#ad-005--escáner-ml-kit-on-device)) |
 | Semilla de catálogo | Open Food Facts / Open Products Facts (ODbL) | Catálogo argentino con EAN-13, gratuito y durable ([AD-008](decisiones.md#ad-008--catálogo-semilla-desde-open-food-facts--open-products-facts)) |
 | Backend | Supabase (Postgres) | Colaboración con datos exportables y reglas de acceso ([AD-002](decisiones.md#ad-002--supabase-como-backend-colaborativo)) |
-| Identidad | Auth anónimo + ID de dispositivo | Cero fricción, sin registro ([AD-003](decisiones.md#ad-003--identidad-anónima--id-de-dispositivo)) |
+| Identidad | Anónimo por defecto + cuenta opcional (email mágico) | Cero fricción, y sync multi-dispositivo para quien quiera ([AD-003](decisiones.md#ad-003--identidad-anónima--id-de-dispositivo)) |
 
 ## Datos semilla y enriquecimiento (R10)
 
@@ -114,7 +114,7 @@ cualquier conectividad.
 ## Seguridad y acceso
 
 - **RLS en todas las tablas:** cualquiera puede **leer** e **insertar** (ese es el fin colaborativo); **editar nombre/categoría** solo quien lo creó; **borrar** (lógico) solo quien lo creó. Precios: solo insert.
-- **Auth anónimo de Supabase:** cada instalación obtiene un usuario estable sin datos personales (`signInAnonymously`); a futuro puede convertirse en cuenta real sin migrar datos.
+- **Auth de Supabase:** cada instalación obtiene un usuario estable sin datos personales (`signInAnonymously`); con el **login opcional por email (enlace mágico)** ese usuario se convierte en cuenta real sin migrar datos, y habilita la sincronización multi-dispositivo del mismo usuario (AD-003, R17).
 - **Claves:** la clave anónima de Supabase va embebida en la app (está diseñada para eso; la protección real es la RLS).
 
 ## Durabilidad del backend gratuito (R14)

@@ -76,3 +76,5 @@ seguidor-precios/
 - En desarrollo puede correrse Supabase local con su CLI.
 - La URL y la clave del backend viven en un único punto de configuración (entorno/flavor): apuntar a
   otra infraestructura es cambio de configuración, no de código (R16, AD-011).
+- Auth: anónimo (`signInAnonymously`) + login opcional con enlace mágico (`signInWithOtp`) — ambos
+  incluidos en el free tier (R17, AD-003).

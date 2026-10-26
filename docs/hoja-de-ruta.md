@@ -37,7 +37,7 @@
 en un comercio nuevo → abrir el comparador del artículo y ver el precio por unidad con mínimo y
 promedio; el backup restaura en otra instalación.
 
-## Fase 2 — Colaborativo (R4, R5, R10, R14, R15)
+## Fase 2 — Colaborativo (R4, R5, R10, R14, R15, R17)
 
 *Prevista: ~2-3 semanas. Estado: pendiente.*
 
@@ -51,11 +51,13 @@ promedio; el backup restaura en otra instalación.
 | 2.6 | Carga inicial del catálogo semilla en Supabase (por lotes) | R10 |
 | 2.7 | Enriquecimiento: EAN desconocido con red → precarga desde la API abierta, confirmada por el usuario | R10 |
 | 2.8 | Aviso de sync al iniciar: solo WiFi + (cambios locales pendientes o >7 días), con confirmación del usuario | R15, AD-010 |
+| 2.9 | Login opcional: enlace mágico por email que vincula el usuario anónimo a una cuenta | R17, AD-003 |
 
 **Criterio de salida:** dos instalaciones se ven los datos mutuamente; el mismo EAN de dos usuarios
 converge en un solo producto; sin conexión todo sigue funcionando; un EAN desconocido se precarga
 desde la fuente abierta. El aviso de sync respeta las condiciones de R15 y la app nunca
-sincroniza sin confirmación.
+sincroniza sin confirmación. Con la misma cuenta en dos instalaciones, un usuario recupera sus
+datos propios (R17).
 
 ## Fase 3 — Valor agregado (post-MVP)
 

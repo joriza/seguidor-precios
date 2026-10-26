@@ -2,9 +2,9 @@
 
 Fuente: pedido original del dueño del proyecto. R1–R9 provienen del pedido inicial; R10–R12 se
 agregaron en la revisión del plan (catálogo inicial y comparación por artículo), R13–R15 en la
-siguiente (jerarquía de comparación y política de conexión) y R16 al proyectar la escala pública.
-Los requisitos se transcriben textualmente; cada uno incluye su interpretación y criterios de
-aceptación verificables.
+siguiente (jerarquía de comparación y política de conexión), R16 al proyectar la escala pública y
+R17 al definir la identidad multi-dispositivo. Los requisitos se transcriben textualmente; cada
+uno incluye su interpretación y criterios de aceptación verificables.
 
 ## R1 — Control personal de precios
 
@@ -145,3 +145,13 @@ aceptación verificables.
   - Existe un procedimiento documentado de export/import de la base completa (cloud → propia).
   - El camino de migración está planificado como [Fase 4](hoja-de-ruta.md#fase-4--público-e-infraestructura-propia-condicional-r16), **condicional** a la adopción real.
   - En la etapa de grupo reducido el costo sigue siendo $0 (R5).
+
+## R17 — Cuenta opcional para multi-dispositivo
+
+- **Requisito (verbatim):** "Anónimo + cuenta opcional: cada instalación empieza anónima; login opcional por email (enlace mágico) para que tus datos te sigan entre PC y teléfono."
+- **Aceptación:**
+  - Por defecto la app funciona 100% anónima, sin registro (AD-003).
+  - Desde ajustes puedo iniciar sesión con mi email mediante un enlace mágico, sin contraseña.
+  - Al iniciar sesión, los aportes hechos en ese dispositivo (usuario anónimo) quedan vinculados a la cuenta.
+  - En otro dispositivo, al iniciar sesión con la misma cuenta, recupero mis datos propios.
+  - Cerrar sesión vuelve al modo anónimo sin perder datos.
