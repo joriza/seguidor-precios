@@ -48,7 +48,7 @@ class _HomeShellState extends State<HomeShell> {
         const InicioScreen(),
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
         ArticulosScreen(baseDeDatos: widget.baseDeDatos),
-        const HistorialScreen(),
+        HistorialScreen(baseDeDatos: widget.baseDeDatos),
         ComerciosScreen(baseDeDatos: widget.baseDeDatos),
       ];
 

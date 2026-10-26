@@ -49,3 +49,10 @@ double? precioPorUnidad({
   if (neto == null || neto <= 0) return null;
   return precio / (neto * factor);
 }
+
+/// Variación porcentual entre dos tomas consecutivas (R8).
+/// Null si el precio anterior no es utilizable (<= 0).
+double? variacionPorcentual(double anterior, double nuevo) {
+  if (anterior <= 0) return null;
+  return ((nuevo - anterior) / anterior) * 100;
+}

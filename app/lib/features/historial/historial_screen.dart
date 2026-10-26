@@ -1,20 +1,85 @@
 import 'package:flutter/material.dart';
 
-/// Pantalla placeholder del historial de precios (se implementa en Fase 1).
-class HistorialScreen extends StatelessWidget {
-  const HistorialScreen({super.key});
+import '../../data/local/base_de_datos.dart';
+import 'historial_producto_screen.dart';
+
+/// S10 (R8): historial — productos con precios registrados.
+class HistorialScreen extends StatefulWidget {
+  const HistorialScreen({super.key, required this.baseDeDatos});
+
+  final BaseDeDatos baseDeDatos;
+
+  @override
+  State<HistorialScreen> createState() => _HistorialScreenState();
+}
+
+class _HistorialScreenState extends State<HistorialScreen> {
+  List<Map<String, dynamic>> _productos = <Map<String, dynamic>>[];
+  bool _cargando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargar();
+  }
+
+  Future<void> _cargar() async {
+    final filas = await widget.baseDeDatos.customSelect(
+      'SELECT p.id AS id, p.nombre AS nombre, p.marca AS marca, '
+      'COUNT(pr.id) AS cantidad, MAX(pr.fecha_toma) AS ultima '
+      'FROM precios pr JOIN productos p ON pr.producto_id = p.id '
+      'WHERE p.borrado_en IS NULL '
+      'GROUP BY p.id ORDER BY ultima DESC',
+      readsFrom: {
+        widget.baseDeDatos.precios,
+        widget.baseDeDatos.productos,
+      },
+    ).get();
+
+    if (!mounted) return;
+    setState(() {
+      _productos = filas.map((f) => f.data).toList();
+      _cargando = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const <Widget>[
-          Icon(Icons.history, size: 64),
-          SizedBox(height: 16),
-          Text('Historial — placeholder Fase 0'),
-        ],
-      ),
+    if (_cargando) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_productos.isEmpty) {
+      return const Center(
+        child: Text('Sin precios registrados todavía'),
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: _productos.length,
+      itemBuilder: (BuildContext contexto, int i) {
+        final Map<String, dynamic> p = _productos[i];
+        final String nombre = p['marca'] == null || (p['marca'] as String).isEmpty
+            ? p['nombre'] as String
+            : '${p['nombre']} · ${p['marca']}';
+        return ListTile(
+          leading: const Icon(Icons.receipt_long),
+          title: Text(nombre),
+          subtitle: Text(
+            '${p['cantidad']} precio(s) · última toma: ${p['ultima']}',
+          ),
+          onTap: () {
+            Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => HistorialProductoScreen(
+                  baseDeDatos: widget.baseDeDatos,
+                  productoId: p['id'] as String,
+                  nombre: nombre,
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
