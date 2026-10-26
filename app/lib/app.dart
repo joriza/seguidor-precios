@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'data/local/base_de_datos.dart';
 import 'features/articulos/articulos_screen.dart';
+import 'features/busqueda/busqueda_screen.dart';
 import 'features/comercios/comercios_screen.dart';
 import 'features/escaner/escaner_screen.dart';
 import 'features/historial/historial_screen.dart';
@@ -23,7 +24,8 @@ class SeguidorPreciosApp extends StatelessWidget {
   }
 }
 
-/// Shell de navegación: cinco secciones (Fase 0); el escáner consulta la base.
+/// Shell de navegación: seis secciones; el escáner y la búsqueda consultan
+/// la base (Fase 0: cinco; T12 agrega Buscar).
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, required this.baseDeDatos});
 
@@ -39,6 +41,7 @@ class _HomeShellState extends State<HomeShell> {
   static const List<String> _titles = <String>[
     'Inicio',
     'Escanear',
+    'Buscar',
     'Artículos',
     'Historial',
     'Comercios',
@@ -47,6 +50,7 @@ class _HomeShellState extends State<HomeShell> {
   List<Widget> _pantallas() => <Widget>[
         const InicioScreen(),
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
+        BusquedaScreen(baseDeDatos: widget.baseDeDatos),
         ArticulosScreen(baseDeDatos: widget.baseDeDatos),
         HistorialScreen(baseDeDatos: widget.baseDeDatos),
         ComerciosScreen(baseDeDatos: widget.baseDeDatos),
@@ -70,6 +74,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.qr_code_scanner_outlined),
             selectedIcon: Icon(Icons.qr_code_scanner),
             label: 'Escanear',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.search_outlined),
+            selectedIcon: Icon(Icons.search),
+            label: 'Buscar',
           ),
           NavigationDestination(
             icon: Icon(Icons.category_outlined),
