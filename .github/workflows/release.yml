@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+        working-directory: app
+
+      - name: Analyze + tests (no publicamos sin verificar)
+        run: |
+          flutter analyze
+          flutter test
+        working-directory: app
+
+      - name: Build APK (debug, firmado con clave de debug — para pruebas)
+        run: flutter build apk --debug
+        working-directory: app
+
+      - name: Publish release with the APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/app/outputs/flutter-apk/app-debug.apk \
+            "seguidor-precios-${GITHUB_REF_NAME}-debug.apk"
+          gh release create "$GITHUB_REF_NAME" \
+            "seguidor-precios-${GITHUB_REF_NAME}-debug.apk" \
+            --title "Seguidor de Precios $GITHUB_REF_NAME (Fase 1)" \
+            --notes "APK de pruebas de la Fase 1 (MVP 100% local, offline).
+            Firmado con clave de debug: al instalar, permití orígenes
+            desconocidos si el teléfono lo pide."
