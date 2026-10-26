@@ -97,6 +97,19 @@ sequenceDiagram
 5. **Borrado:** lógico (`borrado_en`), nunca físico, para que el borrado se propague a otros dispositivos.
 6. **Dedup por EAN:** si subo un producto cuyo código de barras ya existe en el servidor, el backend devuelve el id existente y el dispositivo re-apunta sus precios a ese producto (transacción local).
 7. **Agrupación por artículo:** los `articulo_id` se sincronizan como cualquier campo; si dos usuarios clasifican el mismo producto en artículos distintos, gana la escritura más reciente y el resto puede reasignarse desde la UI.
+8. **Estado local de sync:** la cola outbox y la marca `ultimo_sync` (por tabla) viven solo en el dispositivo; alimentan la condición del aviso de sincronización (R15).
+
+### Política de sincronización al iniciar (R15)
+
+La sincronización **nunca** es automática: la app pregunta. El aviso al iniciar aparece solo si se
+cumplen **todas** estas condiciones:
+
+1. Conexión **WiFi** (con datos móviles no aparece; la sync manual sigue disponible con cualquier conexión).
+2. Hay **cambios locales sin sincronizar** (outbox no vacío) **o** pasaron **más de 7 días** desde el
+   último sync exitoso.
+
+El ping anti-pausa (R14) es otra cosa: es una consulta mínima que no sincroniza nada y corre con
+cualquier conectividad.
 
 ## Seguridad y acceso
 
@@ -104,11 +117,36 @@ sequenceDiagram
 - **Auth anónimo de Supabase:** cada instalación obtiene un usuario estable sin datos personales (`signInAnonymously`); a futuro puede convertirse en cuenta real sin migrar datos.
 - **Claves:** la clave anónima de Supabase va embebida en la app (está diseñada para eso; la protección real es la RLS).
 
-## Durabilidad del backend gratuito
+## Durabilidad del backend gratuito (R14)
 
-Supabase pausa proyectos gratuitos tras ~7 días sin actividad. Mitigaciones (Fase 2):
+Supabase pausa proyectos gratuitos tras ~7 días sin actividad. Mitigación principal:
 
-- Ping programado con GitHub Actions (cron gratuito) para mantenerlo activo, o
+- **Ping mínimo desde la app (R14):** al iniciar y solo con conectividad, la app envía una consulta
+  mínima (RPC `ping`, un `SELECT 1`) que resetea el contador de inactividad. No sincroniza datos.
+
+Mitigaciones complementarias:
+
+- Cron gratuito de GitHub Actions (útil si nadie abre la app por mucho tiempo), o
 - reactivación manual desde el panel (1 minuto, sin costo).
 
 En cualquier caso, R3 nunca se compromete: la app no depende de la nube.
+
+## Escala y camino a infraestructura propia (R16)
+
+El proyecto arranca para un **grupo reducido** con el free tier de Supabase ($0). Si gana aceptación
+y se libera al público, el mismo stack migra a infraestructura propia **sin reescribir la app**:
+
+```mermaid
+flowchart LR
+    APP["App (URL de backend configurable)"] -- "hoy" --> CLOUD[("Supabase cloud<br/>free tier")]
+    APP -- "futuro" --> PROPIA["Infraestructura propia:<br/>Supabase self-hosted (Docker)<br/>o Postgres + PostgREST"]
+```
+
+- **Sin lock-in:** Supabase es open source (self-hosteable con Docker) y su capa de API es
+  PostgREST; los datos son Postgres estándar y las migraciones SQL del repo son el esquema canónico.
+- **Migración:** dump/restauración de la base (`pg_dump`/`restore`); la app apunta al nuevo backend
+  cambiando URL + clave en su único punto de configuración.
+- **Qué exige la escala pública:** política de moderación y anti-abuso (rate limiting, revisión de
+  RLS), backups automáticos, monitoreo y decisión de distribución (APK vs Play Store).
+- Todo está planificado como [Fase 4](hoja-de-ruta.md#fase-4--público-e-infraestructura-propia-condicional-r16),
+  **condicional**: solo se ejecuta si hay adopción real.

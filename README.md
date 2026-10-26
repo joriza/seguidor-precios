@@ -13,11 +13,11 @@ Aplicación Android para llevar el control personal de precios de productos de c
 - 🌱 **Arranca con catálogo** — productos argentinos con código EAN-13 precargados desde bases de datos abiertas (R10).
 - 📷 **Escáner de códigos de barras** con la cámara (ML Kit, en el dispositivo) y **ingreso manual** siempre disponible.
 - 🥩 **Productos sin código de barras** (carnicería, verdulería, madera, construcción) con unidad de medida y contenido neto.
-- ⚖️ **Comparador por artículo** — el precio por unidad de medida ($/kg, $/L, $/unidad) compara marcas y presentaciones distintas e identifica el más económico (R11).
+- ⚖️ **Comparador en dos niveles** — si el producto existe por su código, compara ese producto entre comercios; si no, compara por artículo (tipo de producto) con el precio por unidad de medida ($/kg, $/L, $/unidad) entre marcas y presentaciones (R11, R13).
 - 📊 **Mínimo y promedio por artículo** — el precio de referencia de un tipo de producto más allá de su marca o presentación (R12).
 - 🕘 **Historial de precios** con fecha de toma del dato y variación porcentual entre tomas.
 - 🏪 **Comercios** con alta en el momento, sin salir de la pantalla de registro de precio.
-- ☁️ **Colaboración** — sincronización con un repositorio central (Supabase) para compartir datos nuevos entre usuarios.
+- ☁️ **Colaboración bajo tu control** — sincronización con un repositorio central (Supabase): aviso solo por WiFi y cuando hay novedades, siempre preguntando antes; un ping mínimo mantiene activa la base gratuita (R14, R15).
 - 💸 **Recursos gratuitos y perdurables** — sin costos recurrentes y con datos siempre exportables.
 
 ## Stack
@@ -31,6 +31,14 @@ Aplicación Android para llevar el control personal de precios de productos de c
 | Backend colaborativo | Supabase (Postgres + Auth + RLS), plan gratuito | $0 |
 | Distribución | APK vía GitHub Releases | $0 |
 | Código e integración continua | GitHub + GitHub Actions | $0 |
+
+## Escala y despliegue a futuro
+
+Pensado para arrancar en un **grupo reducido** con costo $0. Si el proyecto tiene aceptación y se
+libera al público, el mismo stack migra a **infraestructura propia** (Supabase self-hosted o
+Postgres + PostgREST) sin reescribir la app: todo es open source y los datos son Postgres estándar.
+Detalle en [Arquitectura · Escala](docs/arquitectura.md#escala-y-camino-a-infraestructura-propia-r16)
+y [Fase 4](docs/hoja-de-ruta.md#fase-4--público-e-infraestructura-propia-condicional-r16).
 
 ## Arquitectura en una línea
 

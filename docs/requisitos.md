@@ -1,8 +1,10 @@
 # Requisitos funcionales
 
 Fuente: pedido original del dueño del proyecto. R1–R9 provienen del pedido inicial; R10–R12 se
-agregaron en la revisión del plan (catálogo inicial y comparación por artículo). Los requisitos se
-transcriben textualmente; cada uno incluye su interpretación y criterios de aceptación verificables.
+agregaron en la revisión del plan (catálogo inicial y comparación por artículo), R13–R15 en la
+siguiente (jerarquía de comparación y política de conexión) y R16 al proyectar la escala pública.
+Los requisitos se transcriben textualmente; cada uno incluye su interpretación y criterios de
+aceptación verificables.
 
 ## R1 — Control personal de precios
 
@@ -105,3 +107,41 @@ transcriben textualmente; cada uno incluye su interpretación y criterios de ace
   - Los agregados se calculan por defecto sobre los precios de los últimos 30 días, con opción de ver todo el histórico.
   - Los agregados pueden filtrarse por comercio.
   - Los productos sin contenido neto declarado no participan de la comparación normalizada (pero sí del historial).
+
+## R13 — Jerarquía de comparación: mismo código primero
+
+- **Requisito (verbatim):** "La comparación si el producto con el mismo código existe, es la que más vale, pero sino solo por tipo de producto."
+- **Interpretación:** la comparación más valiosa/confiable es la del **producto exacto** (mismo EAN, entre comercios); la comparación por **artículo** (tipo de producto) es la vía cuando no existe coincidencia por código o el producto no tiene código.
+- **Aceptación:**
+  - Si el producto con ese EAN ya existe, el comparador muestra primero la comparación de ese producto entre comercios.
+  - Si no hay coincidencia por código (o el producto no tiene código), la comparación es solo por artículo.
+  - Ambos niveles usan el precio por unidad de medida normalizado (R11).
+
+## R14 — Ping mínimo anti-pausa al iniciar
+
+- **Requisito (verbatim):** "Para que no se apague la base de datos, al iniciar enviar una consulta mínima suficiente."
+- **Interpretación:** la app misma mantiene activo el proyecto gratuito del backend con una consulta mínima al iniciar; el cron de GitHub Actions pasa a complemento opcional.
+- **Aceptación:**
+  - Al iniciar con conectividad, se envía una consulta mínima al backend (p. ej. `SELECT 1` vía RPC `ping`) que resetea el contador de inactividad.
+  - Sin conectividad se omite en silencio (R3 intacto).
+  - La consulta no sincroniza datos ni consume cuota significativa.
+
+## R15 — Sincronización al iniciar: solo WiFi, con condiciones y confirmación
+
+- **Requisito (verbatim):** "Al iniciar la aplicación, solo si está conectado a wifi y tiene datos locales nuevos o ha pasado más de 7 días desde la última sincronización, consultar si quiere sincronizar datos."
+- **Aceptación:**
+  - El aviso de sincronización aparece solo si se cumplen **todas** las condiciones: conexión **WiFi**, y además **hay cambios locales sin sincronizar** **o** pasaron **más de 7 días** desde el último sync exitoso.
+  - La app **pregunta antes** de sincronizar; nunca sincroniza automáticamente sin confirmación.
+  - Con datos móviles (no WiFi) no aparece el aviso; la sincronización manual sigue disponible siempre con cualquier conexión.
+  - El estado que alimenta la condición (outbox pendiente y `ultimo_sync`) vive solo en el dispositivo.
+
+## R16 — Camino a público general con infraestructura propia
+
+- **Requisito (verbatim):** "Al principio la aplicación será para un grupo reducido de personas. Pero si tiene aceptación, es posible que la libere al público en general, con lo cual debe contemplar la posibilidad de que se aloje en infraestructura propia, con una base de datos propia."
+- **Interpretación:** la etapa inicial usa el free tier de Supabase (costo $0); la arquitectura debe garantizar un camino de migración a infraestructura propia **sin reescribir la app** y sin perder datos.
+- **Aceptación:**
+  - Todo el stack del backend es open source y self-hosteable: Supabase completo (Docker) o Postgres + PostgREST.
+  - La URL y la clave del backend son configurables en un único punto (entorno/flavor), sin tocar la lógica de la app.
+  - Existe un procedimiento documentado de export/import de la base completa (cloud → propia).
+  - El camino de migración está planificado como [Fase 4](hoja-de-ruta.md#fase-4--público-e-infraestructura-propia-condicional-r16), **condicional** a la adopción real.
+  - En la etapa de grupo reducido el costo sigue siendo $0 (R5).

@@ -74,3 +74,5 @@ seguidor-precios/
 - Crear proyecto gratuito en supabase.com; guardar URL y clave anónima.
 - El esquema de Postgres se versiona con migraciones SQL dentro del repo (`supabase/migrations/`).
 - En desarrollo puede correrse Supabase local con su CLI.
+- La URL y la clave del backend viven en un único punto de configuración (entorno/flavor): apuntar a
+  otra infraestructura es cambio de configuración, no de código (R16, AD-011).

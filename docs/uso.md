@@ -52,6 +52,10 @@ días, con opción de ver todo el histórico o filtrar por comercio.
 Así funciona para cualquier tipo de producto: aceite por litro, arroz por kilo, tornillos por
 unidad, madera por metro.
 
+**¿Y si el producto ya existe por su código?** En ese caso la comparación más confiable es la de
+ese mismo producto entre comercios (misma referencia exacta); la comparación por artículo se usa
+cuando no hay coincidencia por código o el producto no tiene código.
+
 ## Historial
 
 En la ficha de cada producto: precios cronológicos con su **fecha de toma** y la **variación %**
@@ -59,9 +63,15 @@ entre tomas consecutivas.
 
 ## Sincronizar (opcional)
 
-Con internet, la app sube tus aportes y baja los de otros usuarios. Sin internet todo sigue
-funcionando igual y se sincroniza después solo. Hay un indicador de estado y sync manual
-(deslizar para actualizar).
+- **Al iniciar**, la app **te pregunta** si querés sincronizar, pero solo si se cumplen todas estas
+  condiciones: estás conectado por **WiFi** y, además, tenés **cambios sin sincronizar** o pasaron
+  **más de 7 días** desde la última sincronización.
+- Si no se cumplen, el inicio es silencioso; la app funciona igual sin internet y podés sincronizar
+  cuando quieras (indicador de estado y sync manual: deslizar para actualizar).
+- **Con datos móviles no aparece el aviso** (ahorro de datos); la sync manual sí funciona con
+  cualquier conexión.
+- Además, al iniciar la app manda en silencio una **consulta mínima** al backend para mantener
+  activa la base gratuita; no sincroniza datos ni consume tu plan.
 
 ## Copia de seguridad
 
@@ -69,7 +79,8 @@ Exportá todos tus datos a JSON/CSV y restauralos en otro teléfono.
 
 ## Preguntas frecuentes
 
-- **¿Necesito internet?** No, salvo para sincronizar o precargar un producto desconocido.
+- **¿Necesito internet?** No, salvo para sincronizar o precargar un producto desconocido; y la
+  propuesta de sincronizar solo aparece con WiFi y cuando hay novedades (o pasaron más de 7 días).
 - **¿De dónde salen los productos que ya están cargados?** De bases de datos abiertas (Open Food
   Facts) y de lo que cargan los usuarios.
 - **¿Por qué mi producto no aparece en el comparador?** Le falta contenido neto o artículo

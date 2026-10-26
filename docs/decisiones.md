@@ -13,7 +13,7 @@ explícitamente por el dueño se marcan así.
 
 - **Contexto:** centralización web colaborativa (R4) con recursos gratuitos y perdurables (R5). Alternativas evaluadas: Firebase Spark, PocketBase self-host.
 - **Decisión:** Supabase, plan gratuito (Postgres + Auth + RLS).
-- **Consecuencias:** datos en Postgres estándar, exportables y migrables; API y reglas de acceso incluidas. Contra: **el plan gratuito pausa el proyecto tras ~7 días sin actividad**; mitigación con ping programado (GitHub Actions) o reactivación manual sin costo. La app local nunca depende del backend (R3).
+- **Consecuencias:** datos en Postgres estándar, exportables y migrables; API y reglas de acceso incluidas. Contra: **el plan gratuito pausa el proyecto tras ~7 días sin actividad**; mitigación con ping al iniciar (R14) o reactivación manual sin costo. La app local nunca depende del backend (R3). Camino propio (R16): si el proyecto escala a público, Supabase self-hosted o Postgres + PostgREST corren en infraestructura propia sin reescribir la app (ver AD-011).
 
 ## AD-003 — Identidad anónima + ID de dispositivo ✅ aprobado
 
@@ -55,6 +55,19 @@ explícitamente por el dueño se marcan así.
 - **Contexto:** comparar marcas y presentaciones distintas de un mismo tipo de producto exige un nivel de agrupación que el producto alone no da.
 - **Decisión:** nueva entidad `articulo` (tipo de producto genérico con `unidad_base`); cada `producto` (marca + presentación) pertenece opcionalmente a un artículo. La comparación usa el **precio por unidad de medida normalizado**; artículos sin clasificar quedan fuera del comparador, no del historial.
 - **Consecuencias:** + comparaciones justas entre presentaciones (500 g contra 1 kg) y agregados (mínimo/promedio/máximo) por artículo. − un paso extra de clasificación, aliviado con sugerencias por categoría/nombre y con los datos del pack semilla (que ya traen categoría).
+- **Jerarquía (R13):** si existe el producto con el mismo código, la comparación más valiosa es la del producto exacto entre comercios; solo si no hay coincidencia por código (o no hay código) se compara por artículo.
+
+## AD-010 — Política de red al iniciar: ping anti-pausa y sync bajo confirmación ✅ aprobada
+
+- **Contexto:** el free tier de Supabase se pausa tras ~7 días sin actividad (AD-002); la sincronización automática consume datos y sorprende al usuario.
+- **Decisión (R14/R15):** al iniciar y con conectividad, la app envía una consulta mínima (`ping`) que mantiene activo el backend. La sincronización de datos, en cambio, solo se ofrece al iniciar bajo **todas** estas condiciones: conexión **WiFi** y (**cambios locales pendientes** o **más de 7 días** desde el último sync), siempre con **confirmación del usuario**. La sync manual queda disponible siempre con cualquier conexión.
+- **Consecuencias:** + control del usuario, ahorro de datos móviles y backend mantenido despierto por la propia app. − un diálogo ocasional al iniciar; requiere estado local (`ultimo_sync`, outbox) que no se sincroniza.
+
+## AD-011 — Escala pública sobre stack open source, sin lock-in
+
+- **Contexto (R16):** la app nace para un grupo reducido, pero si tiene aceptación se liberaría al público; el dueño exige contemplar alojamiento en infraestructura propia con base de datos propia.
+- **Decisión:** todo el backend es open source y self-hosteable: Supabase completo (Docker Compose propio) o Postgres + PostgREST en un VPS. La app configura URL + clave del backend en un único punto, sin tocar su lógica; las migraciones SQL del repo son el esquema canónico y `pg_dump`/`restore` es la vía de migración de datos.
+- **Consecuencias:** + cero reescritura al migrar, datos siempre exportables (R5), costo $0 en la etapa de grupo reducido. − la operación propia (backups, monitoreo, seguridad del servidor) queda a cargo del dueño cuando llegue esa etapa; se planifica condicionalmente en la Fase 4.
 
 ## Decisiones abiertas
 
@@ -63,5 +76,7 @@ explícitamente por el dueño se marcan así.
 | Licencia del repositorio | abierta | antes del primer release |
 | Nombre definitivo de la app | abierta | Fase 0 |
 | Profundidad del catálogo semilla (cuántos productos lleva el pack) | abierta | Fase 1 |
-| Política de moderación de datos colaborativos | abierta | Fase 2 |
+| Política de moderación de datos colaborativos | abierta | Fase 2; crítica en Fase 4 (público) |
 | Coincidencia difusa de productos sin EAN | abierta | Fase 3 |
+| Distribución pública (APK directo vs Play Store) | abierta | Fase 4 |
+| Infraestructura propia (VPS/proveedor y costos) | abierta | Fase 4 |

@@ -152,6 +152,13 @@ Ejemplo — artículo **Mayonesa** (`unidad_base = kg`):
 
 Se calcula **en consulta, no se almacena**: siempre refleja el precio y la presentación vigentes.
 
+### Jerarquía de comparación (R13)
+
+1. **Producto exacto (mismo EAN):** si el producto con ese código ya existe, la comparación más
+   valiosa es la de ese producto entre comercios (misma referencia, comparación perfecta).
+2. **Artículo (tipo de producto):** si no hay coincidencia por código, o el producto no tiene código,
+   la comparación es solo por artículo, normalizada por unidad de medida (R11).
+
 ## Agregados por artículo (mínimo y promedio) — R12
 
 Vista `resumen_articulo` (SQL local; en Postgres, vista o materializada en Fase 2):
