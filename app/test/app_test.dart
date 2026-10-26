@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/app.dart';
+import 'package:seguidor_precios/data/local/base_de_datos.dart';
 
 void main() {
   testWidgets('muestra las 5 secciones y navega entre ellas', (WidgetTester tester) async {
-    await tester.pumpWidget(const SeguidorPreciosApp());
+    final db = BaseDeDatos.memoria();
+    addTearDown(db.close);
+
+    await tester.pumpWidget(SeguidorPreciosApp(baseDeDatos: db));
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationDestination), findsNWidgets(5));

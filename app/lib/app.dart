@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'data/local/base_de_datos.dart';
 import 'features/articulos/articulos_screen.dart';
 import 'features/comercios/comercios_screen.dart';
 import 'features/escaner/escaner_screen.dart';
@@ -8,21 +9,25 @@ import 'features/inicio/inicio_screen.dart';
 
 /// Raíz de la aplicación: tema Material 3, UI en español rioplatense (AD-007).
 class SeguidorPreciosApp extends StatelessWidget {
-  const SeguidorPreciosApp({super.key});
+  const SeguidorPreciosApp({super.key, required this.baseDeDatos});
+
+  final BaseDeDatos baseDeDatos;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Seguidor de Precios',
       theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
-      home: const HomeShell(),
+      home: HomeShell(baseDeDatos: baseDeDatos),
     );
   }
 }
 
-/// Shell de navegación de la Fase 0: cinco secciones placeholder (T3).
+/// Shell de navegación: cinco secciones (Fase 0); el escáner consulta la base.
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  const HomeShell({super.key, required this.baseDeDatos});
+
+  final BaseDeDatos baseDeDatos;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -39,19 +44,19 @@ class _HomeShellState extends State<HomeShell> {
     'Comercios',
   ];
 
-  static const List<Widget> _screens = <Widget>[
-    InicioScreen(),
-    EscanerScreen(),
-    ArticulosScreen(),
-    HistorialScreen(),
-    ComerciosScreen(),
-  ];
+  List<Widget> _pantallas() => <Widget>[
+        const InicioScreen(),
+        EscanerScreen(baseDeDatos: widget.baseDeDatos),
+        const ArticulosScreen(),
+        const HistorialScreen(),
+        const ComerciosScreen(),
+      ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_titles[_index])),
-      body: IndexedStack(index: _index, children: _screens),
+      body: IndexedStack(index: _index, children: _pantallas()),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (int i) => setState(() => _index = i),
