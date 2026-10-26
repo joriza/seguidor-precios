@@ -614,6 +614,15 @@ class $ProductosTable extends Productos
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _origenMeta = const VerificationMeta('origen');
+  @override
+  late final GeneratedColumn<String> origen = GeneratedColumn<String>(
+    'origen',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _notasMeta = const VerificationMeta('notas');
   @override
   late final GeneratedColumn<String> notas = GeneratedColumn<String>(
@@ -677,6 +686,7 @@ class $ProductosTable extends Productos
     categoria,
     unidad,
     contenidoNeto,
+    origen,
     notas,
     creadoPor,
     creadoEn,
@@ -750,6 +760,12 @@ class $ProductosTable extends Productos
           data['contenido_neto']!,
           _contenidoNetoMeta,
         ),
+      );
+    }
+    if (data.containsKey('origen')) {
+      context.handle(
+        _origenMeta,
+        origen.isAcceptableOrUnknown(data['origen']!, _origenMeta),
       );
     }
     if (data.containsKey('notas')) {
@@ -832,6 +848,10 @@ class $ProductosTable extends Productos
         DriftSqlType.double,
         data['${effectivePrefix}contenido_neto'],
       ),
+      origen: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origen'],
+      ),
       notas: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}notas'],
@@ -875,6 +895,9 @@ class Producto extends DataClass implements Insertable<Producto> {
   /// kg | g | L | mL | unidad | m — unidad en que se vende.
   final String unidad;
   final double? contenidoNeto;
+
+  /// 'semilla' si vino del pack de Open Food Facts; null si lo cargó un usuario.
+  final String? origen;
   final String? notas;
   final String creadoPor;
   final String creadoEn;
@@ -889,6 +912,7 @@ class Producto extends DataClass implements Insertable<Producto> {
     this.categoria,
     required this.unidad,
     this.contenidoNeto,
+    this.origen,
     this.notas,
     required this.creadoPor,
     required this.creadoEn,
@@ -915,6 +939,9 @@ class Producto extends DataClass implements Insertable<Producto> {
     map['unidad'] = Variable<String>(unidad);
     if (!nullToAbsent || contenidoNeto != null) {
       map['contenido_neto'] = Variable<double>(contenidoNeto);
+    }
+    if (!nullToAbsent || origen != null) {
+      map['origen'] = Variable<String>(origen);
     }
     if (!nullToAbsent || notas != null) {
       map['notas'] = Variable<String>(notas);
@@ -948,6 +975,9 @@ class Producto extends DataClass implements Insertable<Producto> {
       contenidoNeto: contenidoNeto == null && nullToAbsent
           ? const Value.absent()
           : Value(contenidoNeto),
+      origen: origen == null && nullToAbsent
+          ? const Value.absent()
+          : Value(origen),
       notas: notas == null && nullToAbsent
           ? const Value.absent()
           : Value(notas),
@@ -974,6 +1004,7 @@ class Producto extends DataClass implements Insertable<Producto> {
       categoria: serializer.fromJson<String?>(json['categoria']),
       unidad: serializer.fromJson<String>(json['unidad']),
       contenidoNeto: serializer.fromJson<double?>(json['contenidoNeto']),
+      origen: serializer.fromJson<String?>(json['origen']),
       notas: serializer.fromJson<String?>(json['notas']),
       creadoPor: serializer.fromJson<String>(json['creadoPor']),
       creadoEn: serializer.fromJson<String>(json['creadoEn']),
@@ -993,6 +1024,7 @@ class Producto extends DataClass implements Insertable<Producto> {
       'categoria': serializer.toJson<String?>(categoria),
       'unidad': serializer.toJson<String>(unidad),
       'contenidoNeto': serializer.toJson<double?>(contenidoNeto),
+      'origen': serializer.toJson<String?>(origen),
       'notas': serializer.toJson<String?>(notas),
       'creadoPor': serializer.toJson<String>(creadoPor),
       'creadoEn': serializer.toJson<String>(creadoEn),
@@ -1010,6 +1042,7 @@ class Producto extends DataClass implements Insertable<Producto> {
     Value<String?> categoria = const Value.absent(),
     String? unidad,
     Value<double?> contenidoNeto = const Value.absent(),
+    Value<String?> origen = const Value.absent(),
     Value<String?> notas = const Value.absent(),
     String? creadoPor,
     String? creadoEn,
@@ -1026,6 +1059,7 @@ class Producto extends DataClass implements Insertable<Producto> {
     contenidoNeto: contenidoNeto.present
         ? contenidoNeto.value
         : this.contenidoNeto,
+    origen: origen.present ? origen.value : this.origen,
     notas: notas.present ? notas.value : this.notas,
     creadoPor: creadoPor ?? this.creadoPor,
     creadoEn: creadoEn ?? this.creadoEn,
@@ -1048,6 +1082,7 @@ class Producto extends DataClass implements Insertable<Producto> {
       contenidoNeto: data.contenidoNeto.present
           ? data.contenidoNeto.value
           : this.contenidoNeto,
+      origen: data.origen.present ? data.origen.value : this.origen,
       notas: data.notas.present ? data.notas.value : this.notas,
       creadoPor: data.creadoPor.present ? data.creadoPor.value : this.creadoPor,
       creadoEn: data.creadoEn.present ? data.creadoEn.value : this.creadoEn,
@@ -1069,6 +1104,7 @@ class Producto extends DataClass implements Insertable<Producto> {
           ..write('categoria: $categoria, ')
           ..write('unidad: $unidad, ')
           ..write('contenidoNeto: $contenidoNeto, ')
+          ..write('origen: $origen, ')
           ..write('notas: $notas, ')
           ..write('creadoPor: $creadoPor, ')
           ..write('creadoEn: $creadoEn, ')
@@ -1088,6 +1124,7 @@ class Producto extends DataClass implements Insertable<Producto> {
     categoria,
     unidad,
     contenidoNeto,
+    origen,
     notas,
     creadoPor,
     creadoEn,
@@ -1106,6 +1143,7 @@ class Producto extends DataClass implements Insertable<Producto> {
           other.categoria == this.categoria &&
           other.unidad == this.unidad &&
           other.contenidoNeto == this.contenidoNeto &&
+          other.origen == this.origen &&
           other.notas == this.notas &&
           other.creadoPor == this.creadoPor &&
           other.creadoEn == this.creadoEn &&
@@ -1122,6 +1160,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
   final Value<String?> categoria;
   final Value<String> unidad;
   final Value<double?> contenidoNeto;
+  final Value<String?> origen;
   final Value<String?> notas;
   final Value<String> creadoPor;
   final Value<String> creadoEn;
@@ -1137,6 +1176,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
     this.categoria = const Value.absent(),
     this.unidad = const Value.absent(),
     this.contenidoNeto = const Value.absent(),
+    this.origen = const Value.absent(),
     this.notas = const Value.absent(),
     this.creadoPor = const Value.absent(),
     this.creadoEn = const Value.absent(),
@@ -1153,6 +1193,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
     this.categoria = const Value.absent(),
     required String unidad,
     this.contenidoNeto = const Value.absent(),
+    this.origen = const Value.absent(),
     this.notas = const Value.absent(),
     required String creadoPor,
     required String creadoEn,
@@ -1174,6 +1215,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
     Expression<String>? categoria,
     Expression<String>? unidad,
     Expression<double>? contenidoNeto,
+    Expression<String>? origen,
     Expression<String>? notas,
     Expression<String>? creadoPor,
     Expression<String>? creadoEn,
@@ -1190,6 +1232,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
       if (categoria != null) 'categoria': categoria,
       if (unidad != null) 'unidad': unidad,
       if (contenidoNeto != null) 'contenido_neto': contenidoNeto,
+      if (origen != null) 'origen': origen,
       if (notas != null) 'notas': notas,
       if (creadoPor != null) 'creado_por': creadoPor,
       if (creadoEn != null) 'creado_en': creadoEn,
@@ -1208,6 +1251,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
     Value<String?>? categoria,
     Value<String>? unidad,
     Value<double?>? contenidoNeto,
+    Value<String?>? origen,
     Value<String?>? notas,
     Value<String>? creadoPor,
     Value<String>? creadoEn,
@@ -1224,6 +1268,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
       categoria: categoria ?? this.categoria,
       unidad: unidad ?? this.unidad,
       contenidoNeto: contenidoNeto ?? this.contenidoNeto,
+      origen: origen ?? this.origen,
       notas: notas ?? this.notas,
       creadoPor: creadoPor ?? this.creadoPor,
       creadoEn: creadoEn ?? this.creadoEn,
@@ -1260,6 +1305,9 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
     if (contenidoNeto.present) {
       map['contenido_neto'] = Variable<double>(contenidoNeto.value);
     }
+    if (origen.present) {
+      map['origen'] = Variable<String>(origen.value);
+    }
     if (notas.present) {
       map['notas'] = Variable<String>(notas.value);
     }
@@ -1292,6 +1340,7 @@ class ProductosCompanion extends UpdateCompanion<Producto> {
           ..write('categoria: $categoria, ')
           ..write('unidad: $unidad, ')
           ..write('contenidoNeto: $contenidoNeto, ')
+          ..write('origen: $origen, ')
           ..write('notas: $notas, ')
           ..write('creadoPor: $creadoPor, ')
           ..write('creadoEn: $creadoEn, ')
@@ -3090,6 +3139,7 @@ typedef $$ProductosTableCreateCompanionBuilder = ProductosCompanion Function({
   Value<String?> categoria,
   required String unidad,
   Value<double?> contenidoNeto,
+  Value<String?> origen,
   Value<String?> notas,
   required String creadoPor,
   required String creadoEn,
@@ -3106,6 +3156,7 @@ typedef $$ProductosTableUpdateCompanionBuilder = ProductosCompanion Function({
   Value<String?> categoria,
   Value<String> unidad,
   Value<double?> contenidoNeto,
+  Value<String?> origen,
   Value<String?> notas,
   Value<String> creadoPor,
   Value<String> creadoEn,
@@ -3196,6 +3247,11 @@ class $$ProductosTableFilterComposer
 
   ColumnFilters<double> get contenidoNeto => $composableBuilder(
     column: $table.contenidoNeto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get origen => $composableBuilder(
+    column: $table.origen,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3317,6 +3373,11 @@ class $$ProductosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get origen => $composableBuilder(
+    column: $table.origen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get notas => $composableBuilder(
     column: $table.notas,
     builder: (column) => ColumnOrderings(column),
@@ -3399,6 +3460,9 @@ class $$ProductosTableAnnotationComposer
     column: $table.contenidoNeto,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get origen =>
+      $composableBuilder(column: $table.origen, builder: (column) => column);
 
   GeneratedColumn<String> get notas =>
       $composableBuilder(column: $table.notas, builder: (column) => column);
@@ -3502,6 +3566,7 @@ class $$ProductosTableTableManager
                 Value<String?> categoria = const Value.absent(),
                 Value<String> unidad = const Value.absent(),
                 Value<double?> contenidoNeto = const Value.absent(),
+                Value<String?> origen = const Value.absent(),
                 Value<String?> notas = const Value.absent(),
                 Value<String> creadoPor = const Value.absent(),
                 Value<String> creadoEn = const Value.absent(),
@@ -3517,6 +3582,7 @@ class $$ProductosTableTableManager
                 categoria: categoria,
                 unidad: unidad,
                 contenidoNeto: contenidoNeto,
+                origen: origen,
                 notas: notas,
                 creadoPor: creadoPor,
                 creadoEn: creadoEn,
@@ -3534,6 +3600,7 @@ class $$ProductosTableTableManager
                 Value<String?> categoria = const Value.absent(),
                 required String unidad,
                 Value<double?> contenidoNeto = const Value.absent(),
+                Value<String?> origen = const Value.absent(),
                 Value<String?> notas = const Value.absent(),
                 required String creadoPor,
                 required String creadoEn,
@@ -3549,6 +3616,7 @@ class $$ProductosTableTableManager
                 categoria: categoria,
                 unidad: unidad,
                 contenidoNeto: contenidoNeto,
+                origen: origen,
                 notas: notas,
                 creadoPor: creadoPor,
                 creadoEn: creadoEn,

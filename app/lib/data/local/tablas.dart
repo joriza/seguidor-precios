@@ -45,6 +45,10 @@ class Productos extends Table {
   /// kg | g | L | mL | unidad | m — unidad en que se vende.
   TextColumn get unidad => text()();
   RealColumn get contenidoNeto => real().nullable()();
+
+  /// 'semilla' si vino del pack de Open Food Facts; null si lo cargó un usuario.
+  TextColumn get origen => text().nullable()();
+
   TextColumn get notas => text().nullable()();
   TextColumn get creadoPor => text()();
   TextColumn get creadoEn => text()();
