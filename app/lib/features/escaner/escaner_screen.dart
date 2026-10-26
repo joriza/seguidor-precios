@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../precios/producto_comparacion_screen.dart';
 import '../precios/registro_precio_screen.dart';
 import '../productos/producto_form_screen.dart';
 
@@ -82,6 +83,19 @@ class _EscanerScreenState extends State<EscanerScreen> {
     });
   }
 
+  Future<void> _compararPrecios() async {
+    final Producto? producto = _productoEncontrado;
+    if (producto == null) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ProductoComparacionScreen(
+          baseDeDatos: widget.baseDeDatos,
+          producto: producto,
+        ),
+      ),
+    );
+  }
+
   Future<void> _crearProducto() async {
     final guardado = await Navigator.of(context).push<Producto>(
       MaterialPageRoute<Producto>(
@@ -143,6 +157,12 @@ class _EscanerScreenState extends State<EscanerScreen> {
           FilledButton.tonal(
             onPressed: _registrarPrecio,
             child: const Text('Registrar precio'),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _compararPrecios,
+            icon: const Icon(Icons.compare_arrows),
+            label: const Text('Comparar precios'),
           ),
         ],
       ],

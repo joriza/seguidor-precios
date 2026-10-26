@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/features/escaner/escaner_screen.dart';
+import 'package:seguidor_precios/features/precios/producto_comparacion_screen.dart';
 import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 
 void main() {
@@ -114,5 +115,66 @@ void main() {
       find.textContaining('Producto encontrado: Nuevo desde escáner'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('producto existente permite comparar precios entre comercios', (tester) async {
+    await db.into(db.productos).insert(ProductosCompanion.insert(
+          id: 'p1',
+          codigoBarras: const Value('7790001001001'),
+          nombre: 'Mayonesa Marca A',
+          unidad: 'g',
+          contenidoNeto: const Value(500),
+          creadoPor: 'u1',
+          creadoEn: '2026-01-01T00:00:00',
+          actualizadoEn: '2026-01-01T00:00:00',
+        ));
+    await db.into(db.comercios).insert(ComerciosCompanion.insert(
+          id: 'c1',
+          nombre: 'Almacén',
+          creadoPor: 'u1',
+          creadoEn: '2026-01-01T00:00:00',
+          actualizadoEn: '2026-01-01T00:00:00',
+        ));
+    await db.into(db.comercios).insert(ComerciosCompanion.insert(
+          id: 'c2',
+          nombre: 'Kiosco',
+          creadoPor: 'u1',
+          creadoEn: '2026-01-01T00:00:00',
+          actualizadoEn: '2026-01-01T00:00:00',
+        ));
+    await db.into(db.precios).insert(PreciosCompanion.insert(
+          id: 'pr1',
+          productoId: 'p1',
+          comercioId: 'c1',
+          precio: 1500,
+          fechaToma: '2026-01-02',
+          cargadoPor: 'u1',
+          cargadoEn: '2026-01-02T10:00:00',
+        ));
+    await db.into(db.precios).insert(PreciosCompanion.insert(
+          id: 'pr2',
+          productoId: 'p1',
+          comercioId: 'c2',
+          precio: 1200,
+          fechaToma: '2026-01-02',
+          cargadoPor: 'u1',
+          cargadoEn: '2026-01-02T10:00:00',
+        ));
+
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+
+    await tester.enterText(find.byType(TextField), '7790001001001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Comparar precios'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProductoComparacionScreen), findsOneWidget);
+    expect(find.text(r'$1200.00'), findsOneWidget);
+    expect(find.text(r'$1500.00'), findsOneWidget);
+    expect(find.text('MÍNIMO'), findsOneWidget);
   });
 }
