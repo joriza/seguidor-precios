@@ -29,10 +29,23 @@ android {
         versionName = flutter.versionName
     }
 
+    // S3 (v0.1.1): keystore de firma COMMITEADO al repo. Con firma estable,
+    // los APK de las versiones futuras se instalan encima sin desinstalar
+    // (el keystore efímero de cada runner de CI era la causa del problema de
+    // actualización). Es una clave de PRUEBA (pass "android"); el release de
+    // Play Store usará su propio flujo de firma.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // El APK de pruebas se firma con el keystore debug commiteado.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
