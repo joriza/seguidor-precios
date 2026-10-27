@@ -177,4 +177,48 @@ void main() {
     expect(find.text(r'$1500.00'), findsOneWidget);
     expect(find.text('MÍNIMO'), findsOneWidget);
   });
+
+  testWidgets('S4 v0.1.2: producto con precios muestra el último conocido',
+      (tester) async {
+    await insertarProductoMayonesa();
+    await db.into(db.comercios).insert(ComerciosCompanion.insert(
+          id: 'c1',
+          nombre: 'Almacén',
+          creadoPor: 'u1',
+          creadoEn: '2026-01-01T00:00:00',
+          actualizadoEn: '2026-01-01T00:00:00',
+        ));
+    await db.into(db.precios).insert(PreciosCompanion.insert(
+          id: 'pr1',
+          productoId: 'p1',
+          comercioId: 'c1',
+          precio: 1500,
+          fechaToma: '2026-01-02',
+          cargadoPor: 'u1',
+          cargadoEn: '2026-01-02T10:00:00',
+        ));
+
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+    await tester.enterText(find.byType(TextField), '7790001001001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Último precio: \$1500.00'), findsOneWidget);
+    expect(find.textContaining('Almacén'), findsOneWidget);
+  });
+
+  testWidgets('S4 v0.1.2: producto sin precios lo informa', (tester) async {
+    await insertarProductoMayonesa();
+
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+    await tester.enterText(find.byType(TextField), '7790001001001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('todavía no tiene precios'), findsOneWidget);
+  });
 }

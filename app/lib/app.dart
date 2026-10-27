@@ -42,6 +42,12 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
+  /// S1 (v0.1.2): contador de visitas a pestañas. Las pantallas de datos se
+  /// recrean al volver a su pestaña (key cambia → initState recarga la base):
+  /// sin esto, mostraban la instantánea del arranque y el historial o los
+  /// comercios parecían vacíos tras registrar.
+  int _visita = 0;
+
   @override
   void initState() {
     super.initState();
@@ -122,12 +128,26 @@ class _HomeShellState extends State<HomeShell> {
   ];
 
   List<Widget> _pantallas() => <Widget>[
-        InicioScreen(baseDeDatos: widget.baseDeDatos),
+        // Datos: recrear al volver (refresco). Escáner/Buscar: sin key —
+        // no recrear la cámara ni perder la búsqueda en curso.
+        InicioScreen(
+          key: ValueKey('inicio-$_visita'),
+          baseDeDatos: widget.baseDeDatos,
+        ),
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
         BusquedaScreen(baseDeDatos: widget.baseDeDatos),
-        ArticulosScreen(baseDeDatos: widget.baseDeDatos),
-        HistorialScreen(baseDeDatos: widget.baseDeDatos),
-        ComerciosScreen(baseDeDatos: widget.baseDeDatos),
+        ArticulosScreen(
+          key: ValueKey('articulos-$_visita'),
+          baseDeDatos: widget.baseDeDatos,
+        ),
+        HistorialScreen(
+          key: ValueKey('historial-$_visita'),
+          baseDeDatos: widget.baseDeDatos,
+        ),
+        ComerciosScreen(
+          key: ValueKey('comercios-$_visita'),
+          baseDeDatos: widget.baseDeDatos,
+        ),
       ];
 
   @override
@@ -137,7 +157,13 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(index: _index, children: _pantallas()),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (int i) => setState(() => _index = i),
+        onDestinationSelected: (int i) => setState(() {
+          if (i != _index) {
+            _index = i;
+            _visita++; // refresca las pantallas de datos (S1, v0.1.2)
+          }
+        }),
+
         destinations: const <Widget>[
           NavigationDestination(
             icon: Icon(Icons.home_outlined),

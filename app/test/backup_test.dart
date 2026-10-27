@@ -280,6 +280,8 @@ void main() {
       // La lectura del archivo y la importación son E/S real: el FakeAsync
       // de flutter_test no las completa solas → el tap corre dentro de
       // runAsync con espera real.
+      await tester.ensureVisible(find.byKey(const ValueKey('btn-importar')));
+      await tester.pumpAndSettle();
       await tester.runAsync(() async {
         await tester.tap(find.byKey(const ValueKey('btn-importar')));
         await Future<void>.delayed(const Duration(milliseconds: 500));

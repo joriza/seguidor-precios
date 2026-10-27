@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/backup.dart';
@@ -20,11 +21,34 @@ class InicioScreen extends StatefulWidget {
 
 class _InicioScreenState extends State<InicioScreen> {
   Usuario? _usuario;
+  int? _productosSemilla;
+  String? _version;
 
   @override
   void initState() {
     super.initState();
     _cargarUsuario();
+    _cargarCatalogoYVersion();
+  }
+
+  /// S3 (v0.1.2): el catálogo base viaja DENTRO del APK (no se descarga);
+  /// acá se muestra cuántos productos trae y cuántos siguen disponibles.
+  Future<void> _cargarCatalogoYVersion() async {
+    final filas = await (widget.baseDeDatos.select(widget.baseDeDatos.productos)
+          ..where((p) => p.origen.equals('semilla')))
+        .get();
+    String? version;
+    try {
+      final info = await PackageInfo.fromPlatform();
+      version = '${info.version}+${info.buildNumber}';
+    } catch (_) {
+      version = null; // en tests sin mock no hay plataforma real
+    }
+    if (!mounted) return;
+    setState(() {
+      _productosSemilla = filas.length;
+      _version = version;
+    });
   }
 
   Future<void> _cargarUsuario() async {
@@ -110,6 +134,25 @@ class _InicioScreenState extends State<InicioScreen> {
                   subtitle: Text(_usuario?.etiqueta ?? 'Aún sin etiqueta'),
                   trailing: const Icon(Icons.edit_outlined),
                   onTap: () => _cambiarEtiqueta(context),
+                ),
+                ListTile(
+                  key: const ValueKey('info-catalogo'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.inventory),
+                  title: const Text('Catálogo base'),
+                  subtitle: Text(
+                    _productosSemilla == null
+                        ? '…'
+                        : '$_productosSemilla productos incluidos en la app '
+                            '(sin conexión, no se descarga nada)',
+                  ),
+                ),
+                ListTile(
+                  key: const ValueKey('info-version'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('Versión'),
+                  subtitle: Text(_version ?? '…'),
                 ),
                 FilledButton.icon(
                   key: const ValueKey('btn-exportar-json'),

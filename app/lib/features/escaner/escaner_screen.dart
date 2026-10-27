@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -30,6 +31,10 @@ class _EscanerScreenState extends State<EscanerScreen> {
   String? _mensaje;
   Producto? _productoEncontrado;
 
+  /// S4 (v0.1.2): último precio conocido del producto encontrado — propio o
+  /// ajeno (misma base local, cualquier aportante).
+  ({double precio, String comercio, String fecha})? _ultimoPrecio;
+
   @override
   void dispose() {
     _controladorCodigo.dispose();
@@ -57,13 +62,41 @@ class _EscanerScreenState extends State<EscanerScreen> {
           ..where((t) => t.codigoBarras.equals(codigo)))
         .getSingleOrNull();
 
+    final ultimo = producto == null ? null : await _ultimoPrecioDe(producto.id);
+
+    if (!mounted) return;
     setState(() {
       _buscando = false;
       _productoEncontrado = producto;
+      _ultimoPrecio = ultimo;
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo desde la sección Artículos (Fase 1.5).'
           : 'Producto encontrado: ${producto.nombre}';
     });
+  }
+
+  /// Último precio conocido del producto (R1): la toma de fecha más reciente.
+  Future<({double precio, String comercio, String fecha})?>
+      _ultimoPrecioDe(String productoId) async {
+    final filas = await widget.baseDeDatos.customSelect(
+      'SELECT pr.precio AS precio, c.nombre AS comercio, '
+      'pr.fecha_toma AS fecha '
+      'FROM precios pr JOIN comercios c ON pr.comercio_id = c.id '
+      'WHERE pr.producto_id = ? '
+      'ORDER BY pr.fecha_toma DESC, pr.cargado_en DESC LIMIT 1',
+      variables: [Variable.withString(productoId)],
+      readsFrom: {
+        widget.baseDeDatos.precios,
+        widget.baseDeDatos.comercios,
+      },
+    ).get();
+    if (filas.isEmpty) return null;
+    final f = filas.first;
+    return (
+      precio: f.read<double>('precio'),
+      comercio: f.read<String>('comercio'),
+      fecha: f.read<String>('fecha'),
+    );
   }
 
   Future<void> _registrarPrecio() async {
@@ -78,8 +111,11 @@ class _EscanerScreenState extends State<EscanerScreen> {
       ),
     );
     if (!mounted) return;
+    final ultimo = await _ultimoPrecioDe(producto.id);
+    if (!mounted) return;
     setState(() {
       _mensaje = 'Precio registrado ✓';
+      _ultimoPrecio = ultimo; // refresca el precio mostrado (S4)
     });
   }
 
@@ -118,7 +154,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
       children: <Widget>[
         if (widget.mostrarCamara)
           SizedBox(
-            height: 280,
+            // S4 (v0.1.2): menos altura para dejar lugar a los datos del
+            // producto escaneado (último precio, etc.).
+            height: 180,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: MobileScanner(onDetect: _alDetectar),
@@ -153,6 +191,14 @@ class _EscanerScreenState extends State<EscanerScreen> {
           ),
         ],
         if (_productoEncontrado != null) ...<Widget>[
+          const SizedBox(height: 12),
+          if (_ultimoPrecio != null)
+            Text(
+              'Último precio: \$${_ultimoPrecio!.precio.toStringAsFixed(2)}'
+              ' · ${_ultimoPrecio!.comercio} · ${_ultimoPrecio!.fecha}',
+            )
+          else
+            const Text('Este producto todavía no tiene precios registrados'),
           const SizedBox(height: 12),
           FilledButton.tonal(
             onPressed: _registrarPrecio,
