@@ -1,0 +1,2974 @@
+{
+ "formato": "seguidor-precios-pack-semilla",
+ "version": 1,
+ "productos": [
+  {
+   "codigo_barras": "7790036000343",
+   "nombre": "Baggio Pronto Durazno",
+   "marca": "Baggio",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790036000466",
+   "nombre": "Baggio multifruta",
+   "marca": "baggio",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790036000565",
+   "nombre": "Baggio Pronto Naranja",
+   "marca": "Baggio",
+   "unidad": "mL",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7790036020235",
+   "nombre": "Si diet",
+   "marca": "Si diet",
+   "unidad": "mL",
+   "contenido_neto": 600.0
+  },
+  {
+   "codigo_barras": "7790036567440",
+   "nombre": "Puré de Tomate la huerta",
+   "marca": "Baggio",
+   "unidad": "g",
+   "contenido_neto": 530.0
+  },
+  {
+   "codigo_barras": "7790040003569",
+   "nombre": "Rex Sabor Original",
+   "marca": "bagley",
+   "unidad": "g",
+   "contenido_neto": 75.0
+  },
+  {
+   "codigo_barras": "7790040003606",
+   "nombre": "Kesitas",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 75.0
+  },
+  {
+   "codigo_barras": "7790040116610",
+   "nombre": "Alfajor Tofi Negro",
+   "marca": "Tofi",
+   "unidad": "g",
+   "contenido_neto": 46.0
+  },
+  {
+   "codigo_barras": "7790040126817",
+   "nombre": "Hogareñas 7 Semillas",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 189.0
+  },
+  {
+   "codigo_barras": "7790040132689",
+   "nombre": "Porteñitas Originales",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 139.0
+  },
+  {
+   "codigo_barras": "7790040133259",
+   "nombre": "Maná Rellenas sabor Limón",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 152.0
+  },
+  {
+   "codigo_barras": "7790040133266",
+   "nombre": "Maná Rellenas sabor Frutilla",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 152.0
+  },
+  {
+   "codigo_barras": "7790040133488",
+   "nombre": "Sonrisas",
+   "marca": "Galletitas bagley",
+   "unidad": "g",
+   "contenido_neto": 108.0
+  },
+  {
+   "codigo_barras": "7790040135758",
+   "nombre": "Cereal Mix Semillas & Chips",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 207.0
+  },
+  {
+   "codigo_barras": "7790040135765",
+   "nombre": "Cereal Mix Frutilla & Chía",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 207.0
+  },
+  {
+   "codigo_barras": "7790040137813",
+   "nombre": "Maná Leche",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 136.0
+  },
+  {
+   "codigo_barras": "7790040137820",
+   "nombre": "Maná limon",
+   "marca": "arcor",
+   "unidad": "g",
+   "contenido_neto": 136.0
+  },
+  {
+   "codigo_barras": "7790040139015",
+   "nombre": "Criollitas x 5",
+   "marca": "BAGLEY",
+   "unidad": "g",
+   "contenido_neto": 499.0
+  },
+  {
+   "codigo_barras": "7790040140912",
+   "nombre": "Cereal Mix Sin Harina",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790040140943",
+   "nombre": "Cereal Mix Con Cacao",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790040142992",
+   "nombre": "Chocolinas negro",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 258.0
+  },
+  {
+   "codigo_barras": "7790040143227",
+   "nombre": "Chocolinas",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7790040143234",
+   "nombre": "Chocolinas Original",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790040143364",
+   "nombre": "Galletas Diversion",
+   "marca": "arcor",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790040143586",
+   "nombre": "Media Tarde",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 315.0
+  },
+  {
+   "codigo_barras": "7790040143807",
+   "nombre": "Rellenas Bon o Bon",
+   "marca": "Cofler",
+   "unidad": "g",
+   "contenido_neto": 85.0
+  },
+  {
+   "codigo_barras": "7790040143937",
+   "nombre": "Traviata",
+   "marca": "Rex",
+   "unidad": "g",
+   "contenido_neto": 96.0
+  },
+  {
+   "codigo_barras": "7790040143944",
+   "nombre": "Traviata kesitas",
+   "marca": "kesitas",
+   "unidad": "g",
+   "contenido_neto": 96.0
+  },
+  {
+   "codigo_barras": "7790040147720",
+   "nombre": "Surtido Bagley",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790040147775",
+   "nombre": "Saladillo Xtra Picante",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790040377707",
+   "nombre": "Criollitas (original)",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790040377806",
+   "nombre": "criollitas x3",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7790040613706",
+   "nombre": "Alfajor bon o bon",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7790040704800",
+   "nombre": "Sandwich",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 112.0
+  },
+  {
+   "codigo_barras": "7790040704909",
+   "nombre": "Sandwich",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 336.0
+  },
+  {
+   "codigo_barras": "7790040719804",
+   "nombre": "Rex",
+   "marca": "Bagley",
+   "unidad": "g",
+   "contenido_neto": 125.0
+  },
+  {
+   "codigo_barras": "7790040882102",
+   "nombre": "Hogareñas Sésamo",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 167.0
+  },
+  {
+   "codigo_barras": "7790045000846",
+   "nombre": "Galletitas de Limón",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7790045001188",
+   "nombre": "Frutigran Avena y Pasas",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790045001195",
+   "nombre": "Frutigran Salvado",
+   "marca": "Frutigran",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790045001584",
+   "nombre": "Copos de maíz",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 160.0
+  },
+  {
+   "codigo_barras": "7790045001607",
+   "nombre": "Copos de maíz azucarados Skarchitos",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 240.0
+  },
+  {
+   "codigo_barras": "7790045823575",
+   "nombre": "Avena instantánea",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790045823865",
+   "nombre": "Bizcochitos con semillas de Sésamo",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 180.0
+  },
+  {
+   "codigo_barras": "7790045824886",
+   "nombre": "Fiesta Surtidas",
+   "marca": "Fiesta",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7790045824893",
+   "nombre": "Frutigran Chisps de Chocolate",
+   "marca": "Frutigran",
+   "unidad": "g",
+   "contenido_neto": 255.0
+  },
+  {
+   "codigo_barras": "7790045824909",
+   "nombre": "granix bizcochitos",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 180.0
+  },
+  {
+   "codigo_barras": "7790045825395",
+   "nombre": "Frutigran Avena, Chía y Lino",
+   "marca": "Frutigran",
+   "unidad": "g",
+   "contenido_neto": 240.0
+  },
+  {
+   "codigo_barras": "7790045826200",
+   "nombre": "Salvado",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 240.0
+  },
+  {
+   "codigo_barras": "7790045826224",
+   "nombre": "Sésamo",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 185.0
+  },
+  {
+   "codigo_barras": "7790045826309",
+   "nombre": "Sésamo Sin Sal",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 175.0
+  },
+  {
+   "codigo_barras": "7790045826637",
+   "nombre": "Granola Coco y Miel",
+   "marca": "Granix",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7790070012050",
+   "nombre": "Cocinero Aceite de girasol",
+   "marca": "Cocinero",
+   "unidad": "mL",
+   "contenido_neto": 900.0
+  },
+  {
+   "codigo_barras": "7790070231864",
+   "nombre": "Aceite de Oliva Extra Virgen Intenso",
+   "marca": "Cocinero",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070265333",
+   "nombre": "Clásico antiadherente",
+   "marca": "Cocinero",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7790070320018",
+   "nombre": "Matarazzo ave María",
+   "marca": "matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070335937",
+   "nombre": "3 Vegetales",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070335968",
+   "nombre": "tirabuzón integral",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070335975",
+   "nombre": "SPAGHETTI N°7",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336026",
+   "nombre": "Tirabuzón n°34",
+   "marca": "Lucchetti",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336149",
+   "nombre": "Fideos Mostachol",
+   "marca": "Lucchetti",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336217",
+   "nombre": "mostachón n52",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336316",
+   "nombre": "Tallarín N°5",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336965",
+   "nombre": "Vitina Clásica",
+   "marca": "Vitina",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070336989",
+   "nombre": "espinaca",
+   "marca": "vitina",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790070337016",
+   "nombre": "Lasagna 100% trigo candeal seleccionado",
+   "marca": "Matarazzo",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790070418449",
+   "nombre": "bizcochos de arroz tortita negra",
+   "marca": "Snacks",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790070507273",
+   "nombre": "Selección",
+   "marca": "Nobleza Guacha",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070507341",
+   "nombre": "Jugo 100 % de limón",
+   "marca": "Minerva",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790070508621",
+   "nombre": "Yerba Mate",
+   "marca": "Cruz de Malta",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790070622075",
+   "nombre": "Tapas de empanadas sin gluten",
+   "marca": "La Salte",
+   "unidad": "unidad",
+   "contenido_neto": 1.0
+  },
+  {
+   "codigo_barras": "7790070933652",
+   "nombre": "cafe arlistan",
+   "marca": "arlistan",
+   "unidad": "g",
+   "contenido_neto": 50.0
+  },
+  {
+   "codigo_barras": "7790070936479",
+   "nombre": "Café",
+   "marca": "Arlistan",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7790072001014",
+   "nombre": "Sal fina",
+   "marca": "Celusal",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790072001038",
+   "nombre": "sal",
+   "marca": "Celusal",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790072002080",
+   "nombre": "Sal Fina",
+   "marca": "Celusal",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790077000067",
+   "nombre": "Pozo",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 148.0
+  },
+  {
+   "codigo_barras": "7790079010828",
+   "nombre": "Salchichas Paladini",
+   "marca": "Paladini",
+   "unidad": "g",
+   "contenido_neto": 225.0
+  },
+  {
+   "codigo_barras": "7790080010879",
+   "nombre": "Manteca Clásica",
+   "marca": "SanCor",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7790080065145",
+   "nombre": "Yogs Firme Natural",
+   "marca": "SanCor",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7790119002370",
+   "nombre": "Sidra",
+   "marca": "1888",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7790127780987",
+   "nombre": "Chimichurri",
+   "marca": "Vanoli",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7790130000058",
+   "nombre": "Vinagre de Alcohol",
+   "marca": "Menoyo",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790150100486",
+   "nombre": "Café instantáneo clásico",
+   "marca": "La Virginia",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7790150101773",
+   "nombre": "café suave",
+   "marca": "La virginia",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790150161128",
+   "nombre": "Alimento instantaneo a base de leche entera en polvo, cafe instantaneo, azúcar y",
+   "marca": "La Virginia",
+   "unidad": "g",
+   "contenido_neto": 155.0
+  },
+  {
+   "codigo_barras": "7790150320266",
+   "nombre": "Tilo",
+   "marca": "La Virginia",
+   "unidad": "g",
+   "contenido_neto": 25.0
+  },
+  {
+   "codigo_barras": "7790150355084",
+   "nombre": "Té Verde",
+   "marca": "La Virginia",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7790150396186",
+   "nombre": "Té con sabor Frutilla",
+   "marca": "La Virginia",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7790150610305",
+   "nombre": "Esencia artificial de vainilla",
+   "marca": "Alicante",
+   "unidad": "mL",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790170903937",
+   "nombre": "Café torrado molido",
+   "marca": "Morenita",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790174001318",
+   "nombre": "Medallones de Espinaca",
+   "marca": "Vegetalex",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7790199000013",
+   "nombre": "Harina de trigo 000",
+   "marca": "morixe",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790199602910",
+   "nombre": "Morixse",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790199604587",
+   "nombre": "Avena Tradicional",
+   "marca": "Morixe",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790244000401",
+   "nombre": "Doce de Leite",
+   "marca": "San Ignacio",
+   "unidad": "g",
+   "contenido_neto": 450.0
+  },
+  {
+   "codigo_barras": "7790263119634",
+   "nombre": "Galletitas dulces con avena y cacao",
+   "marca": "Okebon",
+   "unidad": "g",
+   "contenido_neto": 240.0
+  },
+  {
+   "codigo_barras": "7790263119658",
+   "nombre": "MOLINO NATURAL GALLETITA 10 SEMILLA",
+   "marca": "Okebon",
+   "unidad": "g",
+   "contenido_neto": 231.0
+  },
+  {
+   "codigo_barras": "7790272000831",
+   "nombre": "Rocio vegetal",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7790272001005",
+   "nombre": "Aceite de girasol",
+   "marca": "Natura",
+   "unidad": "mL",
+   "contenido_neto": 900.0
+  },
+  {
+   "codigo_barras": "7790272001029",
+   "nombre": "Aceite puro de girasol",
+   "marca": "AGD",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7790290101602",
+   "nombre": "Fernet Branca",
+   "marca": "Branca",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7790310920398",
+   "nombre": "Rueditas",
+   "marca": "PEP",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7790310985403",
+   "nombre": "Papas Fritas Pehuamar",
+   "marca": "Pehuamar",
+   "unidad": "g",
+   "contenido_neto": 485.0
+  },
+  {
+   "codigo_barras": "7790310985656",
+   "nombre": "Doritos",
+   "marca": "PepsiCo",
+   "unidad": "g",
+   "contenido_neto": 129.0
+  },
+  {
+   "codigo_barras": "7790313000011",
+   "nombre": "Duraznos amarillos en mitades comunes en jarabe diluido",
+   "marca": "LA COLINA S.A.",
+   "unidad": "g",
+   "contenido_neto": 820.0
+  },
+  {
+   "codigo_barras": "7790315058201",
+   "nombre": "Villavicencio Aventura",
+   "marca": "villavicencio",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7790360720115",
+   "nombre": "Picadillo de carne",
+   "marca": "Swift",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7790360720122",
+   "nombre": "Picadillo de carne",
+   "marca": "La Blanca",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7790360720382",
+   "nombre": "Paté de foie",
+   "marca": "Swift",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7790387013627",
+   "nombre": "Taragüi",
+   "marca": "Las Marías",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790387014419",
+   "nombre": "Hierbas Serranas",
+   "marca": "Unión",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790387014624",
+   "nombre": "Original",
+   "marca": "Unión",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790387015324",
+   "nombre": "Yerba Mate",
+   "marca": "Mañanita",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790387110159",
+   "nombre": "Yerba mate",
+   "marca": "Taragui",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790387110234",
+   "nombre": "Taragui Yerba Mate X500GR",
+   "marca": "Taragüi",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790387113242",
+   "nombre": "Yerba Mate Maracuya",
+   "marca": "Taragui",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790398100132",
+   "nombre": "Queso Rallado",
+   "marca": "La Paulina",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790407031013",
+   "nombre": "Chocolate Semiamargo",
+   "marca": "Aguila",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790411000029",
+   "nombre": "Rosamonte- yerba mate especial",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790411000050",
+   "nombre": "Rosamonte Yerba Mate, 500g Bag",
+   "marca": "Rosamonte",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790412000271",
+   "nombre": "Tostadas de Arroz Clásicas",
+   "marca": "LEIVA",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790412000295",
+   "nombre": "Tostadas de Arroz Sin Sal",
+   "marca": "Leiva",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790490998231",
+   "nombre": "Educorante Clásico Forte",
+   "marca": "Hileret",
+   "unidad": "mL",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7790503000326",
+   "nombre": "Tostaditas de arroz sin sal agregada",
+   "marca": "Dos Hermanos",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7790503198689",
+   "nombre": "Galletas de Arroz Sin Sal Agregada",
+   "marca": "Dos Hermanos",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790503198696",
+   "nombre": "Galletas de Arroz Saladas",
+   "marca": "Dos Hermanos",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790503199082",
+   "nombre": "Dos hermanos arroz",
+   "marca": "Dos Hermanos",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790538009561",
+   "nombre": "Arrocitas con Sal, Sésamo y Lino",
+   "marca": "Arrocitas",
+   "unidad": "g",
+   "contenido_neto": 101.0
+  },
+  {
+   "codigo_barras": "7790550022258",
+   "nombre": "Súper Cabrales",
+   "marca": "Cabrales",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790550029455",
+   "nombre": "7790550029455",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7790580056001",
+   "nombre": "Confitados",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 50.0
+  },
+  {
+   "codigo_barras": "7790580105822",
+   "nombre": "Chocolate semi amargo",
+   "marca": "Aguila",
+   "unidad": "g",
+   "contenido_neto": 225.0
+  },
+  {
+   "codigo_barras": "7790580109882",
+   "nombre": "Extra Fino 60% Cacao",
+   "marca": "Aguila",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790580111243",
+   "nombre": "Bomboncitos",
+   "marca": "Bon o Bon",
+   "unidad": "g",
+   "contenido_neto": 180.0
+  },
+  {
+   "codigo_barras": "7790580120092",
+   "nombre": "50% cocao",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 25.0
+  },
+  {
+   "codigo_barras": "7790580120573",
+   "nombre": "Ultra 7 Clean Mint",
+   "marca": "Topline",
+   "unidad": "g",
+   "contenido_neto": 24.0
+  },
+  {
+   "codigo_barras": "7790580123741",
+   "nombre": "graffiti blanco",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7790580124397",
+   "nombre": "Chocolate amargo 70%",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7790580132224",
+   "nombre": "Mermelada de Durazno",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 390.0
+  },
+  {
+   "codigo_barras": "7790580134440",
+   "nombre": "Salsa Lista Tipo Italiana &quot;La Campagnola&quot;",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 340.0
+  },
+  {
+   "codigo_barras": "7790580138721",
+   "nombre": "Presto Pronta",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 730.0
+  },
+  {
+   "codigo_barras": "7790580138738",
+   "nombre": "Polenta instantánea",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 490.0
+  },
+  {
+   "codigo_barras": "7790580138868",
+   "nombre": "Puré de tomate",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 530.0
+  },
+  {
+   "codigo_barras": "7790580141844",
+   "nombre": "Mogul Jelly Beans",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 50.0
+  },
+  {
+   "codigo_barras": "7790580146115",
+   "nombre": "puré arcor",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 520.0
+  },
+  {
+   "codigo_barras": "7790580199913",
+   "nombre": "Ositos",
+   "marca": "Mogul",
+   "unidad": "g",
+   "contenido_neto": 30.0
+  },
+  {
+   "codigo_barras": "7790580327415",
+   "nombre": "Rocklets",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7790580504809",
+   "nombre": "Batata con sabor a Chocolate",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790580567903",
+   "nombre": "Tomates Peritas",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790580602000",
+   "nombre": "Mogul Frutales",
+   "marca": "Arcor",
+   "unidad": "g",
+   "contenido_neto": 420.0
+  },
+  {
+   "codigo_barras": "7790639003437",
+   "nombre": "Cunnington 2,25",
+   "marca": "Cunnington",
+   "unidad": "mL",
+   "contenido_neto": 2250.0
+  },
+  {
+   "codigo_barras": "7790710334603",
+   "nombre": "Yerba maté",
+   "marca": "Reune lo bueno",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790742067005",
+   "nombre": "Ls. de leche repostero",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790742140609",
+   "nombre": "Dulce de Leche Estilo Colonial",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790742141705",
+   "nombre": "CREMA COCINAR LS",
+   "marca": "La Serenisima",
+   "unidad": "mL",
+   "contenido_neto": 330.0
+  },
+  {
+   "codigo_barras": "7790742223005",
+   "nombre": "Queso rallado 70g",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 70.0
+  },
+  {
+   "codigo_barras": "7790742223104",
+   "nombre": "Queso rayado reggianito 130g",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 130.0
+  },
+  {
+   "codigo_barras": "7790742321800",
+   "nombre": "Finlandia Light",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 180.0
+  },
+  {
+   "codigo_barras": "7790742324108",
+   "nombre": "Finlandia +Livx",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7790742333605",
+   "nombre": "Leche Zero Lactosa",
+   "marca": "La Serenísima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742335500",
+   "nombre": "Leche Larga Vida Clásica",
+   "marca": "LA SERENISIMA",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742335609",
+   "nombre": "Serenísima Leche Larga Vida Liviana",
+   "marca": "La Serenisima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742340108",
+   "nombre": "Almendra",
+   "marca": "La Serenísima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742340306",
+   "nombre": "Almendra sin Azúcar",
+   "marca": "La  Serenísima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742348005",
+   "nombre": "LaSere 1%",
+   "marca": "La Serenisima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742348302",
+   "nombre": "Leche Fresca Clásica",
+   "marca": "La Serenisima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742352002",
+   "nombre": "Leche Red en Lactosa",
+   "marca": "La Serenisima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742358608",
+   "nombre": "Leche Protein",
+   "marca": "La Serenísima",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790742373205",
+   "nombre": "Finlandia Clasico 290g",
+   "marca": "LA SERENISIMA",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7790742373304",
+   "nombre": "Finlandia lightx 290",
+   "marca": "LA SERENISIMA",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7790742373809",
+   "nombre": "Cremón light x 280",
+   "marca": "La serenísima",
+   "unidad": "g",
+   "contenido_neto": 280.0
+  },
+  {
+   "codigo_barras": "7790742373908",
+   "nombre": "Cremon original x 280",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 280.0
+  },
+  {
+   "codigo_barras": "7790742625205",
+   "nombre": "Dulce de leche estilo colonial",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790742625304",
+   "nombre": "Dulce de leche clásico",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790762050117",
+   "nombre": "La Mascota",
+   "marca": "",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7790787153664",
+   "nombre": "Dulce de leche Ilolay",
+   "marca": "ilolay",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7790787960651",
+   "nombre": "Manteca ilolay 100g 3263956",
+   "marca": "Ilolay",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7790790120257",
+   "nombre": "Arvejas",
+   "marca": "Inca",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7790813130140",
+   "nombre": "Alimento a base de levadura de cerveza",
+   "marca": "virgen",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7790873000025",
+   "nombre": "Levadura en copos",
+   "marca": "TITAN",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7790895000232",
+   "nombre": "Coca-Cola lata",
+   "marca": "Coca",
+   "unidad": "mL",
+   "contenido_neto": 354.0
+  },
+  {
+   "codigo_barras": "7790895000782",
+   "nombre": "Coca-Cola sabor original 500",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790895000829",
+   "nombre": "Sprite",
+   "marca": "coca cola",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790895000997",
+   "nombre": "coca cola",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 2250.0
+  },
+  {
+   "codigo_barras": "7790895001000",
+   "nombre": "Sprite Lima-Limon",
+   "marca": "Sprite",
+   "unidad": "mL",
+   "contenido_neto": 2250.0
+  },
+  {
+   "codigo_barras": "7790895003035",
+   "nombre": "coca-cola",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790895003325",
+   "nombre": "Aquarius naranja",
+   "marca": "Aquarius",
+   "unidad": "mL",
+   "contenido_neto": 2.25
+  },
+  {
+   "codigo_barras": "7790895005794",
+   "nombre": "Coca Sabor Original",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 2500.0
+  },
+  {
+   "codigo_barras": "7790895009815",
+   "nombre": "Naranja Tentación 1L",
+   "marca": "Cepita",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790895010088",
+   "nombre": "schweppes gaseosa sabor pomelo",
+   "marca": "schweppes",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7790895067532",
+   "nombre": "coca zero",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790895067556",
+   "nombre": "Coca zero 1,5l",
+   "marca": "Coca cola",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7790895067617",
+   "nombre": "Coca-Cola sin azúcares",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 2000.0
+  },
+  {
+   "codigo_barras": "7790895640025",
+   "nombre": "Powerade Bebida mountain",
+   "marca": "Powerade",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790895640445",
+   "nombre": "Aquarius Pera",
+   "marca": "AQUARIUS",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7790895640483",
+   "nombre": "AQUA Manzana",
+   "marca": "Coca Cola",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7790895641541",
+   "nombre": "Cepita from Valle Peach",
+   "marca": "Cepita del valle",
+   "unidad": "mL",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7790895643835",
+   "nombre": "Soja + Jugo de Manzana",
+   "marca": "Ades",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7790895645778",
+   "nombre": "SIN GAS",
+   "marca": "Smartwater",
+   "unidad": "mL",
+   "contenido_neto": 591.0
+  },
+  {
+   "codigo_barras": "7790895646027",
+   "nombre": "Agua con Gas",
+   "marca": "Smartwater",
+   "unidad": "mL",
+   "contenido_neto": 591.0
+  },
+  {
+   "codigo_barras": "7790895648441",
+   "nombre": "Cepita del Valle, Naranja (Variedad)",
+   "marca": "Coca-Cola",
+   "unidad": "mL",
+   "contenido_neto": 995.0
+  },
+  {
+   "codigo_barras": "7790895650833",
+   "nombre": "COCA COLA",
+   "marca": "coca",
+   "unidad": "mL",
+   "contenido_neto": 600.0
+  },
+  {
+   "codigo_barras": "7790920008707",
+   "nombre": "Picadillo de Carne",
+   "marca": "safra",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7791017000062",
+   "nombre": "Aceite de oliva extra virgen",
+   "marca": "Yancanelo",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791058790359",
+   "nombre": "Yogur Vainilla Yofrey",
+   "marca": "Manfrey",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7791078023376",
+   "nombre": "Naturitos",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7791118000503",
+   "nombre": "Malta",
+   "marca": "El pocillo",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7791120031557",
+   "nombre": "Arroz largo fino - Molinos Ala",
+   "marca": "PILAGA SA",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791120098888",
+   "nombre": "Arroz Integral",
+   "marca": "PILAGA SA",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791120102769",
+   "nombre": "Tostaditas de arroz clásicas",
+   "marca": "Molinos Ala",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7791203001231",
+   "nombre": "Malbec",
+   "marca": "Luigi Bosca",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7791273000707",
+   "nombre": "ananas golden smile",
+   "marca": "Golden Smile",
+   "unidad": "g",
+   "contenido_neto": 565.0
+  },
+  {
+   "codigo_barras": "7791324157046",
+   "nombre": "Pitusas",
+   "marca": "Par-Nor",
+   "unidad": "g",
+   "contenido_neto": 160.0
+  },
+  {
+   "codigo_barras": "7791324157466",
+   "nombre": "Mini Pitusas sabor Frutilla",
+   "marca": "ParNor",
+   "unidad": "g",
+   "contenido_neto": 160.0
+  },
+  {
+   "codigo_barras": "7791337006355",
+   "nombre": "Yogurisimo sabor Natural",
+   "marca": "La serenisima",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7791337007208",
+   "nombre": "Ser Natural",
+   "marca": "Ser",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7791337007253",
+   "nombre": "Cindor 1L",
+   "marca": "Cindor",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791337007901",
+   "nombre": "Silk almendra",
+   "marca": "Silk",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791337009660",
+   "nombre": "Ser PRO+ Batido Sabor Natural",
+   "marca": "Ser PRO+ Sabor Natural",
+   "unidad": "g",
+   "contenido_neto": 175.0
+  },
+  {
+   "codigo_barras": "7791337009677",
+   "nombre": "batido sabor frutos rojos",
+   "marca": "Ser PRO+",
+   "unidad": "g",
+   "contenido_neto": 175.0
+  },
+  {
+   "codigo_barras": "7791337009783",
+   "nombre": "Yogurísimo natural reducido en lactosa",
+   "marca": "Yoguris",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7791337009820",
+   "nombre": "Ser PRO+ Proteína",
+   "marca": "Ser frutos rojos bebible",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7791337010017",
+   "nombre": "Yogurisimo Griego Natural",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7791337060944",
+   "nombre": "CasanCrem LIGHT",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7791337061361",
+   "nombre": "CasanCrem Clásico",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7791337061385",
+   "nombre": "Balance",
+   "marca": "CasanCrem",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7791337061422",
+   "nombre": "Queso clásico",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7791337061439",
+   "nombre": "Queso Descremado",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7791337061491",
+   "nombre": "Casamcrem",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791337061507",
+   "nombre": "Casanmcrem Balance",
+   "marca": "La Serenisima",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791337939813",
+   "nombre": "yog Ser vainilla",
+   "marca": "Ser PRO+",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7791720018392",
+   "nombre": "Papas fritas sabor original",
+   "marca": "Carrefour Classic",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7791720028773",
+   "nombre": "Tomates Peritas Pelados Carrefour",
+   "marca": "Carrefour",
+   "unidad": "g",
+   "contenido_neto": 230.0
+  },
+  {
+   "codigo_barras": "7791720029473",
+   "nombre": "Leche descremada",
+   "marca": "Classic",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7791720037003",
+   "nombre": "Bizcochitos de grasa",
+   "marca": "Carrefour Classic",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7791787000040",
+   "nombre": "Pepas trio",
+   "marca": "Trio",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791813420385",
+   "nombre": "Toro",
+   "marca": "Paso de los Toros",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791813421368",
+   "nombre": "Paso de los Toros Tonica",
+   "marca": "PEPSICO DE ARGENTINA S.R.L.",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7791813421382",
+   "nombre": "Paso de los toros 1.5l",
+   "marca": "Paso de los Toros",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7791813888406",
+   "nombre": "Pepsi 500",
+   "marca": "Pepsi",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791866000381",
+   "nombre": "Ketchup Natura",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7791866000664",
+   "nombre": "kepchup natura",
+   "marca": "natura",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7791866001203",
+   "nombre": "Mayonesa",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 237.0
+  },
+  {
+   "codigo_barras": "7791866001357",
+   "nombre": "Mayonesa",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 950.0
+  },
+  {
+   "codigo_barras": "7791866001364",
+   "nombre": "Mayonesa Natura",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 475.0
+  },
+  {
+   "codigo_barras": "7791866001579",
+   "nombre": "Mayonesa con aceite de oliva",
+   "marca": "agd",
+   "unidad": "g",
+   "contenido_neto": 475.0
+  },
+  {
+   "codigo_barras": "7791866004211",
+   "nombre": "Aderezo a base de Mostaza",
+   "marca": "Natura",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7791875000020",
+   "nombre": "Havanna Luxury Alfajores Mixed Chocolate / Snow X",
+   "marca": "Havanna",
+   "unidad": "g",
+   "contenido_neto": 612.0
+  },
+  {
+   "codigo_barras": "7791875000334",
+   "nombre": "Galletitas de Limón",
+   "marca": "Havanna",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7791875000471",
+   "nombre": "Havannets Chocolate",
+   "marca": "Havanna",
+   "unidad": "g",
+   "contenido_neto": 456.0
+  },
+  {
+   "codigo_barras": "7791875005353",
+   "nombre": "Dulce de Leche",
+   "marca": "Havanna",
+   "unidad": "g",
+   "contenido_neto": 450.0
+  },
+  {
+   "codigo_barras": "7791875101956",
+   "nombre": "Alfajor Mar del Plata",
+   "marca": "Havanna",
+   "unidad": "g",
+   "contenido_neto": 90.0
+  },
+  {
+   "codigo_barras": "7791954004109",
+   "nombre": "Avena Tradicional",
+   "marca": "Exclusivo",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7792170042258",
+   "nombre": "Cool Blue",
+   "marca": "Gatorade",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792170052271",
+   "nombre": "Gatorade manzana 750",
+   "marca": "Gatorade",
+   "unidad": "mL",
+   "contenido_neto": 750.0
+  },
+  {
+   "codigo_barras": "7792170555420",
+   "nombre": "avena quaker",
+   "marca": "Quaker",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792180001665",
+   "nombre": "Cañuelas Aceite de girasol",
+   "marca": "Cañuelas",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7792180004567",
+   "nombre": "Harina especial pizza casera con levadura",
+   "marca": "Molino Cañuelas",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7792180005182",
+   "nombre": "Cañuelas Aceite de Oliva Virgen Extra Clásico",
+   "marca": "Cañuelas",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792180007315",
+   "nombre": "Paso 5 semillas",
+   "marca": "Molino Cañuelas",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7792180131935",
+   "nombre": "Rocío vegetal Cañuelas girasol",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7792180137111",
+   "nombre": "9 de oro Brigitte vainilla y limón",
+   "marca": "Molino Cañuelas",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7792184003146",
+   "nombre": "Biscuits",
+   "marca": "Soriano",
+   "unidad": "g",
+   "contenido_neto": 130.0
+  },
+  {
+   "codigo_barras": "7792200000128",
+   "nombre": "9 de oro",
+   "marca": "9 de oro",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7792200000159",
+   "nombre": "9 de oro clásicos",
+   "marca": "Molino Cañuelas",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7792200001125",
+   "nombre": "Agridulces",
+   "marca": "9 de oro",
+   "unidad": "g",
+   "contenido_neto": 420.0
+  },
+  {
+   "codigo_barras": "7792290000398",
+   "nombre": "Lentejas secas remojadas",
+   "marca": "Monte nevi",
+   "unidad": "g",
+   "contenido_neto": 340.0
+  },
+  {
+   "codigo_barras": "7792350067019",
+   "nombre": "Inalpa Arvejas secas remojadas",
+   "marca": "Inalpa",
+   "unidad": "g",
+   "contenido_neto": 205.0
+  },
+  {
+   "codigo_barras": "7792360071365",
+   "nombre": "Chocolate taza",
+   "marca": "Bonafide",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7792360072447",
+   "nombre": "Nugaton Chocolate",
+   "marca": "Bonafide",
+   "unidad": "g",
+   "contenido_neto": 27.0
+  },
+  {
+   "codigo_barras": "7792360096818",
+   "nombre": "Donuts chocolate",
+   "marca": "Bonafide",
+   "unidad": "g",
+   "contenido_neto": 78.0
+  },
+  {
+   "codigo_barras": "7792540250450",
+   "nombre": "Azúcar Superior",
+   "marca": "Ledesma",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7792540260138",
+   "nombre": "Azúcar Clásica",
+   "marca": "Ledesma",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7792540294607",
+   "nombre": "AZUCAR MASCABO",
+   "marca": "Ledesma",
+   "unidad": "g",
+   "contenido_neto": 800.0
+  },
+  {
+   "codigo_barras": "7792710000090",
+   "nombre": "Yerba mate especial",
+   "marca": "LA CACHUERA S.A.",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792710000182",
+   "nombre": "Yerba Mate Tradicional",
+   "marca": "Amanda",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792798005888",
+   "nombre": "Brahma lata x 437",
+   "marca": "",
+   "unidad": "mL",
+   "contenido_neto": 473.0
+  },
+  {
+   "codigo_barras": "7792799000011",
+   "nombre": "Agua",
+   "marca": "Eco de los Andes",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7792931000039",
+   "nombre": "Glaciar Agua",
+   "marca": "ECO DE LOS ANDES S A",
+   "unidad": "mL",
+   "contenido_neto": 2000.0
+  },
+  {
+   "codigo_barras": "7793046007722",
+   "nombre": "CormilloT arándanos Light",
+   "marca": "Cormillot",
+   "unidad": "g",
+   "contenido_neto": 390.0
+  },
+  {
+   "codigo_barras": "7793046007791",
+   "nombre": "CormilloT frutilla Light",
+   "marca": "Cormillot",
+   "unidad": "g",
+   "contenido_neto": 390.0
+  },
+  {
+   "codigo_barras": "7793046008415",
+   "nombre": "Mermelada de Durazno",
+   "marca": "Dulcor",
+   "unidad": "g",
+   "contenido_neto": 454.0
+  },
+  {
+   "codigo_barras": "7793147118860",
+   "nombre": "schneider 473",
+   "marca": "",
+   "unidad": "mL",
+   "contenido_neto": 473.0
+  },
+  {
+   "codigo_barras": "7793323004789",
+   "nombre": "Soja texturizada dicomere",
+   "marca": "Dicomere",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7793360000157",
+   "nombre": "Puré de tomate",
+   "marca": "La Campagnola",
+   "unidad": "g",
+   "contenido_neto": 520.0
+  },
+  {
+   "codigo_barras": "7793360103018",
+   "nombre": "Ketchup",
+   "marca": "La campagnola",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7793360131530",
+   "nombre": "Mermelada de frutilla",
+   "marca": "BC el Campagnola",
+   "unidad": "g",
+   "contenido_neto": 390.0
+  },
+  {
+   "codigo_barras": "7793450000159",
+   "nombre": "Larguitas",
+   "marca": "Hojalmar",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7793704000225",
+   "nombre": "Yerba",
+   "marca": "playadito",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7793704000232",
+   "nombre": "Playadito",
+   "marca": "Playadito",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7793704000911",
+   "nombre": "Playadito",
+   "marca": "COOP.AGRIC.DE LA COLONIA LIEBIG LTDA.",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7793704000928",
+   "nombre": "yerba (corregido)",
+   "marca": "PLAYADITO",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7793750000057",
+   "nombre": "pipore Tea",
+   "marca": "Piporé",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7793890258264",
+   "nombre": "Rapiditas Clásicas",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 275.0
+  },
+  {
+   "codigo_barras": "7793890258271",
+   "nombre": "Rapiditas BIMBO Light",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 275.0
+  },
+  {
+   "codigo_barras": "7793890258288",
+   "nombre": "Rapiditas BIMBO Integrales",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 275.0
+  },
+  {
+   "codigo_barras": "7793890258806",
+   "nombre": "Lactal hamburguesa",
+   "marca": "LACTAL",
+   "unidad": "g",
+   "contenido_neto": 210.0
+  },
+  {
+   "codigo_barras": "7793890260885",
+   "nombre": "Pan BIMBO Artesano BLANCO",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7793890260892",
+   "nombre": "Pan BIMBO Artesano Integral",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7793890261226",
+   "nombre": "Pan Integral  BIMBOCero Cero",
+   "marca": "Bimbo",
+   "unidad": "g",
+   "contenido_neto": 430.0
+  },
+  {
+   "codigo_barras": "7793890261486",
+   "nombre": "Integral Granos Enteros",
+   "marca": "Fargo",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7793890261493",
+   "nombre": "Pan FARGO Con Cereales Y Semillas",
+   "marca": "Fargo",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7793913001822",
+   "nombre": "Tregar Leche Entera",
+   "marca": "Tregar",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7793913002423",
+   "nombre": "Yogurt natural endulzado",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7793913013252",
+   "nombre": "colchón arandanos",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 160.0
+  },
+  {
+   "codigo_barras": "7793913013443",
+   "nombre": "Crema De Leche Doble",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7793913013535",
+   "nombre": "cremoso vainilla",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 125.0
+  },
+  {
+   "codigo_barras": "7793913013689",
+   "nombre": "Natural",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7793913013726",
+   "nombre": "Queso blanco light",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7793913013986",
+   "nombre": "Yogur natural endulzado",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 280.0
+  },
+  {
+   "codigo_barras": "7793913013993",
+   "nombre": "Yogur natural sin azúcar agregada",
+   "marca": "Tregar",
+   "unidad": "g",
+   "contenido_neto": 280.0
+  },
+  {
+   "codigo_barras": "7793940054006",
+   "nombre": "Manteca",
+   "marca": "La Serenísima",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7794000006072",
+   "nombre": "Mayonesa Clásica Rica y Cremosa",
+   "marca": "Hellmann's",
+   "unidad": "g",
+   "contenido_neto": 475.0
+  },
+  {
+   "codigo_barras": "7794000006164",
+   "nombre": "Hellmann's Ketchup",
+   "marca": "Hellmann's",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7794000006188",
+   "nombre": "Ketchup",
+   "marca": "Hellmann's",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7794000006478",
+   "nombre": "Savora",
+   "marca": "Savora",
+   "unidad": "g",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7794000006485",
+   "nombre": "Mostaza &quot;Savora&quot; 500 g",
+   "marca": "Savora",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7794000007109",
+   "nombre": "Hellmans liviana",
+   "marca": "Hellmann's",
+   "unidad": "g",
+   "contenido_neto": 475.0
+  },
+  {
+   "codigo_barras": "7794000008557",
+   "nombre": "Caldo de verduras",
+   "marca": "Knorr",
+   "unidad": "g",
+   "contenido_neto": 18.0
+  },
+  {
+   "codigo_barras": "7794000008595",
+   "nombre": "CALDO DE VERDURAS",
+   "marca": "Knorr",
+   "unidad": "g",
+   "contenido_neto": 57.0
+  },
+  {
+   "codigo_barras": "7794520869034",
+   "nombre": "Bastoncillos",
+   "marca": "Krachitos Snack",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7794820902721",
+   "nombre": "Yogur cremoso",
+   "marca": "Milkaut",
+   "unidad": "g",
+   "contenido_neto": 180.0
+  },
+  {
+   "codigo_barras": "7794820903292",
+   "nombre": "Manteca milkaut 100g",
+   "marca": "Milkout",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7794870000330",
+   "nombre": "Aceite",
+   "marca": "Bunge",
+   "unidad": "mL",
+   "contenido_neto": 900.0
+  },
+  {
+   "codigo_barras": "7794940000536",
+   "nombre": "Hileret Light",
+   "marca": "hileret",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7794940000796",
+   "nombre": "Hileret Stevia",
+   "marca": "Hileret",
+   "unidad": "mL",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7794940000864",
+   "nombre": "Hileret Zucra",
+   "marca": "Hileret",
+   "unidad": "mL",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7794990878871",
+   "nombre": "Fontina untable la psulina",
+   "marca": "La Paulina",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7794990879656",
+   "nombre": "Queso de crema tradicional",
+   "marca": "La Paulina",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7794990879663",
+   "nombre": "Queso de Crema Equilibrio",
+   "marca": "La Paulina",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7795258000737",
+   "nombre": "extracto natural de vainilla",
+   "marca": "especias el castillo",
+   "unidad": "mL",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7795293601869",
+   "nombre": "Pan integral",
+   "marca": "Don Yeyo",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7795735000328",
+   "nombre": "Bizcocho Salado",
+   "marca": "Don Satur",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7795735000335",
+   "nombre": "Bizcocho Dulce",
+   "marca": "Don Satur",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7795735000342",
+   "nombre": "Bizcocho Negrito",
+   "marca": "Don Satur",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7795735600917",
+   "nombre": "Mix de semillas",
+   "marca": "Don Satur",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7795735600924",
+   "nombre": "Pepas",
+   "marca": "Don Satur",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7795735601228",
+   "nombre": "Bizcochos vegetales",
+   "marca": "DON SATUR",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7795933204023",
+   "nombre": "Champignones Enteros al Natural Bahía",
+   "marca": "Bahía",
+   "unidad": "g",
+   "contenido_neto": 230.0
+  },
+  {
+   "codigo_barras": "7796373002682",
+   "nombre": "Chimi Churri",
+   "marca": "La Parmesana",
+   "unidad": "mL",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7798014465429",
+   "nombre": "Stevia",
+   "marca": "Stevia Dulri",
+   "unidad": "mL",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7798031470833",
+   "nombre": "Pasta de kale",
+   "marca": "Wakas",
+   "unidad": "g",
+   "contenido_neto": 300.0
+  },
+  {
+   "codigo_barras": "7798033333907",
+   "nombre": "Lomitos de atún al natural",
+   "marca": "Classic",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7798039590342",
+   "nombre": "Reserve Malbec",
+   "marca": "Trivento",
+   "unidad": "mL",
+   "contenido_neto": 7500.0
+  },
+  {
+   "codigo_barras": "7798039850026",
+   "nombre": "Andresito",
+   "marca": "Andresito",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798048720150",
+   "nombre": "Porotos negros",
+   "marca": "Elio",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7798048720938",
+   "nombre": "Lentejon",
+   "marca": "Elio",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7798048730876",
+   "nombre": "Pepas",
+   "marca": "Delicias de la Nonna",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7798054490603",
+   "nombre": "Dulce de Leche Sin Azucar",
+   "marca": "Doña Magdalena",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7798059750252",
+   "nombre": "Mate Tee Kraus Mate Organica 500g - Bio Und Fair Trade",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 7500.0
+  },
+  {
+   "codigo_barras": "7798060850019",
+   "nombre": "Manteca Tonadita",
+   "marca": "Tonadita",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7798060850026",
+   "nombre": "Manteca Tonadita",
+   "marca": "ELCOR S.A.",
+   "unidad": "g",
+   "contenido_neto": 200.0
+  },
+  {
+   "codigo_barras": "7798060852822",
+   "nombre": "Queso Cremette Tonadita",
+   "marca": "Tonadita",
+   "unidad": "g",
+   "contenido_neto": 290.0
+  },
+  {
+   "codigo_barras": "7798065733454",
+   "nombre": "Agua mineral",
+   "marca": "Sierra de los Padres",
+   "unidad": "mL",
+   "contenido_neto": 600.0
+  },
+  {
+   "codigo_barras": "7798067630041",
+   "nombre": "Yerba Mate con Menta",
+   "marca": "Dob Arriegui",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7798085681568",
+   "nombre": "Jugo de naranja sin pulpa",
+   "marca": "Citric",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798085681841",
+   "nombre": "Jugo de naranja con pulpa",
+   "marca": "Citric",
+   "unidad": "mL",
+   "contenido_neto": 1500.0
+  },
+  {
+   "codigo_barras": "7798085681957",
+   "nombre": "Frutas de estación naranja y frutilla",
+   "marca": "EL CARMEN S.A.",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798088960059",
+   "nombre": "Mermelada de Higo",
+   "marca": "El Brocal",
+   "unidad": "g",
+   "contenido_neto": 420.0
+  },
+  {
+   "codigo_barras": "7798094220956",
+   "nombre": "Alfajor Genio Dulce de Leche",
+   "marca": "Genio Nevados",
+   "unidad": "g",
+   "contenido_neto": 60.0
+  },
+  {
+   "codigo_barras": "7798094225616",
+   "nombre": "Minitorta Rapsodia",
+   "marca": "Nevares",
+   "unidad": "g",
+   "contenido_neto": 80.0
+  },
+  {
+   "codigo_barras": "7798096031055",
+   "nombre": "Arvejas",
+   "marca": "Doña Pupa",
+   "unidad": "g",
+   "contenido_neto": 340.0
+  },
+  {
+   "codigo_barras": "7798108347891",
+   "nombre": "Ananás en rodajas",
+   "marca": "Carrefour",
+   "unidad": "g",
+   "contenido_neto": 565.0
+  },
+  {
+   "codigo_barras": "7798113300010",
+   "nombre": "Manaos cola",
+   "marca": "Manaos",
+   "unidad": "mL",
+   "contenido_neto": 2250.0
+  },
+  {
+   "codigo_barras": "7798113300027",
+   "nombre": "Manaos",
+   "marca": "Manaos",
+   "unidad": "mL",
+   "contenido_neto": 2250.0
+  },
+  {
+   "codigo_barras": "7798119220015",
+   "nombre": "Speed 250",
+   "marca": "Speed Unlimited",
+   "unidad": "mL",
+   "contenido_neto": 250.0
+  },
+  {
+   "codigo_barras": "7798119220183",
+   "nombre": "Speed 473",
+   "marca": "Speed Unlimited",
+   "unidad": "mL",
+   "contenido_neto": 473.0
+  },
+  {
+   "codigo_barras": "7798127670161",
+   "nombre": "miel orgánica",
+   "marca": "las quinas",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7798127670260",
+   "nombre": "miel organica",
+   "marca": "las quinas",
+   "unidad": "g",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7798128000684",
+   "nombre": "Galletas Integral",
+   "marca": "Cachafaz",
+   "unidad": "g",
+   "contenido_neto": 225.0
+  },
+  {
+   "codigo_barras": "7798128000691",
+   "nombre": "Galletas Integral de Avena con Chips de Chocolate",
+   "marca": "Cachafaz",
+   "unidad": "g",
+   "contenido_neto": 225.0
+  },
+  {
+   "codigo_barras": "7798128000707",
+   "nombre": "Galletas Integral de Granola con Avena, Almendras y Maní",
+   "marca": "Cachafaz",
+   "unidad": "g",
+   "contenido_neto": 225.0
+  },
+  {
+   "codigo_barras": "7798128002138",
+   "nombre": "Galletitas Orgánicas Avena & Miel",
+   "marca": "Cachafaz",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7798134780235",
+   "nombre": "Mermelada de frutilla dietética",
+   "marca": "Trini",
+   "unidad": "g",
+   "contenido_neto": 410.0
+  },
+  {
+   "codigo_barras": "7798136870545",
+   "nombre": "Dahi yogur firme natural",
+   "marca": "Dahi",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7798136870606",
+   "nombre": "Yogur Descremado",
+   "marca": "Dahi",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7798136870743",
+   "nombre": "Yogur Deslactosado Natural",
+   "marca": "Dahi",
+   "unidad": "g",
+   "contenido_neto": 190.0
+  },
+  {
+   "codigo_barras": "7798141711031",
+   "nombre": "Puré de Tomates",
+   "marca": "Carrefour",
+   "unidad": "g",
+   "contenido_neto": 520.0
+  },
+  {
+   "codigo_barras": "7798142880019",
+   "nombre": "Tostadas de arroz - sabor original",
+   "marca": "productos cariló",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7798143230264",
+   "nombre": "Jual Stevia",
+   "marca": "Jual",
+   "unidad": "mL",
+   "contenido_neto": 125.0
+  },
+  {
+   "codigo_barras": "7798147783223",
+   "nombre": "Frambuesas Bañadas Chocolate con Leche",
+   "marca": "franui",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7798151952332",
+   "nombre": "Pasta de Maní Natural",
+   "marca": "Maní King",
+   "unidad": "g",
+   "contenido_neto": 485.0
+  },
+  {
+   "codigo_barras": "7798151952356",
+   "nombre": "Pasta de maní Natural",
+   "marca": "Maní King",
+   "unidad": "g",
+   "contenido_neto": 245.0
+  },
+  {
+   "codigo_barras": "7798151953117",
+   "nombre": "Natural Peanut Butter",
+   "marca": "Maní King",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7798151953254",
+   "nombre": "pasta de maní",
+   "marca": "Maní King",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7798151953360",
+   "nombre": "Maní Tostado sin Piel",
+   "marca": "Maní King",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7798156760062",
+   "nombre": "Puré de tomates",
+   "marca": "Sabores del Valle",
+   "unidad": "g",
+   "contenido_neto": 520.0
+  },
+  {
+   "codigo_barras": "7798165593347",
+   "nombre": "Mantequilla de maní",
+   "marca": "BEEPURE",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7798171730095",
+   "nombre": "Alfajor de chocolate",
+   "marca": "Alfa Pampa",
+   "unidad": "g",
+   "contenido_neto": 60.0
+  },
+  {
+   "codigo_barras": "7798171730392",
+   "nombre": "Chips de papas rústicas y sal marina nuestros dabores",
+   "marca": "Nuestros Sabores",
+   "unidad": "g",
+   "contenido_neto": 80.0
+  },
+  {
+   "codigo_barras": "7798174970016",
+   "nombre": "Azúcar",
+   "marca": "",
+   "unidad": "g",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798181510212",
+   "nombre": "Crackers",
+   "marca": "Smams",
+   "unidad": "g",
+   "contenido_neto": 150.0
+  },
+  {
+   "codigo_barras": "7798183771918",
+   "nombre": "Bocaditos de framuesas con doble chocolate",
+   "marca": "Grido",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7798187211830",
+   "nombre": "Tostaditas De Arroz Sabor 4 Quesos",
+   "marca": "Quento Snacks",
+   "unidad": "g",
+   "contenido_neto": 95.0
+  },
+  {
+   "codigo_barras": "7798188380177",
+   "nombre": "Galletitas Dulces Sabor Vainilla",
+   "marca": "Cautiva",
+   "unidad": "g",
+   "contenido_neto": 25.0
+  },
+  {
+   "codigo_barras": "7798200050019",
+   "nombre": "Tostaditas de arroz",
+   "marca": "Crackines",
+   "unidad": "g",
+   "contenido_neto": 120.0
+  },
+  {
+   "codigo_barras": "7798228640902",
+   "nombre": "green crops",
+   "marca": "establecimiento fin del mundo",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798233800704",
+   "nombre": "Fajitas Integrales Panacity x10 unidades",
+   "marca": "Panacity",
+   "unidad": "g",
+   "contenido_neto": 360.0
+  },
+  {
+   "codigo_barras": "7798267200754",
+   "nombre": "Mini alfajor. Pasta de maní",
+   "marca": "La Bustincera",
+   "unidad": "g",
+   "contenido_neto": 140.0
+  },
+  {
+   "codigo_barras": "7798310270048",
+   "nombre": "Granola original",
+   "marca": "Kuati",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7798333090067",
+   "nombre": "muecas cacao",
+   "marca": "MUÉCAS ALIMENTOS S.R.L.",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798333090142",
+   "nombre": "muecas, pasas y arandanos",
+   "marca": "MUECAS",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798338290035",
+   "nombre": "leche parcialmente descremada",
+   "marca": "las tres niñas",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798338291575",
+   "nombre": "Leche 0% lactosa",
+   "marca": "Las tres niñas",
+   "unidad": "mL",
+   "contenido_neto": 1000.0
+  },
+  {
+   "codigo_barras": "7798342151810",
+   "nombre": "NOT PROTEIN BAR CHOCOLATE BROWNIE",
+   "marca": "NOT",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798342151827",
+   "nombre": "NOT PROTEIN BAR Almond Salted Caramel",
+   "marca": "NotCo",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798343750999",
+   "nombre": "Barra de avena con almendra y nuez",
+   "marca": "INTEGRA",
+   "unidad": "g",
+   "contenido_neto": 41.0
+  },
+  {
+   "codigo_barras": "7798343751002",
+   "nombre": "Barra de avena y banana",
+   "marca": "Integra",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7798343751026",
+   "nombre": "Barra de avena",
+   "marca": "Integra",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7798343751118",
+   "nombre": "Granola De Chocolate",
+   "marca": "Integra",
+   "unidad": "g",
+   "contenido_neto": 350.0
+  },
+  {
+   "codigo_barras": "7798343751422",
+   "nombre": "Barra De Cereal Proteica Mani Y Chocolate",
+   "marca": "Íntegra",
+   "unidad": "g",
+   "contenido_neto": 45.0
+  },
+  {
+   "codigo_barras": "7798355480044",
+   "nombre": "Pan con Salvado",
+   "marca": "Deli Pan",
+   "unidad": "g",
+   "contenido_neto": 380.0
+  },
+  {
+   "codigo_barras": "7798359560445",
+   "nombre": "Alfajor Negro marley",
+   "marca": "Marley",
+   "unidad": "g",
+   "contenido_neto": 75.0
+  },
+  {
+   "codigo_barras": "7798359560452",
+   "nombre": "Alfajor Marley Blanco",
+   "marca": "Marley",
+   "unidad": "g",
+   "contenido_neto": 75.0
+  },
+  {
+   "codigo_barras": "7798359560469",
+   "nombre": "Alfajor tribajón de chocolate",
+   "marca": "Marley",
+   "unidad": "g",
+   "contenido_neto": 100.0
+  },
+  {
+   "codigo_barras": "7798397444202",
+   "nombre": "Alfajor negro rasta",
+   "marca": "Rasta",
+   "unidad": "g",
+   "contenido_neto": 70.0
+  },
+  {
+   "codigo_barras": "7798417060085",
+   "nombre": "Leche en polvo",
+   "marca": "La Herminia",
+   "unidad": "g",
+   "contenido_neto": 400.0
+  },
+  {
+   "codigo_barras": "7798419670091",
+   "nombre": "Barra De Avellama Y Chocolate",
+   "marca": "CRUDDA",
+   "unidad": "g",
+   "contenido_neto": 40.0
+  },
+  {
+   "codigo_barras": "7798422620021",
+   "nombre": "monster energy ultra",
+   "marca": "Monster Energy",
+   "unidad": "mL",
+   "contenido_neto": 473.0
+  },
+  {
+   "codigo_barras": "7799120000863",
+   "nombre": "Atún desmenuzado al natural",
+   "marca": "Aliada",
+   "unidad": "g",
+   "contenido_neto": 170.0
+  },
+  {
+   "codigo_barras": "7799155000173",
+   "nombre": "Villavicencio Sin Gas",
+   "marca": "",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  },
+  {
+   "codigo_barras": "7799155000197",
+   "nombre": "Villavicencio Sin Gas",
+   "marca": "",
+   "unidad": "mL",
+   "contenido_neto": 2000.0
+  },
+  {
+   "codigo_barras": "7799155000982",
+   "nombre": "Levite sabor a Pomelo",
+   "marca": "Villa del Sur",
+   "unidad": "mL",
+   "contenido_neto": 500.0
+  }
+ ]
+}

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'data/local/base_de_datos.dart';
 import 'data/identidad.dart';
+import 'data/semilla.dart';
 import 'features/articulos/articulos_screen.dart';
 import 'features/busqueda/busqueda_screen.dart';
 import 'features/comercios/comercios_screen.dart';
@@ -47,51 +50,66 @@ class _HomeShellState extends State<HomeShell> {
 
   /// S14 (R17): en el primer inicio pide el nombre o apodo del aportante y
   /// lo guarda en el dispositivo. Sin email ni conexión.
+  /// S2 (v0.1.1): al terminar, importa el semillero si falta (segundo plano).
   Future<void> _pedirEtiquetaSiFalta() async {
-    if (await hayUsuario(widget.baseDeDatos)) return;
-    if (!mounted) return;
+    if (!await hayUsuario(widget.baseDeDatos)) {
+      if (!mounted) return;
 
-    final TextEditingController controlador = TextEditingController();
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Bienvenida/o'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text(
-              '¿Cómo te llamamos? Tu etiqueta de aportante queda guardada '
-              'en el dispositivo y viaja con cada precio que cargás.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              key: const ValueKey('campo-etiqueta'),
-              controller: controlador,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Nombre o apodo',
-                border: OutlineInputBorder(),
+      final TextEditingController controlador = TextEditingController();
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) => AlertDialog(
+          title: const Text('Bienvenida/o'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                '¿Cómo te llamamos? Tu etiqueta de aportante queda guardada '
+                'en el dispositivo y viaja con cada precio que cargás.',
               ),
+              const SizedBox(height: 12),
+              TextField(
+                key: const ValueKey('campo-etiqueta'),
+                controller: controlador,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre o apodo',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            FilledButton(
+              key: const ValueKey('btn-guardar-etiqueta'),
+              onPressed: () async {
+                final String etiqueta = controlador.text.trim();
+                await crearUsuarioConEtiqueta(
+                  widget.baseDeDatos,
+                  etiqueta.isEmpty ? 'Anónimo' : etiqueta,
+                );
+                if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Guardar'),
             ),
           ],
         ),
-        actions: <Widget>[
-          FilledButton(
-            key: const ValueKey('btn-guardar-etiqueta'),
-            onPressed: () async {
-              final String etiqueta = controlador.text.trim();
-              await crearUsuarioConEtiqueta(
-                widget.baseDeDatos,
-                etiqueta.isEmpty ? 'Anónimo' : etiqueta,
-              );
-              if (dialogContext.mounted) Navigator.of(dialogContext).pop();
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
+      );
+    }
+
+    // Con el usuario resuelto, el semillero entra en segundo plano: no
+    // bloquea la UI y la dedup por EAN lo hace idempotente.
+    unawaited(_importarSemillaSiFalta());
+  }
+
+  Future<void> _importarSemillaSiFalta() async {
+    try {
+      await importarSemillaDelAsset(widget.baseDeDatos);
+    } catch (_) {
+      // El semillero es una conveniencia: si el asset faltara o estuviera
+      // corrupto, la app funciona igual con altas manuales.
+    }
   }
 
   static const List<String> _titles = <String>[
