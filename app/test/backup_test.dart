@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart' hide Column;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:seguidor_precios/data/backup.dart';
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
@@ -194,31 +198,92 @@ void main() {
     });
   });
 
-  group('InicioScreen — backup UI', () {
+  group('InicioScreen — backup UI (v0.1.1: archivos)', () {
     Widget envolver(Widget hijo) => MaterialApp(home: Scaffold(body: hijo));
 
-    testWidgets('exportar JSON muestra el contenido del backup', (tester) async {
-      await tester.pumpWidget(envolver(InicioScreen(baseDeDatos: db)));
+    testWidgets('exportar JSON comparte un archivo .json vía share sheet',
+        (tester) async {
+      final compartidas = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        const MethodChannel('dev.fluttercommunity.plus/share'), (call) async {
+          compartidas.add(call);
+          return null;
+        },
+      );
+      const canalPaths = MethodChannel('plugins.flutter.io/path_provider');
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        canalPaths,
+        (call) async => Directory.systemTemp.path,
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            const MethodChannel('dev.fluttercommunity.plus/share'), null);
+        tester.binding.defaultBinaryMessenger
+            .setMockMethodCallHandler(canalPaths, null);
+      });
 
-      await tester.tap(find.byKey(const ValueKey('btn-exportar-json')));
+      await tester.pumpWidget(envolver(InicioScreen(baseDeDatos: db)));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('seguidor-precios-backup'), findsOneWidget);
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const ValueKey('btn-exportar-json')));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      });
+      await tester.pumpAndSettle();
+
+      // El contrato real: el backup viaja como .json con el formato v1.
+      // (El resultado del share sheet varía por plataforma: unavailable en
+      // desktop/CI, pero el archivo queda generado y compartido.)
+      final backups = Directory.systemTemp
+          .listSync()
+          .whereType<File>()
+          .where((f) =>
+              f.uri.pathSegments.last
+                  .startsWith('backup-seguidor-precios-') &&
+              f.path.endsWith('.json'))
+          .toList();
+      expect(backups, isNotEmpty);
+      final contenido = backups.map((f) => f.readAsStringSync()).join();
+      expect(contenido, contains('seguidor-precios-backup'));
+      expect(contenido, contains('"precios"'));
+
+      // Limpieza: los backups generados en temp no deben acumularse.
+      for (final f in backups) {
+        f.deleteSync();
+      }
     });
 
-    testWidgets('importar pega el backup y reporta el resultado',
-        (tester) async {
+    testWidgets('importar elige archivo, importa y avisa', (tester) async {
       final backup = jsonEncode(await exportarBackup(db));
       final db2 = BaseDeDatos.memoria();
       addTearDown(db2.close);
 
+      final archivo = File('build/backup-prueba.json').absolute
+        ..writeAsStringSync(backup);
+      addTearDown(() {
+        // Windows retiene el lock un instante tras la lectura: tolerante.
+        try {
+          if (archivo.existsSync()) archivo.deleteSync();
+        } on FileSystemException {
+          // se limpia en la próxima corrida de CI (runner efímero)
+        }
+      });
+
+      final original = FilePickerPlatform.instance;
+      FilePickerPlatform.instance = _FilePickerFalso(_ArchivoFalso(archivo));
+      addTearDown(() => FilePickerPlatform.instance = original);
+
       await tester.pumpWidget(envolver(InicioScreen(baseDeDatos: db2)));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const ValueKey('btn-importar')));
-      await tester.pumpAndSettle();
-      await tester.enterText(
-          find.byKey(const ValueKey('campo-importar')), backup);
-      await tester.tap(find.byKey(const ValueKey('btn-confirmar-importar')));
+      // La lectura del archivo y la importación son E/S real: el FakeAsync
+      // de flutter_test no las completa solas → el tap corre dentro de
+      // runAsync con espera real.
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const ValueKey('btn-importar')));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      });
       await tester.pumpAndSettle();
 
       expect(find.textContaining('4 filas nuevas'), findsOneWidget);
@@ -226,23 +291,77 @@ void main() {
       expect(precios, hasLength(1));
     });
 
-    testWidgets('importar texto inválido muestra error y no inserta',
-        (tester) async {
+    testWidgets('cancelar el selector no importa nada', (tester) async {
       final db2 = BaseDeDatos.memoria();
       addTearDown(db2.close);
 
+      final original = FilePickerPlatform.instance;
+      FilePickerPlatform.instance = _FilePickerFalso(null);
+      addTearDown(() => FilePickerPlatform.instance = original);
+
       await tester.pumpWidget(envolver(InicioScreen(baseDeDatos: db2)));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const ValueKey('btn-importar')));
       await tester.pumpAndSettle();
-      await tester.enterText(
-          find.byKey(const ValueKey('campo-importar')), 'no-es-json');
-      await tester.tap(find.byKey(const ValueKey('btn-confirmar-importar')));
-      await tester.pumpAndSettle();
 
-      expect(find.text('El texto no es un backup válido'), findsOneWidget);
+      expect(find.textContaining('Backup importado'), findsNothing);
       final comercios = await db2.select(db2.comercios).get();
       expect(comercios, isEmpty);
     });
   });
+}
+
+/// [PlatformFile] falso sobre un archivo real de disco.
+final class _ArchivoFalso extends PlatformFile {
+  _ArchivoFalso(this._archivo);
+
+  final File _archivo;
+
+  @override
+  String get name => _archivo.uri.pathSegments.last;
+
+  @override
+  Uri get uri => _archivo.uri;
+
+  @override
+  XFile get xFile => XFile(_archivo.path);
+
+  @override
+  int? lengthSync() => _archivo.lengthSync();
+
+  @override
+  Future<int?> length() async => _archivo.lengthSync();
+
+  @override
+  Future<Uint8List> readAsBytes() => _archivo.readAsBytes();
+
+  @override
+  Stream<Uint8List> readAsByteStream() =>
+      _archivo.openRead().map(Uint8List.fromList);
+}
+
+/// [FilePickerPlatform] falso: devuelve el archivo o una lista vacía.
+class _FilePickerFalso extends FilePickerPlatform {
+  _FilePickerFalso(this.resultado);
+
+  final PlatformFile? resultado;
+
+  @override
+  Future<List<PlatformFile>> pickFiles({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.any,
+    List<String>? allowedExtensions,
+    Function(FilePickerStatus)? onFileLoading,
+    int compressionQuality = 0,
+    AndroidOptions androidOptions = const AndroidOptions(),
+    DarwinOptions darwinOptions = const DarwinOptions(),
+    WindowsOptions windowsOptions = const WindowsOptions(),
+    LinuxOptions linuxOptions = const LinuxOptions(),
+    WebOptions webOptions = const WebOptions(),
+  }) async =>
+      resultado == null
+          ? const <PlatformFile>[]
+          : <PlatformFile>[resultado!];
 }

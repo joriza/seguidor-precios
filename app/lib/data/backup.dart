@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'local/base_de_datos.dart';
 
@@ -214,4 +216,28 @@ String campoCsv(String valor) {
       valor.contains('\r');
   if (!necesita) return valor;
   return '"${valor.replaceAll('"', '""')}"';
+}
+
+/// S1 (v0.1.1): el backup viaja como ARCHIVO — export genera un .json en el
+/// directorio temporal listo para compartir, y la importación lee el archivo
+/// elegido por el dueño (la lógica de datos no cambia).
+Future<File> exportarBackupAArchivo(BaseDeDatos db) async {
+  final directorio = await getTemporaryDirectory();
+  final String marca =
+      DateTime.now().toUtc().toIso8601String().replaceAll(RegExp(r'[^0-9]'), '');
+  final archivo = File('${directorio.path}/backup-seguidor-precios-$marca.json');
+  await archivo.writeAsString(
+    const JsonEncoder.withIndent('  ').convert(await exportarBackup(db)),
+  );
+  return archivo;
+}
+
+/// Exporta los precios como CSV en un archivo temporal compartible.
+Future<File> exportarCsvAArchivo(BaseDeDatos db) async {
+  final directorio = await getTemporaryDirectory();
+  final String marca =
+      DateTime.now().toUtc().toIso8601String().replaceAll(RegExp(r'[^0-9]'), '');
+  final archivo = File('${directorio.path}/precios-seguidor-precios-$marca.csv');
+  await archivo.writeAsString(await exportarPreciosCsv(db));
+  return archivo;
 }

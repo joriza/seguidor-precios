@@ -1,7 +1,8 @@
-import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../data/backup.dart';
 import '../../data/identidad.dart';
@@ -138,93 +139,55 @@ class _InicioScreenState extends State<InicioScreen> {
     );
   }
 
-  Future<void> _exportarJson(BuildContext context) async {
-    final String json =
-        JsonEncoder.withIndent('  ').convert(await exportarBackup(widget.baseDeDatos));
-    if (!context.mounted) return;
-    _mostrarTexto(context, 'Backup JSON', json);
-  }
-
-  Future<void> _exportarCsv(BuildContext context) async {
-    final String csv = await exportarPreciosCsv(widget.baseDeDatos);
-    if (!context.mounted) return;
-    _mostrarTexto(context, 'Precios CSV', csv);
-  }
-
-  void _mostrarTexto(BuildContext context, String titulo, String texto) {
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text(titulo),
-        content: SingleChildScrollView(
-          child: SelectableText(
-            texto,
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-          ),
+  /// S1 (v0.1.1): el backup viaja como archivo vía share sheet.
+  Future<void> _compartirArchivo(
+    BuildContext context,
+    String asunto,
+    Future<File> Function() crear,
+  ) async {
+    try {
+      final File archivo = await crear();
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(archivo.path)],
+          title: asunto,
+          text: '$asunto — guardalo o compartilo donde quieras.',
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: texto));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Copiado al portapapeles')),
-              );
-              Navigator.of(dialogContext).pop();
-            },
-            child: const Text('Copiar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo generar el archivo')),
+      );
+    }
   }
 
+  Future<void> _exportarJson(BuildContext context) => _compartirArchivo(
+        context,
+        'Backup Seguidor de Precios (JSON)',
+        () => exportarBackupAArchivo(widget.baseDeDatos),
+      );
+
+  Future<void> _exportarCsv(BuildContext context) => _compartirArchivo(
+        context,
+        'Precios de Seguidor de Precios (CSV)',
+        () => exportarCsvAArchivo(widget.baseDeDatos),
+      );
+
+  /// S1 (v0.1.1): importar elige el archivo .json del backup.
   Future<void> _importar(BuildContext context) async {
-    final TextEditingController controlador = TextEditingController();
-    final bool? confirmar = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Importar backup'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text(
-              'Pegá acá el contenido del backup JSON. '
-              'Las filas que ya existen no se modifican.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              key: const ValueKey('campo-importar'),
-              controller: controlador,
-              maxLines: 6,
-              decoration: const InputDecoration(
-                hintText: '{"formato": "seguidor-precios-backup", ...}',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            key: const ValueKey('btn-confirmar-importar'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Importar'),
-          ),
-        ],
-      ),
+    final archivos = await FilePicker.pickFiles(
+      dialogTitle: 'Elegí el backup (JSON)',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
     );
-    if (confirmar != true || !context.mounted) return;
+    final String? path = archivos.isEmpty ? null : archivos.first.path;
+    if (path == null || !context.mounted) return; // cancelado
 
     try {
+      final String contenido = await File(path).readAsString();
       final ResumenImportacion resumen =
-          await importarBackup(widget.baseDeDatos, controlador.text);
+          await importarBackup(widget.baseDeDatos, contenido);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -238,8 +201,13 @@ class _InicioScreenState extends State<InicioScreen> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('El texto no es un backup válido'),
+          content: Text('El archivo no es un backup válido'),
         ),
+      );
+    } on FileSystemException {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo leer el archivo')),
       );
     }
   }
