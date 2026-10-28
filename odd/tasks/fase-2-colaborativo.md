@@ -185,6 +185,15 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   los SnackBar de app.dart/refresco.dart muestran el detalle real. Suite 201/201. Release
   v0.2.2+8 vía CI: el dueño reintenta la sync y el propio teléfono muestra el error exacto
   (o se lee por USB con flutter run adjunto).
+- L18 — SYNC REAL VERIFICADA EN SERVIDOR (2026-10-28 19:36:24): el dueño sincronizó desde
+  v0.2.1 — comercio: 2 filas reales (Coto, Tino Market, tipo almacen); precio: 7 filas con
+  historial v0.1.x (2026-10-19 y 2026-10-27, cargado_en 19:36:24 = hora del push del dueño);
+  producto: 428 completos; usuario: identidad joriza con auth_uid. El backfill v4 funcionó
+  (sus comercios/precios históricos subieron). Nota menor de UI: el SnackBar de éxito no fue
+  visto por el dueño (v0.2.2 mejora la visibilidad de resultados y errores). FASE 2 VALIDADA
+  EN DISPOSITIVO. Pendientes administrativos: (1) dueño aplica el SQL de es_admin con su uid
+  (opcional, no bloquea); (2) merge fase-2-colaborativo → main (decisión del dueño); (3)
+  instalar v0.2.2 en el teléfono (opcional, mejora errores visibles).
 - L16 — SEGUNDA causa del fallo de sync del dueño (post-0003/0004): su usuario y producto
   subieron ✓, pero el precio murió en FK — apunta a un comercio de la era v0.1.x que nunca
   entró al outbox (los hooks nacieron en v0.2.0; su outbox tenía exactamente producto+precio,
