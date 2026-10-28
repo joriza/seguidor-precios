@@ -3199,6 +3199,755 @@ class ValoracionesCompanion extends UpdateCompanion<Valoracion> {
   }
 }
 
+class $OutboxTable extends Outbox with TableInfo<$OutboxTable, EntradaOutbox> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutboxTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tablaMeta = const VerificationMeta('tabla');
+  @override
+  late final GeneratedColumn<String> tabla = GeneratedColumn<String>(
+    'tabla',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _filaIdMeta = const VerificationMeta('filaId');
+  @override
+  late final GeneratedColumn<String> filaId = GeneratedColumn<String>(
+    'fila_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _operacionMeta = const VerificationMeta(
+    'operacion',
+  );
+  @override
+  late final GeneratedColumn<String> operacion = GeneratedColumn<String>(
+    'operacion',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _encoladoEnMeta = const VerificationMeta(
+    'encoladoEn',
+  );
+  @override
+  late final GeneratedColumn<String> encoladoEn = GeneratedColumn<String>(
+    'encolado_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [tabla, filaId, operacion, encoladoEn];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outbox';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EntradaOutbox> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tabla')) {
+      context.handle(
+        _tablaMeta,
+        tabla.isAcceptableOrUnknown(data['tabla']!, _tablaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tablaMeta);
+    }
+    if (data.containsKey('fila_id')) {
+      context.handle(
+        _filaIdMeta,
+        filaId.isAcceptableOrUnknown(data['fila_id']!, _filaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_filaIdMeta);
+    }
+    if (data.containsKey('operacion')) {
+      context.handle(
+        _operacionMeta,
+        operacion.isAcceptableOrUnknown(data['operacion']!, _operacionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_operacionMeta);
+    }
+    if (data.containsKey('encolado_en')) {
+      context.handle(
+        _encoladoEnMeta,
+        encoladoEn.isAcceptableOrUnknown(data['encolado_en']!, _encoladoEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_encoladoEnMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tabla, filaId};
+  @override
+  EntradaOutbox map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EntradaOutbox(
+      tabla: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tabla'],
+      )!,
+      filaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fila_id'],
+      )!,
+      operacion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operacion'],
+      )!,
+      encoladoEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}encolado_en'],
+      )!,
+    );
+  }
+
+  @override
+  $OutboxTable createAlias(String alias) {
+    return $OutboxTable(attachedDatabase, alias);
+  }
+}
+
+class EntradaOutbox extends DataClass implements Insertable<EntradaOutbox> {
+  /// Nombre de tabla remota (snake_case): usuario, articulo, producto,
+  /// comercio, precio o valoracion.
+  final String tabla;
+  final String filaId;
+  final String operacion;
+  final String encoladoEn;
+  const EntradaOutbox({
+    required this.tabla,
+    required this.filaId,
+    required this.operacion,
+    required this.encoladoEn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tabla'] = Variable<String>(tabla);
+    map['fila_id'] = Variable<String>(filaId);
+    map['operacion'] = Variable<String>(operacion);
+    map['encolado_en'] = Variable<String>(encoladoEn);
+    return map;
+  }
+
+  OutboxCompanion toCompanion(bool nullToAbsent) {
+    return OutboxCompanion(
+      tabla: Value(tabla),
+      filaId: Value(filaId),
+      operacion: Value(operacion),
+      encoladoEn: Value(encoladoEn),
+    );
+  }
+
+  factory EntradaOutbox.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EntradaOutbox(
+      tabla: serializer.fromJson<String>(json['tabla']),
+      filaId: serializer.fromJson<String>(json['filaId']),
+      operacion: serializer.fromJson<String>(json['operacion']),
+      encoladoEn: serializer.fromJson<String>(json['encoladoEn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tabla': serializer.toJson<String>(tabla),
+      'filaId': serializer.toJson<String>(filaId),
+      'operacion': serializer.toJson<String>(operacion),
+      'encoladoEn': serializer.toJson<String>(encoladoEn),
+    };
+  }
+
+  EntradaOutbox copyWith({
+    String? tabla,
+    String? filaId,
+    String? operacion,
+    String? encoladoEn,
+  }) => EntradaOutbox(
+    tabla: tabla ?? this.tabla,
+    filaId: filaId ?? this.filaId,
+    operacion: operacion ?? this.operacion,
+    encoladoEn: encoladoEn ?? this.encoladoEn,
+  );
+  EntradaOutbox copyWithCompanion(OutboxCompanion data) {
+    return EntradaOutbox(
+      tabla: data.tabla.present ? data.tabla.value : this.tabla,
+      filaId: data.filaId.present ? data.filaId.value : this.filaId,
+      operacion: data.operacion.present ? data.operacion.value : this.operacion,
+      encoladoEn: data.encoladoEn.present
+          ? data.encoladoEn.value
+          : this.encoladoEn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EntradaOutbox(')
+          ..write('tabla: $tabla, ')
+          ..write('filaId: $filaId, ')
+          ..write('operacion: $operacion, ')
+          ..write('encoladoEn: $encoladoEn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(tabla, filaId, operacion, encoladoEn);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EntradaOutbox &&
+          other.tabla == this.tabla &&
+          other.filaId == this.filaId &&
+          other.operacion == this.operacion &&
+          other.encoladoEn == this.encoladoEn);
+}
+
+class OutboxCompanion extends UpdateCompanion<EntradaOutbox> {
+  final Value<String> tabla;
+  final Value<String> filaId;
+  final Value<String> operacion;
+  final Value<String> encoladoEn;
+  final Value<int> rowid;
+  const OutboxCompanion({
+    this.tabla = const Value.absent(),
+    this.filaId = const Value.absent(),
+    this.operacion = const Value.absent(),
+    this.encoladoEn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OutboxCompanion.insert({
+    required String tabla,
+    required String filaId,
+    required String operacion,
+    required String encoladoEn,
+    this.rowid = const Value.absent(),
+  }) : tabla = Value(tabla),
+       filaId = Value(filaId),
+       operacion = Value(operacion),
+       encoladoEn = Value(encoladoEn);
+  static Insertable<EntradaOutbox> custom({
+    Expression<String>? tabla,
+    Expression<String>? filaId,
+    Expression<String>? operacion,
+    Expression<String>? encoladoEn,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tabla != null) 'tabla': tabla,
+      if (filaId != null) 'fila_id': filaId,
+      if (operacion != null) 'operacion': operacion,
+      if (encoladoEn != null) 'encolado_en': encoladoEn,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OutboxCompanion copyWith({
+    Value<String>? tabla,
+    Value<String>? filaId,
+    Value<String>? operacion,
+    Value<String>? encoladoEn,
+    Value<int>? rowid,
+  }) {
+    return OutboxCompanion(
+      tabla: tabla ?? this.tabla,
+      filaId: filaId ?? this.filaId,
+      operacion: operacion ?? this.operacion,
+      encoladoEn: encoladoEn ?? this.encoladoEn,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tabla.present) {
+      map['tabla'] = Variable<String>(tabla.value);
+    }
+    if (filaId.present) {
+      map['fila_id'] = Variable<String>(filaId.value);
+    }
+    if (operacion.present) {
+      map['operacion'] = Variable<String>(operacion.value);
+    }
+    if (encoladoEn.present) {
+      map['encolado_en'] = Variable<String>(encoladoEn.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutboxCompanion(')
+          ..write('tabla: $tabla, ')
+          ..write('filaId: $filaId, ')
+          ..write('operacion: $operacion, ')
+          ..write('encoladoEn: $encoladoEn, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CursoresSyncTable extends CursoresSync
+    with TableInfo<$CursoresSyncTable, CursorSync> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CursoresSyncTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tablaMeta = const VerificationMeta('tabla');
+  @override
+  late final GeneratedColumn<String> tabla = GeneratedColumn<String>(
+    'tabla',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cursorMeta = const VerificationMeta('cursor');
+  @override
+  late final GeneratedColumn<String> cursor = GeneratedColumn<String>(
+    'cursor',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [tabla, cursor];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cursores_sync';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CursorSync> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tabla')) {
+      context.handle(
+        _tablaMeta,
+        tabla.isAcceptableOrUnknown(data['tabla']!, _tablaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tablaMeta);
+    }
+    if (data.containsKey('cursor')) {
+      context.handle(
+        _cursorMeta,
+        cursor.isAcceptableOrUnknown(data['cursor']!, _cursorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cursorMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tabla};
+  @override
+  CursorSync map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CursorSync(
+      tabla: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tabla'],
+      )!,
+      cursor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cursor'],
+      )!,
+    );
+  }
+
+  @override
+  $CursoresSyncTable createAlias(String alias) {
+    return $CursoresSyncTable(attachedDatabase, alias);
+  }
+}
+
+class CursorSync extends DataClass implements Insertable<CursorSync> {
+  final String tabla;
+  final String cursor;
+  const CursorSync({required this.tabla, required this.cursor});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tabla'] = Variable<String>(tabla);
+    map['cursor'] = Variable<String>(cursor);
+    return map;
+  }
+
+  CursoresSyncCompanion toCompanion(bool nullToAbsent) {
+    return CursoresSyncCompanion(tabla: Value(tabla), cursor: Value(cursor));
+  }
+
+  factory CursorSync.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CursorSync(
+      tabla: serializer.fromJson<String>(json['tabla']),
+      cursor: serializer.fromJson<String>(json['cursor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tabla': serializer.toJson<String>(tabla),
+      'cursor': serializer.toJson<String>(cursor),
+    };
+  }
+
+  CursorSync copyWith({String? tabla, String? cursor}) =>
+      CursorSync(tabla: tabla ?? this.tabla, cursor: cursor ?? this.cursor);
+  CursorSync copyWithCompanion(CursoresSyncCompanion data) {
+    return CursorSync(
+      tabla: data.tabla.present ? data.tabla.value : this.tabla,
+      cursor: data.cursor.present ? data.cursor.value : this.cursor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CursorSync(')
+          ..write('tabla: $tabla, ')
+          ..write('cursor: $cursor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(tabla, cursor);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CursorSync &&
+          other.tabla == this.tabla &&
+          other.cursor == this.cursor);
+}
+
+class CursoresSyncCompanion extends UpdateCompanion<CursorSync> {
+  final Value<String> tabla;
+  final Value<String> cursor;
+  final Value<int> rowid;
+  const CursoresSyncCompanion({
+    this.tabla = const Value.absent(),
+    this.cursor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CursoresSyncCompanion.insert({
+    required String tabla,
+    required String cursor,
+    this.rowid = const Value.absent(),
+  }) : tabla = Value(tabla),
+       cursor = Value(cursor);
+  static Insertable<CursorSync> custom({
+    Expression<String>? tabla,
+    Expression<String>? cursor,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tabla != null) 'tabla': tabla,
+      if (cursor != null) 'cursor': cursor,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CursoresSyncCompanion copyWith({
+    Value<String>? tabla,
+    Value<String>? cursor,
+    Value<int>? rowid,
+  }) {
+    return CursoresSyncCompanion(
+      tabla: tabla ?? this.tabla,
+      cursor: cursor ?? this.cursor,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tabla.present) {
+      map['tabla'] = Variable<String>(tabla.value);
+    }
+    if (cursor.present) {
+      map['cursor'] = Variable<String>(cursor.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CursoresSyncCompanion(')
+          ..write('tabla: $tabla, ')
+          ..write('cursor: $cursor, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EstadoSyncTable extends EstadoSync
+    with TableInfo<$EstadoSyncTable, EstadoSyncData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EstadoSyncTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ultimoSyncExitosoMeta = const VerificationMeta(
+    'ultimoSyncExitoso',
+  );
+  @override
+  late final GeneratedColumn<String> ultimoSyncExitoso =
+      GeneratedColumn<String>(
+        'ultimo_sync_exitoso',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [id, ultimoSyncExitoso];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'estado_sync';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EstadoSyncData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('ultimo_sync_exitoso')) {
+      context.handle(
+        _ultimoSyncExitosoMeta,
+        ultimoSyncExitoso.isAcceptableOrUnknown(
+          data['ultimo_sync_exitoso']!,
+          _ultimoSyncExitosoMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EstadoSyncData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EstadoSyncData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ultimoSyncExitoso: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ultimo_sync_exitoso'],
+      ),
+    );
+  }
+
+  @override
+  $EstadoSyncTable createAlias(String alias) {
+    return $EstadoSyncTable(attachedDatabase, alias);
+  }
+}
+
+class EstadoSyncData extends DataClass implements Insertable<EstadoSyncData> {
+  /// Fila única: id 'global'.
+  final String id;
+  final String? ultimoSyncExitoso;
+  const EstadoSyncData({required this.id, this.ultimoSyncExitoso});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || ultimoSyncExitoso != null) {
+      map['ultimo_sync_exitoso'] = Variable<String>(ultimoSyncExitoso);
+    }
+    return map;
+  }
+
+  EstadoSyncCompanion toCompanion(bool nullToAbsent) {
+    return EstadoSyncCompanion(
+      id: Value(id),
+      ultimoSyncExitoso: ultimoSyncExitoso == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ultimoSyncExitoso),
+    );
+  }
+
+  factory EstadoSyncData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EstadoSyncData(
+      id: serializer.fromJson<String>(json['id']),
+      ultimoSyncExitoso: serializer.fromJson<String?>(
+        json['ultimoSyncExitoso'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'ultimoSyncExitoso': serializer.toJson<String?>(ultimoSyncExitoso),
+    };
+  }
+
+  EstadoSyncData copyWith({
+    String? id,
+    Value<String?> ultimoSyncExitoso = const Value.absent(),
+  }) => EstadoSyncData(
+    id: id ?? this.id,
+    ultimoSyncExitoso: ultimoSyncExitoso.present
+        ? ultimoSyncExitoso.value
+        : this.ultimoSyncExitoso,
+  );
+  EstadoSyncData copyWithCompanion(EstadoSyncCompanion data) {
+    return EstadoSyncData(
+      id: data.id.present ? data.id.value : this.id,
+      ultimoSyncExitoso: data.ultimoSyncExitoso.present
+          ? data.ultimoSyncExitoso.value
+          : this.ultimoSyncExitoso,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EstadoSyncData(')
+          ..write('id: $id, ')
+          ..write('ultimoSyncExitoso: $ultimoSyncExitoso')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, ultimoSyncExitoso);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EstadoSyncData &&
+          other.id == this.id &&
+          other.ultimoSyncExitoso == this.ultimoSyncExitoso);
+}
+
+class EstadoSyncCompanion extends UpdateCompanion<EstadoSyncData> {
+  final Value<String> id;
+  final Value<String?> ultimoSyncExitoso;
+  final Value<int> rowid;
+  const EstadoSyncCompanion({
+    this.id = const Value.absent(),
+    this.ultimoSyncExitoso = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EstadoSyncCompanion.insert({
+    required String id,
+    this.ultimoSyncExitoso = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<EstadoSyncData> custom({
+    Expression<String>? id,
+    Expression<String>? ultimoSyncExitoso,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ultimoSyncExitoso != null) 'ultimo_sync_exitoso': ultimoSyncExitoso,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EstadoSyncCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? ultimoSyncExitoso,
+    Value<int>? rowid,
+  }) {
+    return EstadoSyncCompanion(
+      id: id ?? this.id,
+      ultimoSyncExitoso: ultimoSyncExitoso ?? this.ultimoSyncExitoso,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ultimoSyncExitoso.present) {
+      map['ultimo_sync_exitoso'] = Variable<String>(ultimoSyncExitoso.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EstadoSyncCompanion(')
+          ..write('id: $id, ')
+          ..write('ultimoSyncExitoso: $ultimoSyncExitoso, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$BaseDeDatos extends GeneratedDatabase {
   _$BaseDeDatos(QueryExecutor e) : super(e);
   $BaseDeDatosManager get managers => $BaseDeDatosManager(this);
@@ -3208,6 +3957,9 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
   late final $PreciosTable precios = $PreciosTable(this);
   late final $UsuariosTable usuarios = $UsuariosTable(this);
   late final $ValoracionesTable valoraciones = $ValoracionesTable(this);
+  late final $OutboxTable outbox = $OutboxTable(this);
+  late final $CursoresSyncTable cursoresSync = $CursoresSyncTable(this);
+  late final $EstadoSyncTable estadoSync = $EstadoSyncTable(this);
   late final Index idxArticuloNombre = Index(
     'idx_articulo_nombre',
     'CREATE INDEX idx_articulo_nombre ON articulos (nombre)',
@@ -3255,6 +4007,9 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
     precios,
     usuarios,
     valoraciones,
+    outbox,
+    cursoresSync,
+    estadoSync,
     idxArticuloNombre,
     idxProductoNombre,
     idxProductoMarca,
@@ -5847,6 +6602,500 @@ typedef $$ValoracionesTableProcessedTableManager =
       Valoracion,
       PrefetchHooks Function({bool usuarioId, bool productoId})
     >;
+typedef $$OutboxTableCreateCompanionBuilder = OutboxCompanion Function({
+  required String tabla,
+  required String filaId,
+  required String operacion,
+  required String encoladoEn,
+  Value<int> rowid,
+});
+typedef $$OutboxTableUpdateCompanionBuilder = OutboxCompanion Function({
+  Value<String> tabla,
+  Value<String> filaId,
+  Value<String> operacion,
+  Value<String> encoladoEn,
+  Value<int> rowid,
+});
+
+class $$OutboxTableFilterComposer
+    extends Composer<_$BaseDeDatos, $OutboxTable> {
+  $$OutboxTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get tabla => $composableBuilder(
+    column: $table.tabla,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get filaId => $composableBuilder(
+    column: $table.filaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operacion => $composableBuilder(
+    column: $table.operacion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get encoladoEn => $composableBuilder(
+    column: $table.encoladoEn,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OutboxTableOrderingComposer
+    extends Composer<_$BaseDeDatos, $OutboxTable> {
+  $$OutboxTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get tabla => $composableBuilder(
+    column: $table.tabla,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get filaId => $composableBuilder(
+    column: $table.filaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operacion => $composableBuilder(
+    column: $table.operacion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get encoladoEn => $composableBuilder(
+    column: $table.encoladoEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OutboxTableAnnotationComposer
+    extends Composer<_$BaseDeDatos, $OutboxTable> {
+  $$OutboxTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get tabla =>
+      $composableBuilder(column: $table.tabla, builder: (column) => column);
+
+  GeneratedColumn<String> get filaId =>
+      $composableBuilder(column: $table.filaId, builder: (column) => column);
+
+  GeneratedColumn<String> get operacion =>
+      $composableBuilder(column: $table.operacion, builder: (column) => column);
+
+  GeneratedColumn<String> get encoladoEn => $composableBuilder(
+    column: $table.encoladoEn,
+    builder: (column) => column,
+  );
+}
+
+class $$OutboxTableTableManager
+    extends
+        RootTableManager<
+          _$BaseDeDatos,
+          $OutboxTable,
+          EntradaOutbox,
+          $$OutboxTableFilterComposer,
+          $$OutboxTableOrderingComposer,
+          $$OutboxTableAnnotationComposer,
+          $$OutboxTableCreateCompanionBuilder,
+          $$OutboxTableUpdateCompanionBuilder,
+          (
+            EntradaOutbox,
+            BaseReferences<_$BaseDeDatos, $OutboxTable, EntradaOutbox>,
+          ),
+          EntradaOutbox,
+          PrefetchHooks Function()
+        > {
+  $$OutboxTableTableManager(_$BaseDeDatos db, $OutboxTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutboxTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OutboxTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OutboxTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> tabla = const Value.absent(),
+                Value<String> filaId = const Value.absent(),
+                Value<String> operacion = const Value.absent(),
+                Value<String> encoladoEn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutboxCompanion(
+                tabla: tabla,
+                filaId: filaId,
+                operacion: operacion,
+                encoladoEn: encoladoEn,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String tabla,
+                required String filaId,
+                required String operacion,
+                required String encoladoEn,
+                Value<int> rowid = const Value.absent(),
+              }) => OutboxCompanion.insert(
+                tabla: tabla,
+                filaId: filaId,
+                operacion: operacion,
+                encoladoEn: encoladoEn,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OutboxTable, EntradaOutbox>(table),
+                  BaseReferences<_$BaseDeDatos, $OutboxTable, EntradaOutbox>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OutboxTableProcessedTableManager =
+    ProcessedTableManager<
+      _$BaseDeDatos,
+      $OutboxTable,
+      EntradaOutbox,
+      $$OutboxTableFilterComposer,
+      $$OutboxTableOrderingComposer,
+      $$OutboxTableAnnotationComposer,
+      $$OutboxTableCreateCompanionBuilder,
+      $$OutboxTableUpdateCompanionBuilder,
+      (
+        EntradaOutbox,
+        BaseReferences<_$BaseDeDatos, $OutboxTable, EntradaOutbox>,
+      ),
+      EntradaOutbox,
+      PrefetchHooks Function()
+    >;
+typedef $$CursoresSyncTableCreateCompanionBuilder =
+    CursoresSyncCompanion Function({
+      required String tabla,
+      required String cursor,
+      Value<int> rowid,
+    });
+typedef $$CursoresSyncTableUpdateCompanionBuilder =
+    CursoresSyncCompanion Function({
+      Value<String> tabla,
+      Value<String> cursor,
+      Value<int> rowid,
+    });
+
+class $$CursoresSyncTableFilterComposer
+    extends Composer<_$BaseDeDatos, $CursoresSyncTable> {
+  $$CursoresSyncTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get tabla => $composableBuilder(
+    column: $table.tabla,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cursor => $composableBuilder(
+    column: $table.cursor,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CursoresSyncTableOrderingComposer
+    extends Composer<_$BaseDeDatos, $CursoresSyncTable> {
+  $$CursoresSyncTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get tabla => $composableBuilder(
+    column: $table.tabla,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cursor => $composableBuilder(
+    column: $table.cursor,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CursoresSyncTableAnnotationComposer
+    extends Composer<_$BaseDeDatos, $CursoresSyncTable> {
+  $$CursoresSyncTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get tabla =>
+      $composableBuilder(column: $table.tabla, builder: (column) => column);
+
+  GeneratedColumn<String> get cursor =>
+      $composableBuilder(column: $table.cursor, builder: (column) => column);
+}
+
+class $$CursoresSyncTableTableManager
+    extends
+        RootTableManager<
+          _$BaseDeDatos,
+          $CursoresSyncTable,
+          CursorSync,
+          $$CursoresSyncTableFilterComposer,
+          $$CursoresSyncTableOrderingComposer,
+          $$CursoresSyncTableAnnotationComposer,
+          $$CursoresSyncTableCreateCompanionBuilder,
+          $$CursoresSyncTableUpdateCompanionBuilder,
+          (
+            CursorSync,
+            BaseReferences<_$BaseDeDatos, $CursoresSyncTable, CursorSync>,
+          ),
+          CursorSync,
+          PrefetchHooks Function()
+        > {
+  $$CursoresSyncTableTableManager(_$BaseDeDatos db, $CursoresSyncTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CursoresSyncTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CursoresSyncTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CursoresSyncTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> tabla = const Value.absent(),
+                Value<String> cursor = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CursoresSyncCompanion(
+                tabla: tabla,
+                cursor: cursor,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String tabla,
+                required String cursor,
+                Value<int> rowid = const Value.absent(),
+              }) => CursoresSyncCompanion.insert(
+                tabla: tabla,
+                cursor: cursor,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CursoresSyncTable, CursorSync>(table),
+                  BaseReferences<_$BaseDeDatos, $CursoresSyncTable, CursorSync>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CursoresSyncTableProcessedTableManager =
+    ProcessedTableManager<
+      _$BaseDeDatos,
+      $CursoresSyncTable,
+      CursorSync,
+      $$CursoresSyncTableFilterComposer,
+      $$CursoresSyncTableOrderingComposer,
+      $$CursoresSyncTableAnnotationComposer,
+      $$CursoresSyncTableCreateCompanionBuilder,
+      $$CursoresSyncTableUpdateCompanionBuilder,
+      (
+        CursorSync,
+        BaseReferences<_$BaseDeDatos, $CursoresSyncTable, CursorSync>,
+      ),
+      CursorSync,
+      PrefetchHooks Function()
+    >;
+typedef $$EstadoSyncTableCreateCompanionBuilder = EstadoSyncCompanion Function({
+  required String id,
+  Value<String?> ultimoSyncExitoso,
+  Value<int> rowid,
+});
+typedef $$EstadoSyncTableUpdateCompanionBuilder = EstadoSyncCompanion Function({
+  Value<String> id,
+  Value<String?> ultimoSyncExitoso,
+  Value<int> rowid,
+});
+
+class $$EstadoSyncTableFilterComposer
+    extends Composer<_$BaseDeDatos, $EstadoSyncTable> {
+  $$EstadoSyncTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ultimoSyncExitoso => $composableBuilder(
+    column: $table.ultimoSyncExitoso,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$EstadoSyncTableOrderingComposer
+    extends Composer<_$BaseDeDatos, $EstadoSyncTable> {
+  $$EstadoSyncTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ultimoSyncExitoso => $composableBuilder(
+    column: $table.ultimoSyncExitoso,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$EstadoSyncTableAnnotationComposer
+    extends Composer<_$BaseDeDatos, $EstadoSyncTable> {
+  $$EstadoSyncTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get ultimoSyncExitoso => $composableBuilder(
+    column: $table.ultimoSyncExitoso,
+    builder: (column) => column,
+  );
+}
+
+class $$EstadoSyncTableTableManager
+    extends
+        RootTableManager<
+          _$BaseDeDatos,
+          $EstadoSyncTable,
+          EstadoSyncData,
+          $$EstadoSyncTableFilterComposer,
+          $$EstadoSyncTableOrderingComposer,
+          $$EstadoSyncTableAnnotationComposer,
+          $$EstadoSyncTableCreateCompanionBuilder,
+          $$EstadoSyncTableUpdateCompanionBuilder,
+          (
+            EstadoSyncData,
+            BaseReferences<_$BaseDeDatos, $EstadoSyncTable, EstadoSyncData>,
+          ),
+          EstadoSyncData,
+          PrefetchHooks Function()
+        > {
+  $$EstadoSyncTableTableManager(_$BaseDeDatos db, $EstadoSyncTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EstadoSyncTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EstadoSyncTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EstadoSyncTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> ultimoSyncExitoso = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EstadoSyncCompanion(
+                id: id,
+                ultimoSyncExitoso: ultimoSyncExitoso,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> ultimoSyncExitoso = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EstadoSyncCompanion.insert(
+                id: id,
+                ultimoSyncExitoso: ultimoSyncExitoso,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EstadoSyncTable, EstadoSyncData>(table),
+                  BaseReferences<
+                    _$BaseDeDatos,
+                    $EstadoSyncTable,
+                    EstadoSyncData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$EstadoSyncTableProcessedTableManager =
+    ProcessedTableManager<
+      _$BaseDeDatos,
+      $EstadoSyncTable,
+      EstadoSyncData,
+      $$EstadoSyncTableFilterComposer,
+      $$EstadoSyncTableOrderingComposer,
+      $$EstadoSyncTableAnnotationComposer,
+      $$EstadoSyncTableCreateCompanionBuilder,
+      $$EstadoSyncTableUpdateCompanionBuilder,
+      (
+        EstadoSyncData,
+        BaseReferences<_$BaseDeDatos, $EstadoSyncTable, EstadoSyncData>,
+      ),
+      EstadoSyncData,
+      PrefetchHooks Function()
+    >;
 
 class $BaseDeDatosManager {
   final _$BaseDeDatos _db;
@@ -5863,4 +7112,10 @@ class $BaseDeDatosManager {
       $$UsuariosTableTableManager(_db, _db.usuarios);
   $$ValoracionesTableTableManager get valoraciones =>
       $$ValoracionesTableTableManager(_db, _db.valoraciones);
+  $$OutboxTableTableManager get outbox =>
+      $$OutboxTableTableManager(_db, _db.outbox);
+  $$CursoresSyncTableTableManager get cursoresSync =>
+      $$CursoresSyncTableTableManager(_db, _db.cursoresSync);
+  $$EstadoSyncTableTableManager get estadoSync =>
+      $$EstadoSyncTableTableManager(_db, _db.estadoSync);
 }

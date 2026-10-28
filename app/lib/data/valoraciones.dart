@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import 'identidad.dart';
 import 'local/base_de_datos.dart';
+import 'sync/cola_saliente.dart';
 
 /// La valoración del usuario actual para un producto, o null si no cargó
 /// ninguna (neutro).
@@ -48,14 +49,17 @@ Future<void> guardarValoracion(
                 v.usuarioId.equals(usuario.id) &
                 v.productoId.equals(productoId)))
           .go();
+      // La baja es física ("quedan cero datos") y se propaga al servidor.
+      await encolarBaja(db, 'valoracion', existentes.first.id);
     }
     return;
   }
 
   if (existentes.isEmpty) {
+    final String nuevoId = const Uuid().v4();
     await db.into(db.valoraciones).insert(
           ValoracionesCompanion.insert(
-            id: const Uuid().v4(),
+            id: nuevoId,
             usuarioId: usuario.id,
             productoId: productoId,
             gusto: Value(gusto),
@@ -64,6 +68,9 @@ Future<void> guardarValoracion(
             actualizadoEn: ahora,
           ),
         );
+    // La valoración viaja en la sync (Fase 2: solo se sincronizan; la
+    // ponderación comunitaria queda postergada).
+    await encolarUpsert(db, 'valoracion', nuevoId);
     return;
   }
 
@@ -76,4 +83,5 @@ Future<void> guardarValoracion(
           actualizadoEn: Value(ahora),
         ),
       );
+  await encolarUpsert(db, 'valoracion', existentes.first.id);
 }

@@ -130,3 +130,44 @@ class Valoraciones extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// v3 (Fase 2, T2): estado de sync que vive solo en el dispositivo
+/// (regla de sync 8: no se sincroniza ni viaja en el backup).
+
+/// Cola de cambios locales pendientes de subir, con clave (tabla, fila):
+/// re-encolar la misma clave reemplaza la entrada anterior (última
+/// intención gana). `operacion`: 'upsert' o 'delete'.
+@DataClassName('EntradaOutbox')
+class Outbox extends Table {
+  /// Nombre de tabla remota (snake_case): usuario, articulo, producto,
+  /// comercio, precio o valoracion.
+  TextColumn get tabla => text()();
+  TextColumn get filaId => text()();
+  TextColumn get operacion => text()();
+  TextColumn get encoladoEn => text()();
+
+  @override
+  Set<Column> get primaryKey => {tabla, filaId};
+}
+
+/// Cursor de pull por tabla: último `actualizado_en` (o `cargado_en` para
+/// precio) visto en el servidor (regla de sync 3).
+@DataClassName('CursorSync')
+class CursoresSync extends Table {
+  TextColumn get tabla => text()();
+  TextColumn get cursor => text()();
+
+  @override
+  Set<Column> get primaryKey => {tabla};
+}
+
+/// Marca global de la última sesión de sync exitosa: alimenta la condición
+/// del aviso de R15 (outbox pendiente o más de 7 días).
+class EstadoSync extends Table {
+  /// Fila única: id 'global'.
+  TextColumn get id => text()();
+  TextColumn get ultimoSyncExitoso => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

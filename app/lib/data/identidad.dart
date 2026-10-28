@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'local/base_de_datos.dart';
+import 'sync/cola_saliente.dart';
 
 /// S14 (R17): identidad del aportante — etiqueta elegida en el dispositivo.
 ///
@@ -16,14 +17,16 @@ Future<Usuario> usuarioActual(BaseDeDatos db) async {
   if (existentes.isNotEmpty) return existentes.first;
 
   final String ahora = DateTime.now().toUtc().toIso8601String();
+  final String nuevoId = const Uuid().v4();
   await db.into(db.usuarios).insert(
         UsuariosCompanion.insert(
-          id: const Uuid().v4(),
+          id: nuevoId,
           etiqueta: 'Anónimo',
           creadoEn: ahora,
           actualizadoEn: ahora,
         ),
       );
+  await encolarUpsert(db, 'usuario', nuevoId);
   return (await db.select(db.usuarios).get()).single;
 }
 
@@ -41,18 +44,21 @@ Future<bool> hayUsuario(BaseDeDatos db) async =>
 /// Guarda la etiqueta elegida en el primer inicio.
 Future<Usuario> crearUsuarioConEtiqueta(BaseDeDatos db, String etiqueta) async {
   final String ahora = DateTime.now().toUtc().toIso8601String();
+  final String nuevoId = const Uuid().v4();
   await db.into(db.usuarios).insert(
         UsuariosCompanion.insert(
-          id: const Uuid().v4(),
+          id: nuevoId,
           etiqueta: etiqueta,
           creadoEn: ahora,
           actualizadoEn: ahora,
         ),
       );
+  await encolarUpsert(db, 'usuario', nuevoId);
   return (await db.select(db.usuarios).get()).single;
 }
 
 /// Cambia la etiqueta del aportante (R17: desde ajustes, sin conexión).
+/// El cambio viaja en la próxima sync (la etiqueta se sincroniza, R17).
 Future<void> cambiarEtiqueta(BaseDeDatos db, String etiqueta) async {
   final Usuario u = await usuarioActual(db);
   await (db.update(db.usuarios)..where((t) => t.id.equals(u.id))).write(
@@ -61,4 +67,5 @@ Future<void> cambiarEtiqueta(BaseDeDatos db, String etiqueta) async {
       actualizadoEn: Value(DateTime.now().toUtc().toIso8601String()),
     ),
   );
+  await encolarUpsert(db, 'usuario', u.id);
 }
