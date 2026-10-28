@@ -123,3 +123,16 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   usa el sistema nuevo de claves. Pivot a claves nuevas: `sb_publishable_...` (va a
   config_backend.dart, pública por diseño AD-002) y `sb_secret_...` (solo `.env` del loader).
   Pendiente del dueño: pasar ambas.
+- L11 — CORRECCIÓN de L10 (hipótesis de legacy desactivadas: FALSA) y cierre del incidente de
+  claves (2026-10-28): diagnóstico con cuerpos de error PostgREST mostró `42501 permission
+  denied for table` — las 4 claves autenticaban bien; el rechazo a `anon` (publishable sin
+  sesión) es POR DISEÑO (AD-016: solo authenticated lee), y el único defecto real era la
+  AUSENCIA de GRANTs para `service_role` en la migración 0001 (el cargador del semillero
+  quedaba afuera). Correctivo: migración `0002_permisos_service_role.sql` (`71465fd`, GRANTs
+  a service_role + EXECUTE funciones + secuencias), aplicada por el dueño en Studio (Success).
+  Claves en uso: legacy anon JWT en `config_backend.dart` (`6b470c7`, verificada: decodifica
+  ref/role y el servidor la acepta) y `sb_secret_...` nueva en `.env` para el loader (escrita
+  por el dueño con bloque PowerShell Read-Host; el harness bloquea escritura de `.env` por
+  política). RESULTADO: semillero cargado y verificado — 424 productos en el servidor
+  (`Content-Range: 0-423/424`); upsert idempotente (re-ejecutar no duplica). El backend
+  colaborativo quedó OPERATIVO con datos reales; ejercicio de sync en dispositivo: T7.
