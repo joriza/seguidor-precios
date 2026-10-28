@@ -576,3 +576,15 @@ COMMENT ON COLUMN producto.borrado_en IS 'Borrado lógico: NULL = vigente (regla
 COMMENT ON COLUMN comercio.borrado_en IS 'Borrado lógico: NULL = vigente (regla de sync 5).';
 
 COMMIT;
+
+-- =============================================================================
+-- Migración 0002: privilegios de service_role (correctivo)
+-- =============================================================================
+
+BEGIN;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO service_role;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
+
+COMMIT;
