@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../data/local/base_de_datos.dart';
 import '../../data/sync/cliente_remoto.dart';
 import '../../data/sync/config_backend.dart';
@@ -76,6 +78,11 @@ class GestorSync {
   final ConfigBackend config;
   final Future<TipoConexion> Function() _conexion;
 
+  /// Último error de sincronización (para que la UI muestre el detalle
+  /// real en lugar de un mensaje genérico); null si la última sync no
+  /// falló. Nunca contiene datos del usuario, solo la excepción.
+  Object? ultimoError;
+
   /// El colaborativo solo se activa con la configuración completa (T7 la
   /// completa el dueño); mientras tanto, cero llamadas de red.
   bool get habilitado => config.estaConfigurada && cliente != null;
@@ -114,12 +121,15 @@ class GestorSync {
 
   /// Sesión completa de sync (identidad → push → pull → marca). Devuelve
   /// null si no hay backend o si algo falla: los datos siguen en el
-  /// dispositivo (R3) y el outbox conserva lo pendiente.
+  /// dispositivo (R3) y el outbox conserva lo pendiente. El detalle del
+  /// fallo queda en [ultimoError] para la UI y la consola.
   Future<ResultadoSync?> sincronizar() async {
     if (!habilitado) return null;
     try {
       return await sincronizarAhora(baseDeDatos, cliente!);
-    } catch (_) {
+    } catch (e) {
+      ultimoError = e;
+      debugPrint('GestorSync: la sincronización falló: $e');
       return null;
     }
   }

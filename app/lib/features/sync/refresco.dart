@@ -21,9 +21,10 @@ Future<void> refrescarLista(
   if (sincronizo || !context.mounted) return;
 
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
+    SnackBar(
       content: Text(
-        'No se pudo sincronizar; tus datos están a salvo en el dispositivo.',
+        'No se pudo sincronizar; tus datos están a salvo en el '
+        'dispositivo.\n${gestor.ultimoError}',
       ),
     ),
   );

@@ -220,12 +220,14 @@ class _HomeShellState extends State<HomeShell> {
     });
     unawaited(_refrescarEstadoSync());
     if (mostrarResultado) {
+      final Object? detalle =
+          resultado == null ? widget.gestorSync.ultimoError : null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             resultado == null
                 ? 'No se pudo sincronizar; tus datos están a salvo en el '
-                    'dispositivo.'
+                    'dispositivo.\n$detalle'
                 : 'Sincronización completa: ${resultado.filasSubidas} '
                     'subida(s), ${resultado.filasDescargadas} '
                     'descargada(s).',

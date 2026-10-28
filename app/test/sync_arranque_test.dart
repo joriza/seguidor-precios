@@ -282,4 +282,16 @@ void main() {
     expect(conexionDesdeNombreInterfaz('tun0'), TipoConexion.movil);
     expect(conexionDesdeNombreInterfaz(''), TipoConexion.movil);
   });
+
+  test('un fallo de sync expone el error real para la UI (sin tragárselo)',
+      () async {
+    final db = BaseDeDatos.memoria();
+    addTearDown(db.close);
+    final cliente = ClienteRemotoFalso()..errorAlSubir = 'usuario';
+    final gestor = gestorDePrueba(db, cliente, conexion: TipoConexion.wifi);
+    await crearUsuarioConEtiqueta(db, 'Vale');
+
+    expect(await gestor.sincronizar(), isNull);
+    expect(gestor.ultimoError, isNotNull);
+  });
 }
