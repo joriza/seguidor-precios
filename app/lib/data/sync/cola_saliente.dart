@@ -71,6 +71,36 @@ Future<void> encolarBaja(
       );
 }
 
+/// Tablas SQLite locales (plural, nombre de la clase drift) para cada
+/// tabla de sync remota (singular). El backfill lee de acá; si alguna
+/// diverge, el test de migración v4 falla con "no such table".
+const Map<String, String> _tablasLocalesPorRemota = <String, String>{
+  'usuario': 'usuarios',
+  'articulo': 'articulos',
+  'producto': 'productos',
+  'comercio': 'comercios',
+  'precio': 'precios',
+  'valoracion': 'valoraciones',
+};
+
+/// Backfill de la migración v4 (una sola vez por instalación): encola toda
+/// fila pre-existente de las tablas de sync. Las filas nacidas antes de
+/// v0.2.0 no pasaron por los hooks de encolado y sin esto nunca subirían
+/// (caso real: precio → FK contra un comercio que el servidor no conocía).
+/// [encolarUpsert] deduplica por (tabla, fila): re-ejecutar no duplica.
+Future<void> encolarFilasExistentes(BaseDeDatos db) async {
+  for (final tabla in tablasEnOrden) {
+    // Nombre de tabla de la lista blanca [tablasEnOrden] y su par local del
+    // mapa de arriba: seguros para interpolar en SQL (no son entrada del
+    // usuario).
+    final local = _tablasLocalesPorRemota[tabla];
+    final filas = await db.customSelect('SELECT id FROM $local').get();
+    for (final fila in filas) {
+      await encolarUpsert(db, tabla, fila.data['id'] as String);
+    }
+  }
+}
+
 /// Cantidad de cambios locales pendientes de subir (condición de R15).
 Future<int> cambiosPendientes(BaseDeDatos db) async =>
     (await db.select(db.outbox).get()).length;

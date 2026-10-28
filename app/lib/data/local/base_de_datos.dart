@@ -7,14 +7,18 @@ import 'package:path_provider/path_provider.dart';
 
 import 'tablas.dart';
 
+import '../sync/cola_saliente.dart';
+
 part 'base_de_datos.g.dart';
 
-/// Base local (fuente de verdad del dispositivo) — esquema v3 según
+/// Base local (fuente de verdad del dispositivo) — esquema v4 según
 /// docs/modelo-de-datos.md. Append-only en `precios` se garantiza en la
 /// capa de datos: no se exponen update/delete para esa tabla.
 /// v2 (v0.1.5): agrega `valoraciones` (valoración personal por usuario).
 /// v3 (Fase 2, T2): agrega las tablas de sync — outbox, cursores por tabla
 /// y marca global de última sync exitosa (reglas de sync 2, 3 y 8).
+/// v4 (Fase 2 correctivo de campo): backfill del outbox — encola las filas
+/// nacidas antes de v0.2.0 para que entren a la sync.
 @DriftDatabase(tables: [
   Articulos,
   Productos,
@@ -36,7 +40,7 @@ class BaseDeDatos extends _$BaseDeDatos {
       : super(executor ?? NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -51,6 +55,12 @@ class BaseDeDatos extends _$BaseDeDatos {
             await m.createTable(outbox);
             await m.createTable(cursoresSync);
             await m.createTable(estadoSync);
+          }
+          // v3 → v4: backfill del outbox — las filas nacidas antes de
+          // v0.2.0 no pasaron por los hooks de encolado y sin esto nunca
+          // subirían (reglas de sync 1 y 2).
+          if (from < 4) {
+            await encolarFilasExistentes(this);
           }
         },
         beforeOpen: (details) async {

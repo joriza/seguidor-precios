@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 
-/// Migración local v2 → v3 (T2): agrega las tablas de sync (outbox, cursores
-/// por tabla y marca global) sin perder datos existentes.
+/// Migración local v2 → versión actual (v4): agrega las tablas de sync
+/// (outbox, cursores por tabla y marca global) sin perder datos existentes,
+/// y el backfill v4 encola las filas pre-existentes (T2 + correctivo de
+/// campo).
 void main() {
   // DDL fiel del esquema v2, previo a la apertura, para que drift ejecute
   // la migración onUpgrade(from: 2, to: 3) contra datos reales.
@@ -54,7 +56,7 @@ void main() {
     await db.close();
   });
 
-  test('migrar v2 → v3 conserva los datos y crea las tablas de sync',
+  test('migrar v2 → actual conserva los datos, crea las tablas de sync y backfilla el outbox',
       () async {
     // Datos v2 intactos tras la migración.
     final articulo = await (db.select(db.articulos)..where((a) => a.id.equals('a1'))).getSingle();
@@ -67,22 +69,25 @@ void main() {
     final valoracion = await (db.select(db.valoraciones)..where((v) => v.id.equals('v1'))).getSingle();
     expect(valoracion.gusto, 'si');
 
-    // Tablas de sync v3 creadas y usables.
+    // Tablas de sync v3 creadas y usables. El backfill v4 ya encoló las 6
+    // filas sembradas (una por tabla, en orden de dependencias); esta
+    // entrada manual usa otra fila para no chocar la PK (tabla, fila_id).
     await db.into(db.outbox).insert(
           OutboxCompanion.insert(
             tabla: 'producto',
-            filaId: 'p1',
+            filaId: 'p-manual',
             operacion: 'upsert',
             encoladoEn: '2026-01-03T00:00:00.000Z',
           ),
         );
-    expect(await db.select(db.outbox).get(), hasLength(1));
+    // 6 del backfill v4 + 1 manual.
+    expect(await db.select(db.outbox).get(), hasLength(7));
     expect(await db.select(db.cursoresSync).get(), isEmpty);
     expect(await db.select(db.estadoSync).get(), isEmpty);
 
-    // El esquema quedó en v3.
-    expect(db.schemaVersion, 3);
+    // El esquema quedó en la versión actual.
+    expect(db.schemaVersion, 4);
     final version = await db.customSelect('PRAGMA user_version').getSingle();
-    expect(version.data['user_version'], 3);
+    expect(version.data['user_version'], 4);
   });
 }
