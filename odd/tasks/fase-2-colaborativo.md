@@ -48,7 +48,7 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
 - T3 — Tool de carga del semillero (S5): script en `tools/` que sube el pack semilla a Supabase
   por lotes usando clave de servicio desde `.env` (nunca commiteado); reutiliza el pack de
   `app/assets/seed/` y el orden de dependencias de T2. Route: worker C, paralelo. Superficie:
-  `tools/**`. Commit: pendiente.
+  `tools/**`. Commit: `907e543`.
 - T4 — UX de red (S5): ping R14 al iniciar con cualquier conectividad; aviso de sync al iniciar
   bajo condiciones de R15 con confirmación; indicador de estado de sync + sync manual
   (pull-to-refresh). Route: worker, tras T2. Superficie: `app/lib/features/**`,
@@ -78,3 +78,12 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   desarrollo/README; aviso MD060 de desarrollo.md ya no aplica (tabla única con separadores
   consistentes). Pendiente para próxima sesión: T1-T3 en paralelo por workers (superficies
   disjuntas), luego T4, T5, T6 final y T7 (requiere proyecto Supabase del dueño).
+- L4 — T3 completada y commiteada (`907e543`): `tools/cargar_semilla_supabase.py` (stdlib,
+  sin dependencias nuevas) + 18 tests unittest verdes; dry-run 424 productos válidos;
+  upsert idempotente `on_conflict=id` con UUIDv5 por EAN; `.env` agregado a `.gitignore`
+  (+ `__pycache__/`); ejecución real contra Supabase supeditada a T7 (proyecto del dueño).
+  Verificar al integrar: nombres de columna vs DDL final de T1 y objetivo de conflicto del
+  upsert (el índice único parcial no puede ser target de PostgREST).
+- L5 — Frontera de slice de entrega: 611 líneas authoradas en 3 commits desde `main` (T1-T3).
+  Estrategia de entrega de la fase: release v0.2.0 (T7) tras cerrar T1-T6; sin PR intermedio
+  (repositorio del dueño, rama de fase). Próximos commits (T2/T4/T5) cierran la fase.
