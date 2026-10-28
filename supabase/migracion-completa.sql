@@ -598,3 +598,13 @@ BEGIN;
 GRANT UPDATE ON usuario, articulo, producto, comercio, precio, valoracion TO authenticated;
 
 COMMIT;
+
+-- =============================================================================
+-- Migración 0004: tipo de comercio sin CHECK (correctivo)
+-- =============================================================================
+
+BEGIN;
+
+ALTER TABLE comercio DROP CONSTRAINT IF EXISTS ck_comercio_tipo;
+
+COMMIT;
