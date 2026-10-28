@@ -176,3 +176,12 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   identificado: `b04e9e8c-3906-4ec0-b16c-643d64331775` (auth user 17:40:12, su intento de
   sync); admin pendiente de activar con CREATE OR REPLACE FUNCTION es_admin() usando ese uid
   (SQL entregado al dueño). Pendiente: retry de “Sincronizar ahora” en el teléfono del dueño.
+- L16 — SEGUNDA causa del fallo de sync del dueño (post-0003/0004): su usuario y producto
+  subieron ✓, pero el precio murió en FK — apunta a un comercio de la era v0.1.x que nunca
+  entró al outbox (los hooks nacieron en v0.2.0; su outbox tenía exactamente producto+precio,
+  como reportó). FIX: migración local v4 (`67aca6c`, v0.2.1+7) — backfill del outbox: encola
+  toda fila pre-existente de las 6 tablas (una sola vez por instalación; el push por orden de
+  dependencias resuelve las FK). Tests: v4 nuevo (backfill) + v3 actualizado al nuevo contrato
+  (backfill deja 6 entradas + 1 manual = 7). Suite 200/200; analyze --fatal-infos limpio.
+  Release v0.2.1 vía CI (tag re-push). Nota: el backfill también sube precios históricos
+  locales v0.1.x — dato valioso del dueño que queda compartido.
