@@ -161,3 +161,18 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   notas del release corregidos a Fase 2. QR de descarga: `apk-debug/qr-instalar-v0.2.0.png`
   (gitignored). Mantenimiento workflow pendiente (no bloqueante): actions/checkout apunta a
   Node 20 deprecado. Validación en dispositivo del dueño: ÚNICO check pendiente de la fase.
+- L15 — BUG DE CAMPO en la primera sync real del dueño (reportada con v0.2.0: “no se pudo
+  sincronizar ahora”, 2 filas pendientes). Diagnóstico por estado del servidor (nada llegó:
+  solo semillero) + reproducción vía API con sesión anónima real. DOS causas, ambas
+  correctivas aplicadas por el dueño en Studio: (a) 0003 `3507824` — el upsert de la sync
+  (ON CONFLICT DO UPDATE) exige privilegio UPDATE aunque la fila sea nueva; 0001 solo daba
+  UPDATE por columnas de clasificación → GRANT UPDATE completo a authenticated en las 6
+  tablas (RLS y triggers siguen aplicando las invariantes); (b) 0004 `70d075e` —
+  ck_comercio_tipo tenía un enum viejo sin supermercado/hipermercado (UI v0.1.3) → CHECK
+  eliminado (local es texto libre; espejo). Verificación post-fix vía API: usuario → dedup →
+  producto → comercio (supermercado) → precio → pull, todo 200/201. Limpieza: filas de prueba
+  borradas con service key (204×4) y 6 usuarios anónimos de prueba eliminados vía admin API;
+  servidor queda en estado base (424 productos, 1 usuario semillero). UID DEL DUEÑO
+  identificado: `b04e9e8c-3906-4ec0-b16c-643d64331775` (auth user 17:40:12, su intento de
+  sync); admin pendiente de activar con CREATE OR REPLACE FUNCTION es_admin() usando ese uid
+  (SQL entregado al dueño). Pendiente: retry de “Sincronizar ahora” en el teléfono del dueño.
