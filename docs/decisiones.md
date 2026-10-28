@@ -97,6 +97,20 @@ abierta D3, con postergación a Fase 4 aceptada por el dueño).
 - **Decisión:** para la etapa de pruebas y grupo reducido, el administrador se identifica por **uid fijo del dueño** en la regla RLS (el `auth_uid` de la primera instalación del dueño). Sin tabla de roles.
 - **Consecuencias:** + una línea de SQL, cero superficie extra. − sumar administradores exigirá migrar a tabla de roles (recién evaluable en Fase 4 si hiciera falta).
 
+## AD-016 — Moderación colaborativa mínima en etapa de pruebas ✅ aprobada
+
+- **Contexto:** la Fase 2 habilita escrituras colaborativas (R4) y faltaba definir la política de
+  moderación para la etapa de pruebas; el dueño la decidió al aprobar el plan de la fase.
+- **Decisión:** política **mínima**, suficiente para grupo de confianza: RLS permite leer e
+  insertar a todos los autenticados anónimos; **borrado lógico solo del creador**;
+  **correcciones de clasificación abiertas** (`articulo_id`, nombre, marca, categoría);
+  **precios solo inserción** (el re-apunte por dedup lo ejecuta el servidor); el dueño corrige
+  el resto vía **Supabase Studio** con su uid de admin fijo (AD-015). Sin rate limiting ni cola
+  de moderación.
+- **Consecuencias:** + cero superficie extra y moderación trivial para un grupo pequeño. − ante
+  una publicación pública hará falta política seria (rate limiting, revisión de RLS,
+  moderación): decisión crítica diferida a Fase 4 (AD-011).
+
 ## Decisiones abiertas
 
 | Tema | Estado | Cuándo se decide |
@@ -104,7 +118,7 @@ abierta D3, con postergación a Fase 4 aceptada por el dueño).
 | Licencia del repositorio | abierta | antes del primer release |
 | Nombre definitivo de la app | abierta | Fase 0 |
 | Profundidad del catálogo semilla (cuántos productos lleva el pack) | abierta | Fase 1 |
-| Política de moderación de datos colaborativos | abierta | Fase 2; crítica en Fase 4 (público) |
+| Política de moderación de datos colaborativos | ✅ decidida para pruebas (AD-016): mínima, RLS + Studio | crítica en Fase 4 (público) |
 | Coincidencia difusa de productos sin EAN | abierta | Fase 3 |
 | Distribución pública (APK directo vs Play Store) | abierta | Fase 4 |
 | Infraestructura propia (VPS/proveedor y costos) | abierta | Fase 4 |

@@ -145,7 +145,9 @@ identidad de los datos creados offline (regla de sync 9).
 - Una fila por (usuario, producto): volver a neutro sin observación **elimina la fila** (quedan cero datos).
 - Esquema local v2 (v0.1.5): migración agrega la tabla sin tocar las existentes.
 - Viaja en el backup JSON (incluida desde v0.1.5; los backups anteriores siguen importables).
-- Fase 2 (colaborativa): se pondera con las valoraciones de otros aportantes **sin perder la propia**.
+- Fase 2 (colaborativa): la tabla **se sincroniza**; la ponderación con las valoraciones de otros
+  aportantes (sin perder la propia) queda **postergada a una fase posterior** — decisión del
+  dueño: por ahora solo se sincronizan.
 
 ## Precio por unidad de medida (normalización) — R11
 

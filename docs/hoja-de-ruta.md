@@ -42,11 +42,13 @@ promedio; el backup restaura en otra instalación.
 
 ## Fase 2 — Colaborativo (R4, R5, R10, R14, R15, R18)
 
-*Prevista: ~2-3 semanas. Estado: pendiente.*
+*Prevista: ~2-3 semanas. Estado: **plan aprobado por el dueño**; implementación delegada a
+subagentes para preservar el contexto principal. Decisiones: valoraciones solo se sincronizan
+(ponderación comunitaria postergada); enriquecimiento incluido (2.7); moderación mínima (AD-016).*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |
-| 2.1 | Proyecto Supabase + esquema espejo + RLS + auth anónimo | AD-002, AD-003 |
+| 2.1 | Proyecto Supabase + esquema espejo (incluida `valoracion`) + RLS + auth anónimo | AD-002, AD-003 |
 | 2.2 | Outbox local + push/pull incremental por `actualizado_en` | arquitectura |
 | 2.3 | Dedup por código de barras (RPC/trigger en Postgres) | R4 |
 | 2.4 | Ping mínimo keep-alive al iniciar (con conectividad); cron de GitHub Actions como complemento opcional | R14, R5, AD-010 |

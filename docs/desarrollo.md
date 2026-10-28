@@ -1,7 +1,8 @@
 # Desarrollo
 
-> **Estado:** aún no hay código. Este documento describe el entorno y las convenciones que se
-> usarán desde la **Fase 0** (ver [hoja de ruta](hoja-de-ruta.md)).
+> **Estado:** Fase 0 y Fase 1 completadas (v0.1.5 publicada); próxima: **Fase 2 — colaborativa**
+> (ver [hoja de ruta](hoja-de-ruta.md)). Este documento describe el entorno y las convenciones
+> vigentes.
 
 ## Entorno
 

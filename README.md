@@ -4,8 +4,9 @@ Aplicación Android para llevar el control personal de precios de productos de c
 (almacén, carnicería, verdulería, ferretería, etc.), con **datos locales sin conexión**,
 **comparación de precios por artículo** y un **repositorio colaborativo** centralizado en la web.
 
-> **Estado del proyecto:** 🚧 en fase de diseño — todavía no hay código. La Fase 0 arranca con la
-> creación del proyecto Flutter. Detalle completo en la [hoja de ruta](docs/hoja-de-ruta.md).
+> **Estado del proyecto:** 🚧 Fase 1 (MVP local) completa — v0.1.5 publicada. Próxima: **Fase 2 —
+> colaborativa (Supabase + sync)**, plan aprobado por el dueño. Detalle completo en la
+> [hoja de ruta](docs/hoja-de-ruta.md).
 
 ## Características
 
