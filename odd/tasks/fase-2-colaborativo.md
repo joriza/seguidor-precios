@@ -38,7 +38,7 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   RPC `ping()`, RPC dedup por EAN (re-apunte server-side de precios), RLS mínima (AD-016) +
   admin uid fijo (AD-015, placeholder `<<UID_DUENO>>`), y `supabase/migracion-completa.sql`
   (archivo único para pegar en Studio). Route: worker A, paralelo. Superficie: `supabase/**`.
-  Commit: pendiente.
+  Commit: `f1ac623`.
 - T2 — Núcleo de sync en la app (S1, S5): punto único de configuración backend (URL + anon key),
   migración local v3 (outbox por tabla+id, cursor por tabla, marca global de última sync
   exitosa), push por lotes (usuario → articulo → producto → comercio → precio → valoracion),
@@ -84,6 +84,17 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   (+ `__pycache__/`); ejecución real contra Supabase supeditada a T7 (proyecto del dueño).
   Verificar al integrar: nombres de columna vs DDL final de T1 y objetivo de conflicto del
   upsert (el índice único parcial no puede ser target de PostgREST).
-- L5 — Frontera de slice de entrega: 611 líneas authoradas en 3 commits desde `main` (T1-T3).
+- L6 — T1 completada y commiteada (`f1ac623`): `supabase/migrations/0001_esquema_colaborativo.sql`
+  (564 líneas) + `supabase/migracion-completa.sql` (578, DDL byte-idéntico verificado); 6 tablas
+  espejo con columnas snake_case de `tablas.dart`, 24 políticas RLS (AD-016), guardia de borrado
+  lógico por trigger, `dedup_ean` SECURITY DEFINER, `ping()`; verificación 100% estática — SIN
+  ejecución contra Postgres real (sin psql, Docker caído). PENDIENTE de validación en proyecto
+  desechable o `supabase db` antes del release (T7).
+- L7 — Decisiones del dueño sobre modelos de workers (2026-10-28): "por ahora dejemos modelo auto
+  para los workers" (se mantiene `freellmapi/auto` + fallback ling-3.0-flash en settings) y "es
+  posible indicar que solo sea un worker maximo por vez?" → política de orquestación: máximo 1
+  worker activo por vez (lanzamientos serializados por el padre), preservando la delegación y el
+  contexto principal; el paralelismo entre workers queda postergado hasta que el router lo
+  soporte o el dueño lo pida.
   Estrategia de entrega de la fase: release v0.2.0 (T7) tras cerrar T1-T6; sin PR intermedio
   (repositorio del dueño, rama de fase). Próximos commits (T2/T4/T5) cierran la fase.
