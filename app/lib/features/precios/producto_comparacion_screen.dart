@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../productos/producto_form_screen.dart';
 
 /// S9 (R13): comparación de UN producto (mismo EAN) entre comercios —
 /// la comparación principal cuando el producto existe por su código.
@@ -27,9 +28,29 @@ class _ProductoComparacionScreenState
   Map<double, String> _comercioPorPrecio = <double, String>{};
   bool _cargando = true;
 
+  /// v0.1.4: copia editable del producto (el dueño puede corregir o
+  /// completar datos del semillero; los cambios valen para consultas).
+  late Producto _producto = widget.producto;
+
   @override
   void initState() {
     super.initState();
+    _cargar();
+  }
+
+  Future<void> _editarDatos() async {
+    final guardado = await Navigator.of(context).push<Producto>(
+      MaterialPageRoute<Producto>(
+        builder: (_) => ProductoFormScreen(
+          baseDeDatos: widget.baseDeDatos,
+          producto: _producto,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (guardado != null) {
+      setState(() => _producto = guardado);
+    }
     _cargar();
   }
 
@@ -61,7 +82,16 @@ class _ProductoComparacionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.producto.nombre)),
+      appBar: AppBar(
+        title: Text(_producto.nombre),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Editar datos',
+            onPressed: _editarDatos,
+          ),
+        ],
+      ),
       body: _cuerpo(),
     );
   }

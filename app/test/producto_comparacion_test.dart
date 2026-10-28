@@ -87,4 +87,34 @@ void main() {
 
     expect(find.textContaining('Sin precios'), findsOneWidget);
   });
+
+  testWidgets('v0.1.4: editar datos desde la comparación actualiza el producto',
+      (tester) async {
+    await insertarPrecio(comercioId: 'c1', nombre: 'Almacén', precio: 1500);
+
+    await tester.pumpWidget(envolver(
+      ProductoComparacionScreen(baseDeDatos: db, producto: producto),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    // Formulario precargado con los datos actuales.
+    expect(find.text('Guardar cambios'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Nombre del producto *'),
+      'Mayonesa Marca A 500g',
+    );
+    // El botón queda bajo el pliegue en el formulario largo: llevarlo a vista.
+    await tester.ensureVisible(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+
+    // Vuelve a la comparación con el nombre actualizado.
+    expect(find.text('Mayonesa Marca A 500g'), findsOneWidget);
+    final filas = await db.select(db.productos).get();
+    expect(filas.single.nombre, 'Mayonesa Marca A 500g');
+  });
 }

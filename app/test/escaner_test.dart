@@ -221,4 +221,58 @@ void main() {
 
     expect(find.textContaining('todavía no tiene precios'), findsOneWidget);
   });
+
+  testWidgets('v0.1.4: el último precio muestra la estandarización por unidad',
+      (tester) async {
+    await insertarProductoMayonesa(); // 500 g
+    await db.into(db.comercios).insert(ComerciosCompanion.insert(
+          id: 'c1',
+          nombre: 'Almacén',
+          creadoPor: 'u1',
+          creadoEn: '2026-01-01T00:00:00',
+          actualizadoEn: '2026-01-01T00:00:00',
+        ));
+    await db.into(db.precios).insert(PreciosCompanion.insert(
+          id: 'pr1',
+          productoId: 'p1',
+          comercioId: 'c1',
+          precio: 1500,
+          fechaToma: '2026-01-02',
+          cargadoPor: 'u1',
+          cargadoEn: '2026-01-02T10:00:00',
+        ));
+
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+    await tester.enterText(find.byType(TextField), '7790001001001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    // 1500 por 500 g → 3000.00 / kg (R11/R12 estandarizado al escanear).
+    expect(
+      find.textContaining('(3000.00 / kg)'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('v0.1.4: Editar datos abre el formulario en modo edición',
+      (tester) async {
+    await insertarProductoMayonesa();
+
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+    await tester.enterText(find.byType(TextField), '7790001001001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Editar datos'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProductoFormScreen), findsOneWidget);
+    // Precargado con los datos actuales del producto.
+    expect(find.text('Mayonesa Marca A'), findsOneWidget);
+    expect(find.text('Guardar cambios'), findsOneWidget);
+  });
 }

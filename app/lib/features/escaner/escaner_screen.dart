@@ -2,6 +2,8 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../data/local/normalizacion.dart';
+
 import '../../data/local/base_de_datos.dart';
 import '../precios/producto_comparacion_screen.dart';
 import '../precios/registro_precio_screen.dart';
@@ -35,10 +37,28 @@ class _EscanerScreenState extends State<EscanerScreen> {
   /// ajeno (misma base local, cualquier aportante).
   ({double precio, String comercio, String fecha})? _ultimoPrecio;
 
+  /// v0.1.4: linterna desde la interfaz (cámaras CCD con poca luz).
+  MobileScannerController? _controladorCamara;
+  bool _linterna = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.mostrarCamara) {
+      _controladorCamara = MobileScannerController();
+    }
+  }
+
   @override
   void dispose() {
     _controladorCodigo.dispose();
+    _controladorCamara?.dispose();
     super.dispose();
+  }
+
+  Future<void> _alternarLinterna() async {
+    await _controladorCamara?.toggleTorch();
+    if (mounted) setState(() => _linterna = !_linterna);
   }
 
   void _alDetectar(BarcodeCapture captura) {
@@ -119,6 +139,45 @@ class _EscanerScreenState extends State<EscanerScreen> {
     });
   }
 
+  /// v0.1.4: corregir o completar datos del producto (semillero incluido).
+  Future<void> _editarProducto() async {
+    final producto = _productoEncontrado;
+    if (producto == null) return;
+    final guardado = await Navigator.of(context).push<Producto>(
+      MaterialPageRoute<Producto>(
+        builder: (_) => ProductoFormScreen(
+          baseDeDatos: widget.baseDeDatos,
+          producto: producto,
+        ),
+      ),
+    );
+    if (guardado != null) {
+      _controladorCodigo.text = guardado.codigoBarras ?? '';
+    }
+    _buscar(); // refresca datos del producto y último precio
+  }
+
+  /// Línea del último precio con la estandarización por unidad de medida
+  /// (R11/R12): '... (3000.00 / kg)' cuando el producto es comparable.
+  String _lineaUltimoPrecio() {
+    final u = _ultimoPrecio!;
+    final p = _productoEncontrado!;
+    final String? base = unidadBaseDe(p.unidad);
+    final double? estandar = base == null
+        ? null
+        : precioPorUnidad(
+            precio: u.precio,
+            unidad: p.unidad,
+            unidadBase: base,
+            contenidoNeto: p.contenidoNeto,
+          );
+    final String sufijo = estandar == null
+        ? ''
+        : ' (${estandar.toStringAsFixed(2)} / $base)';
+    return 'Último precio: \$${u.precio.toStringAsFixed(2)}'
+        ' · ${u.comercio} · ${u.fecha}$sufijo';
+  }
+
   Future<void> _compararPrecios() async {
     final Producto? producto = _productoEncontrado;
     if (producto == null) return;
@@ -160,7 +219,27 @@ class _EscanerScreenState extends State<EscanerScreen> {
             height: 135,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: MobileScanner(onDetect: _alDetectar),
+              child: Stack(
+                children: <Widget>[
+                  MobileScanner(
+                    controller: _controladorCamara,
+                    onDetect: _alDetectar,
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: IconButton.filledTonal(
+                      tooltip: _linterna
+                          ? 'Apagar linterna'
+                          : 'Encender linterna',
+                      icon: Icon(
+                        _linterna ? Icons.flash_on : Icons.flash_off,
+                      ),
+                      onPressed: _alternarLinterna,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         if (widget.mostrarCamara) const SizedBox(height: 16),
@@ -194,16 +273,19 @@ class _EscanerScreenState extends State<EscanerScreen> {
         if (_productoEncontrado != null) ...<Widget>[
           const SizedBox(height: 12),
           if (_ultimoPrecio != null)
-            Text(
-              'Último precio: \$${_ultimoPrecio!.precio.toStringAsFixed(2)}'
-              ' · ${_ultimoPrecio!.comercio} · ${_ultimoPrecio!.fecha}',
-            )
+            Text(_lineaUltimoPrecio())
           else
             const Text('Este producto todavía no tiene precios registrados'),
           const SizedBox(height: 12),
           FilledButton.tonal(
             onPressed: _registrarPrecio,
             child: const Text('Registrar precio'),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _editarProducto,
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('Editar datos'),
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
