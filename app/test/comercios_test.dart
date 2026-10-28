@@ -72,7 +72,7 @@ void main() {
       find.widgetWithText(DropdownButtonFormField<String>, 'Tipo (opcional)'),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('almacen').last);
+    await tester.tap(find.text('Almacen').last);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
@@ -142,5 +142,30 @@ void main() {
     expect(find.text('La Carnicería'), findsOneWidget);
     expect(find.text('almacen'), findsOneWidget);
     expect(find.text('Sin tipo'), findsOneWidget);
+  });
+
+  testWidgets('v0.1.3: tipos Supermercado e Hipermercado disponibles y visibles',
+      (tester) async {
+    await tester.pumpWidget(envolver(_Anfitrion(db: db)));
+    await tester.tap(find.text('Abrir alta'));
+    await tester.pumpAndSettle();
+
+    // El dropdown muestra los tipos capitalizados, incluidos los nuevos.
+    await tester.tap(
+      find.widgetWithText(DropdownButtonFormField<String>, 'Tipo (opcional)'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Supermercado'), findsOneWidget);
+    expect(find.text('Hipermercado'), findsOneWidget);
+
+    // Elegir Supermercado crea el comercio con el valor interno correcto.
+    await tester.tap(find.text('Supermercado'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Coto');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('resultado: creado: Coto / supermercado'), findsOneWidget);
   });
 }

@@ -155,8 +155,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
         if (widget.mostrarCamara)
           SizedBox(
             // S4 (v0.1.2): menos altura para dejar lugar a los datos del
-            // producto escaneado (último precio, etc.).
-            height: 180,
+            // producto escaneado (último precio, etc.). El dueño pidió
+            // reducir un 25% adicional sobre los 180.
+            height: 135,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: MobileScanner(onDetect: _alDetectar),

@@ -7,11 +7,17 @@ import '../../data/local/base_de_datos.dart';
 
 const List<String> tiposComercio = <String>[
   'almacen',
+  'supermercado',
+  'hipermercado',
   'carniceria',
   'verduleria',
   'ferreteria',
   'otro',
 ];
+
+/// Etiqueta visible del tipo: capitalizada (almacen → Almacen).
+String etiquetaTipoComercio(String tipo) =>
+    tipo.isEmpty ? tipo : tipo[0].toUpperCase() + tipo.substring(1);
 
 /// S7 (R9): alta de comercio "en el momento" — diálogo reutilizable por el
 /// registro de precio (T8) y por la sección Comercios. Devuelve el comercio
@@ -56,7 +62,10 @@ Future<Comercio?> mostrarAltaComercio(
                     child: Text('Sin tipo'),
                   ),
                   for (final String t in tiposComercio)
-                    DropdownMenuItem<String>(value: t, child: Text(t)),
+                    DropdownMenuItem<String>(
+                        value: t,
+                        child: Text(etiquetaTipoComercio(t)),
+                      ),
                 ],
                 onChanged: (String? t) => setStateDialogo(() => tipo = t),
               ),
