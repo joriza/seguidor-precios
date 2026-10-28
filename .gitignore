@@ -1,6 +1,12 @@
 # Archivos personales del dueño: pdt-*.md son notas personales (no versionar)
 pdt-*.md
 
+# Credenciales locales del cargador del semillero (tools/cargar_semilla_supabase.py)
+.env
+
+# Bytecode cache de Python (tools/)
+__pycache__/
+
 # Directorio local de herramientas del agente
 .atl/
 
