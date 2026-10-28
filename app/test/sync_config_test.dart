@@ -4,10 +4,12 @@ import 'package:seguidor_precios/data/sync/config_backend.dart';
 
 void main() {
   group('config_backend — punto único de configuración (T2)', () {
-    test('la configuración por defecto trae placeholders, no credenciales', () {
-      expect(configBackend.url, contains('<<'));
-      expect(configBackend.claveAnonima, contains('<<'));
-      expect(configBackend.estaConfigurada, isFalse);
+    test('la configuración por defecto apunta al proyecto real (T7)', () {
+      expect(configBackend.url, isNot(contains('<<')));
+      expect(configBackend.claveAnonima, isNot(contains('<<')));
+      expect(configBackend.url, endsWith('.supabase.co'));
+      expect(configBackend.claveAnonima, isNotEmpty);
+      expect(configBackend.estaConfigurada, isTrue);
     });
 
     test('con credenciales reales queda configurada', () {

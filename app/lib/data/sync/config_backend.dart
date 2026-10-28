@@ -1,9 +1,7 @@
 /// Punto único de configuración del backend colaborativo (AD-002, AD-011).
 ///
 /// La app apunta a cualquier backend Supabase cambiando solo estos dos
-/// valores — nunca hay URL ni clave hardcodeadas en otro archivo. Los
-/// placeholders se reemplazan cuando el dueño cree el proyecto (T7 de la
-/// fase; región sugerida sa-east-1 con anonymous sign-ins activado).
+/// valores — nunca hay URL ni clave hardcodeadas en otro archivo.
 ///
 /// La clave anónima va embebida en la app por diseño (AD-002): está
 /// pensada para eso y la protección real son las reglas RLS del servidor.
@@ -25,9 +23,10 @@ class ConfigBackend {
       !claveAnonima.contains('<<');
 }
 
-/// Valores de producción: los completa el dueño al crear el proyecto
-/// Supabase (placeholder seguido en Studio, formato `<<NOMBRE>>`).
+/// Valores de producción: proyecto Supabase del dueño (creado 2026-10-28,
+/// región us-west-2, anonymous sign-ins activado, esquema T1 aplicado).
 const ConfigBackend configBackend = ConfigBackend(
-  url: '<<URL_DEL_PROYECTO_SUPABASE>>',
-  claveAnonima: '<<CLAVE_ANONIMA_SUPABASE>>',
+  url: 'https://pipoladhxwuhcfjsuzkx.supabase.co',
+  claveAnonima:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpcG9sYWRoeHd1aGNmanN1emt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTEwOTgsImV4cCI6MjEwODc2NzA5OH0.ytVoH37sRhq6lguh2K_wegp9zk3xSEYHtTY9jyaUrc0',
 );
