@@ -4,8 +4,9 @@ Aplicación Android para llevar el control personal de precios de productos de c
 (almacén, carnicería, verdulería, ferretería, etc.), con **datos locales sin conexión**,
 **comparación de precios por artículo** y un **repositorio colaborativo** centralizado en la web.
 
-> **Estado del proyecto:** 🚧 Fase 1 (MVP local) completa — v0.1.5 publicada. Próxima: **Fase 2 —
-> colaborativa (Supabase + sync)**, plan aprobado por el dueño. Detalle completo en la
+> **Estado del proyecto:** 🚧 **Fase 2 — colaborativa (Supabase + sync)** con código completo
+> (suite de tests 199/199) y backend operativo con el semillero cargado (424 productos).
+> Pendiente: validación en dispositivo y release v0.2.0. Detalle completo en la
 > [hoja de ruta](docs/hoja-de-ruta.md).
 
 ## Características

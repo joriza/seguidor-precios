@@ -222,3 +222,26 @@ Vista `resumen_articulo` (SQL local; en Postgres, vista o materializada en Fase 
 | precio | `(producto_id, fecha_toma DESC)` | historial (R8) |
 | precio | `(fecha_toma)` | agregados por ventana de tiempo (R12) |
 | comercio | `(nombre)` | selección rápida |
+
+## Esquema backend (Postgres)
+
+El backend colaborativo (Fase 2) espeja el esquema local en **6 tablas** — `usuario`, `articulo`,
+`producto`, `comercio`, `precio` y `valoracion` — con los mismos nombres de columna en snake_case
+que el esquema local (`app/lib/data/local/tablas.dart`) y tipos nativos de Postgres (`uuid`,
+`timestamptz`, `numeric`, `date`); la conversión con el texto ISO-8601 local la hace la capa de
+sync. El DDL canónico vive en el repo (no se duplica acá): `supabase/migrations/0001_esquema_colaborativo.sql`,
+`supabase/migrations/0002_permisos_service_role.sql` y `supabase/migracion-completa.sql`
+(mismo DDL concatenado, archivo único para pegar en Supabase Studio).
+
+| Pieza | Detalle |
+| --- | --- |
+| Tablas (6) | Espejo 1:1 del esquema local: mismas columnas, `CHECK` de dominio (unidades, tipo de comercio, gusto `si`/`no`, `precio > 0`), FKs y `borrado_en` como borrado lógico; `usuario` con `auth_uid` único (mapeo 1:1 con la sesión anónima) |
+| Índices | Único parcial `(codigo_barras)` solo sobre filas vigentes (`WHERE codigo_barras IS NOT NULL AND borrado_en IS NULL`), base del dedup por EAN; índices de búsqueda, comparador y cursores de pull (`precio.cargado_en`) |
+| Triggers | `actualizado_en` lo estampa el servidor en todo insert/update (árbitro de la última-escritura-gana y cursor de pull, reglas de sync 3-4); `precio` append-only: rechaza todo `UPDATE` salvo el re-apunte de `producto_id`, y su `cargado_en` lo normaliza el servidor; guardia de borrado lógico: solo el creador de la fila, sesión de servidor (Studio/servicio) o dedup en curso |
+| RPC | `ping()` — keep-alive del plan gratuito (R14), no sincroniza datos; `dedup_ean(codigo_barras)` — regla de sync 6: devuelve el producto canónico del EAN, re-apunta sus precios y da de baja lógica los duplicados (`SECURITY DEFINER`, idempotente) |
+| RLS (AD-016) | Solo sesiones `authenticated` (login anónimo): leen todo, insertan a su propio nombre, corrigen columnas de clasificación de cualquiera y borran (lógico) solo lo suyo; `precio` sin `UPDATE` ni `DELETE`; `valoracion` solo filas propias. Moderación mínima: sin rate limiting (diferido a Fase 4) |
+| Admin (AD-015) | Políticas `admin_dueno` con `es_admin()`: `auth_uid` fijo del dueño (placeholder `<<UID_DUENO>>` a reemplazar antes de aplicar; mientras tanto evalúa falso: operación segura por defecto) |
+| Correctivo 0002 | `GRANT` a `service_role` (tablas, `EXECUTE` de funciones, secuencias): sin él el cargador del semillero recibía `permission denied for table`; RLS sigue filtrando, esto solo habilita el acceso a nivel de tabla |
+
+Sin `FORCE ROW LEVEL SECURITY`: el dueño (rol de Studio) corrige cualquier fila sin límites (R18,
+AD-013). Procedimiento de puesta en marcha: [Desarrollo · Backend colaborativo](desarrollo.md#backend-colaborativo-fase-2).

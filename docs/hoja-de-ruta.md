@@ -42,9 +42,10 @@ promedio; el backup restaura en otra instalación.
 
 ## Fase 2 — Colaborativo (R4, R5, R10, R14, R15, R18)
 
-*Prevista: ~2-3 semanas. Estado: **plan aprobado por el dueño**; implementación delegada a
-subagentes para preservar el contexto principal. Decisiones: valoraciones solo se sincronizan
-(ponderación comunitaria postergada); enriquecimiento incluido (2.7); moderación mínima (AD-016).*
+*Prevista: ~2-3 semanas. Estado: **implementada** — código completo (suite 199/199) y backend
+Supabase operativo con el semillero cargado (424 productos). Pendiente: validación en dispositivo
+y release v0.2.0. Decisiones: valoraciones solo se sincronizan (ponderación comunitaria
+postergada); enriquecimiento incluido (2.7); moderación mínima (AD-016).*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |

@@ -1,8 +1,9 @@
 # Desarrollo
 
-> **Estado:** Fase 0 y Fase 1 completadas (v0.1.5 publicada); próxima: **Fase 2 — colaborativa**
-> (ver [hoja de ruta](hoja-de-ruta.md)). Este documento describe el entorno y las convenciones
-> vigentes.
+> **Estado:** **Fase 2 — colaborativa** con código completo (suite 199/199) y backend Supabase
+> operativo con el semillero cargado (424 productos). Pendiente: validación en dispositivo y
+> release v0.2.0 (ver [hoja de ruta](hoja-de-ruta.md)). Este documento describe el entorno y las
+> convenciones vigentes.
 
 ## Entorno
 
@@ -73,14 +74,34 @@ seguidor-precios/
   publica en GitHub Releases si pesa demasiado.
 - El pack incluye su metadato de atribución (`fuente`, `licencia`, `version`) que la app muestra en "Acerca de".
 
-## Supabase (Fase 2)
+## Backend colaborativo (Fase 2)
 
-- Crear proyecto gratuito en supabase.com; guardar URL y clave anónima.
-- El esquema de Postgres se versiona con migraciones SQL dentro del repo (`supabase/migrations/`).
-- En desarrollo puede correrse Supabase local con su CLI.
-- La URL y la clave del backend viven en un único punto de configuración (entorno/flavor): apuntar a
-  otra infraestructura es cambio de configuración, no de código (R16, AD-011).
-- Auth: anónimo (`signInAnonymously`), incluido en el free tier; el login por enlace mágico
-  (`signInWithOtp`) queda diferido a Fase 3 (R17).
-- Mantenimiento de datos en pruebas: **Supabase Studio** (panel incluido). La web de administración
-  del dueño (`admin/`) se construye cuando el panel quede corto (R18, AD-013).
+Runbook de puesta en marcha; el detalle del esquema está en
+[Modelo de datos · Esquema backend (Postgres)](modelo-de-datos.md#esquema-backend-postgres).
+
+1. **Crear el proyecto** en supabase.com (plan gratuito) con **anonymous sign-ins** activado
+   (Authentication → Sign In / Up → Anonymous): la app se identifica con un login anónimo. Guardar
+   la URL y la clave anónima del proyecto.
+2. **Aplicar el esquema** desde el SQL Editor de Supabase Studio: en un proyecto nuevo, pegar el
+   archivo único `supabase/migracion-completa.sql`; en un proyecto existente, solo las migraciones
+   nuevas de `supabase/migrations/` en orden. Son idempotentes (pueden re-ejecutarse). Antes de
+   ejecutar: reemplazar el placeholder `<<UID_DUENO>>` por el `auth_uid` del dueño (AD-015).
+3. **Cargar el semillero** con `python tools/cargar_semilla_supabase.py`: crear un `.env` en la
+   raíz del repo con `SUPABASE_URL` y `SUPABASE_SERVICE_KEY` (clave de servicio nueva
+   `sb_secret_...` o legacy `service_role`). El `.env` está en `.gitignore` y **nunca se commitea**.
+   `--dry-run` valida el pack sin red; `--lote N` ajusta el tamaño de lote (100 por defecto).
+4. **Idempotencia:** re-ejecutar el cargador no duplica filas — cada producto lleva un UUID
+   determinista derivado de su EAN y cada tabla se sube con upsert (`on_conflict=id`).
+5. **Apuntar la app:** la URL del proyecto y la clave anónima (pública por diseño, AD-002) viven en
+   un único punto, `app/lib/data/sync/config_backend.dart`; apuntar a otra infraestructura es un
+   cambio de configuración, no de código (R16, AD-011).
+
+Convenciones vigentes:
+
+- El esquema de Postgres se versiona con migraciones SQL en el repo (`supabase/migrations/`); en
+  desarrollo puede correrse Supabase local con su CLI.
+- Auth anónimo (`signInAnonymously`, incluido en el free tier); el enlace mágico (`signInWithOtp`)
+  queda diferido a Fase 3 (R17).
+- Mantenimiento de datos en pruebas: **Supabase Studio** (borrados lógicos, asignación de
+  artículos, correcciones); la web `admin/` del dueño se construye cuando el panel quede corto
+  (R18, AD-013).
