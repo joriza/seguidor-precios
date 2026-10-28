@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/local/normalizacion.dart';
+import '../../data/valoraciones.dart';
 
 import '../../data/local/base_de_datos.dart';
 import '../precios/producto_comparacion_screen.dart';
@@ -36,6 +37,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
   /// S4 (v0.1.2): último precio conocido del producto encontrado — propio o
   /// ajeno (misma base local, cualquier aportante).
   ({double precio, String comercio, String fecha})? _ultimoPrecio;
+  Valoracion? _valoracion;
 
   /// v0.1.4: linterna desde la interfaz (cámaras CCD con poca luz).
   MobileScannerController? _controladorCamara;
@@ -83,12 +85,15 @@ class _EscanerScreenState extends State<EscanerScreen> {
         .getSingleOrNull();
 
     final ultimo = producto == null ? null : await _ultimoPrecioDe(producto.id);
+    final valoracion =
+        producto == null ? null : await valoracionDe(widget.baseDeDatos, producto.id);
 
     if (!mounted) return;
     setState(() {
       _buscando = false;
       _productoEncontrado = producto;
       _ultimoPrecio = ultimo;
+      _valoracion = valoracion;
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo desde la sección Artículos (Fase 1.5).'
           : 'Producto encontrado: ${producto.nombre}';
@@ -154,7 +159,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
     if (guardado != null) {
       _controladorCodigo.text = guardado.codigoBarras ?? '';
     }
-    _buscar(); // refresca datos del producto y último precio
+    _buscar(); // refresca datos del producto, último precio y valoración
   }
 
   /// Línea del último precio con la estandarización por unidad de medida
@@ -276,6 +281,17 @@ class _EscanerScreenState extends State<EscanerScreen> {
             Text(_lineaUltimoPrecio())
           else
             const Text('Este producto todavía no tiene precios registrados'),
+          if (_valoracion != null &&
+              (_valoracion!.gusto != null ||
+                  (_valoracion!.observacion ?? '').isNotEmpty)) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              'Mi valoración: '
+              '${_valoracion!.gusto == 'si' ? '👍 Me gusta' : _valoracion!.gusto == 'no' ? '👎 No me gusta' : '—'}'
+              '${(_valoracion!.observacion ?? '').isEmpty ? '' : ' — ${_valoracion!.observacion}'}',
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ],
           const SizedBox(height: 12),
           FilledButton.tonal(
             onPressed: _registrarPrecio,

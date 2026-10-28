@@ -2713,6 +2713,492 @@ class UsuariosCompanion extends UpdateCompanion<Usuario> {
   }
 }
 
+class $ValoracionesTable extends Valoraciones
+    with TableInfo<$ValoracionesTable, Valoracion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ValoracionesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _usuarioIdMeta = const VerificationMeta(
+    'usuarioId',
+  );
+  @override
+  late final GeneratedColumn<String> usuarioId = GeneratedColumn<String>(
+    'usuario_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES usuarios (id)',
+    ),
+  );
+  static const VerificationMeta _productoIdMeta = const VerificationMeta(
+    'productoId',
+  );
+  @override
+  late final GeneratedColumn<String> productoId = GeneratedColumn<String>(
+    'producto_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES productos (id)',
+    ),
+  );
+  static const VerificationMeta _gustoMeta = const VerificationMeta('gusto');
+  @override
+  late final GeneratedColumn<String> gusto = GeneratedColumn<String>(
+    'gusto',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _observacionMeta = const VerificationMeta(
+    'observacion',
+  );
+  @override
+  late final GeneratedColumn<String> observacion = GeneratedColumn<String>(
+    'observacion',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _creadoEnMeta = const VerificationMeta(
+    'creadoEn',
+  );
+  @override
+  late final GeneratedColumn<String> creadoEn = GeneratedColumn<String>(
+    'creado_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _actualizadoEnMeta = const VerificationMeta(
+    'actualizadoEn',
+  );
+  @override
+  late final GeneratedColumn<String> actualizadoEn = GeneratedColumn<String>(
+    'actualizado_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    usuarioId,
+    productoId,
+    gusto,
+    observacion,
+    creadoEn,
+    actualizadoEn,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'valoraciones';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Valoracion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('usuario_id')) {
+      context.handle(
+        _usuarioIdMeta,
+        usuarioId.isAcceptableOrUnknown(data['usuario_id']!, _usuarioIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_usuarioIdMeta);
+    }
+    if (data.containsKey('producto_id')) {
+      context.handle(
+        _productoIdMeta,
+        productoId.isAcceptableOrUnknown(data['producto_id']!, _productoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productoIdMeta);
+    }
+    if (data.containsKey('gusto')) {
+      context.handle(
+        _gustoMeta,
+        gusto.isAcceptableOrUnknown(data['gusto']!, _gustoMeta),
+      );
+    }
+    if (data.containsKey('observacion')) {
+      context.handle(
+        _observacionMeta,
+        observacion.isAcceptableOrUnknown(
+          data['observacion']!,
+          _observacionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('creado_en')) {
+      context.handle(
+        _creadoEnMeta,
+        creadoEn.isAcceptableOrUnknown(data['creado_en']!, _creadoEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_creadoEnMeta);
+    }
+    if (data.containsKey('actualizado_en')) {
+      context.handle(
+        _actualizadoEnMeta,
+        actualizadoEn.isAcceptableOrUnknown(
+          data['actualizado_en']!,
+          _actualizadoEnMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_actualizadoEnMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Valoracion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Valoracion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      usuarioId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}usuario_id'],
+      )!,
+      productoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}producto_id'],
+      )!,
+      gusto: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gusto'],
+      ),
+      observacion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}observacion'],
+      ),
+      creadoEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}creado_en'],
+      )!,
+      actualizadoEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}actualizado_en'],
+      )!,
+    );
+  }
+
+  @override
+  $ValoracionesTable createAlias(String alias) {
+    return $ValoracionesTable(attachedDatabase, alias);
+  }
+}
+
+class Valoracion extends DataClass implements Insertable<Valoracion> {
+  final String id;
+  final String usuarioId;
+  final String productoId;
+
+  /// 'si' | 'no' | null (neutro — sin valoración cargada).
+  final String? gusto;
+
+  /// Observación personal breve (ej.: "salió bueno", "no repito").
+  final String? observacion;
+  final String creadoEn;
+  final String actualizadoEn;
+  const Valoracion({
+    required this.id,
+    required this.usuarioId,
+    required this.productoId,
+    this.gusto,
+    this.observacion,
+    required this.creadoEn,
+    required this.actualizadoEn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['usuario_id'] = Variable<String>(usuarioId);
+    map['producto_id'] = Variable<String>(productoId);
+    if (!nullToAbsent || gusto != null) {
+      map['gusto'] = Variable<String>(gusto);
+    }
+    if (!nullToAbsent || observacion != null) {
+      map['observacion'] = Variable<String>(observacion);
+    }
+    map['creado_en'] = Variable<String>(creadoEn);
+    map['actualizado_en'] = Variable<String>(actualizadoEn);
+    return map;
+  }
+
+  ValoracionesCompanion toCompanion(bool nullToAbsent) {
+    return ValoracionesCompanion(
+      id: Value(id),
+      usuarioId: Value(usuarioId),
+      productoId: Value(productoId),
+      gusto: gusto == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gusto),
+      observacion: observacion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observacion),
+      creadoEn: Value(creadoEn),
+      actualizadoEn: Value(actualizadoEn),
+    );
+  }
+
+  factory Valoracion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Valoracion(
+      id: serializer.fromJson<String>(json['id']),
+      usuarioId: serializer.fromJson<String>(json['usuarioId']),
+      productoId: serializer.fromJson<String>(json['productoId']),
+      gusto: serializer.fromJson<String?>(json['gusto']),
+      observacion: serializer.fromJson<String?>(json['observacion']),
+      creadoEn: serializer.fromJson<String>(json['creadoEn']),
+      actualizadoEn: serializer.fromJson<String>(json['actualizadoEn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'usuarioId': serializer.toJson<String>(usuarioId),
+      'productoId': serializer.toJson<String>(productoId),
+      'gusto': serializer.toJson<String?>(gusto),
+      'observacion': serializer.toJson<String?>(observacion),
+      'creadoEn': serializer.toJson<String>(creadoEn),
+      'actualizadoEn': serializer.toJson<String>(actualizadoEn),
+    };
+  }
+
+  Valoracion copyWith({
+    String? id,
+    String? usuarioId,
+    String? productoId,
+    Value<String?> gusto = const Value.absent(),
+    Value<String?> observacion = const Value.absent(),
+    String? creadoEn,
+    String? actualizadoEn,
+  }) => Valoracion(
+    id: id ?? this.id,
+    usuarioId: usuarioId ?? this.usuarioId,
+    productoId: productoId ?? this.productoId,
+    gusto: gusto.present ? gusto.value : this.gusto,
+    observacion: observacion.present ? observacion.value : this.observacion,
+    creadoEn: creadoEn ?? this.creadoEn,
+    actualizadoEn: actualizadoEn ?? this.actualizadoEn,
+  );
+  Valoracion copyWithCompanion(ValoracionesCompanion data) {
+    return Valoracion(
+      id: data.id.present ? data.id.value : this.id,
+      usuarioId: data.usuarioId.present ? data.usuarioId.value : this.usuarioId,
+      productoId: data.productoId.present
+          ? data.productoId.value
+          : this.productoId,
+      gusto: data.gusto.present ? data.gusto.value : this.gusto,
+      observacion: data.observacion.present
+          ? data.observacion.value
+          : this.observacion,
+      creadoEn: data.creadoEn.present ? data.creadoEn.value : this.creadoEn,
+      actualizadoEn: data.actualizadoEn.present
+          ? data.actualizadoEn.value
+          : this.actualizadoEn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Valoracion(')
+          ..write('id: $id, ')
+          ..write('usuarioId: $usuarioId, ')
+          ..write('productoId: $productoId, ')
+          ..write('gusto: $gusto, ')
+          ..write('observacion: $observacion, ')
+          ..write('creadoEn: $creadoEn, ')
+          ..write('actualizadoEn: $actualizadoEn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    usuarioId,
+    productoId,
+    gusto,
+    observacion,
+    creadoEn,
+    actualizadoEn,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Valoracion &&
+          other.id == this.id &&
+          other.usuarioId == this.usuarioId &&
+          other.productoId == this.productoId &&
+          other.gusto == this.gusto &&
+          other.observacion == this.observacion &&
+          other.creadoEn == this.creadoEn &&
+          other.actualizadoEn == this.actualizadoEn);
+}
+
+class ValoracionesCompanion extends UpdateCompanion<Valoracion> {
+  final Value<String> id;
+  final Value<String> usuarioId;
+  final Value<String> productoId;
+  final Value<String?> gusto;
+  final Value<String?> observacion;
+  final Value<String> creadoEn;
+  final Value<String> actualizadoEn;
+  final Value<int> rowid;
+  const ValoracionesCompanion({
+    this.id = const Value.absent(),
+    this.usuarioId = const Value.absent(),
+    this.productoId = const Value.absent(),
+    this.gusto = const Value.absent(),
+    this.observacion = const Value.absent(),
+    this.creadoEn = const Value.absent(),
+    this.actualizadoEn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ValoracionesCompanion.insert({
+    required String id,
+    required String usuarioId,
+    required String productoId,
+    this.gusto = const Value.absent(),
+    this.observacion = const Value.absent(),
+    required String creadoEn,
+    required String actualizadoEn,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       usuarioId = Value(usuarioId),
+       productoId = Value(productoId),
+       creadoEn = Value(creadoEn),
+       actualizadoEn = Value(actualizadoEn);
+  static Insertable<Valoracion> custom({
+    Expression<String>? id,
+    Expression<String>? usuarioId,
+    Expression<String>? productoId,
+    Expression<String>? gusto,
+    Expression<String>? observacion,
+    Expression<String>? creadoEn,
+    Expression<String>? actualizadoEn,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (usuarioId != null) 'usuario_id': usuarioId,
+      if (productoId != null) 'producto_id': productoId,
+      if (gusto != null) 'gusto': gusto,
+      if (observacion != null) 'observacion': observacion,
+      if (creadoEn != null) 'creado_en': creadoEn,
+      if (actualizadoEn != null) 'actualizado_en': actualizadoEn,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ValoracionesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? usuarioId,
+    Value<String>? productoId,
+    Value<String?>? gusto,
+    Value<String?>? observacion,
+    Value<String>? creadoEn,
+    Value<String>? actualizadoEn,
+    Value<int>? rowid,
+  }) {
+    return ValoracionesCompanion(
+      id: id ?? this.id,
+      usuarioId: usuarioId ?? this.usuarioId,
+      productoId: productoId ?? this.productoId,
+      gusto: gusto ?? this.gusto,
+      observacion: observacion ?? this.observacion,
+      creadoEn: creadoEn ?? this.creadoEn,
+      actualizadoEn: actualizadoEn ?? this.actualizadoEn,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (usuarioId.present) {
+      map['usuario_id'] = Variable<String>(usuarioId.value);
+    }
+    if (productoId.present) {
+      map['producto_id'] = Variable<String>(productoId.value);
+    }
+    if (gusto.present) {
+      map['gusto'] = Variable<String>(gusto.value);
+    }
+    if (observacion.present) {
+      map['observacion'] = Variable<String>(observacion.value);
+    }
+    if (creadoEn.present) {
+      map['creado_en'] = Variable<String>(creadoEn.value);
+    }
+    if (actualizadoEn.present) {
+      map['actualizado_en'] = Variable<String>(actualizadoEn.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ValoracionesCompanion(')
+          ..write('id: $id, ')
+          ..write('usuarioId: $usuarioId, ')
+          ..write('productoId: $productoId, ')
+          ..write('gusto: $gusto, ')
+          ..write('observacion: $observacion, ')
+          ..write('creadoEn: $creadoEn, ')
+          ..write('actualizadoEn: $actualizadoEn, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$BaseDeDatos extends GeneratedDatabase {
   _$BaseDeDatos(QueryExecutor e) : super(e);
   $BaseDeDatosManager get managers => $BaseDeDatosManager(this);
@@ -2721,6 +3207,7 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
   late final $ComerciosTable comercios = $ComerciosTable(this);
   late final $PreciosTable precios = $PreciosTable(this);
   late final $UsuariosTable usuarios = $UsuariosTable(this);
+  late final $ValoracionesTable valoraciones = $ValoracionesTable(this);
   late final Index idxArticuloNombre = Index(
     'idx_articulo_nombre',
     'CREATE INDEX idx_articulo_nombre ON articulos (nombre)',
@@ -2749,6 +3236,14 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
     'idx_precio_fecha',
     'CREATE INDEX idx_precio_fecha ON precios (fecha_toma)',
   );
+  late final Index idxValoracionProducto = Index(
+    'idx_valoracion_producto',
+    'CREATE INDEX idx_valoracion_producto ON valoraciones (producto_id)',
+  );
+  late final Index idxValoracionUsuario = Index(
+    'idx_valoracion_usuario',
+    'CREATE INDEX idx_valoracion_usuario ON valoraciones (usuario_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2759,6 +3254,7 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
     comercios,
     precios,
     usuarios,
+    valoraciones,
     idxArticuloNombre,
     idxProductoNombre,
     idxProductoMarca,
@@ -2766,6 +3262,8 @@ abstract class _$BaseDeDatos extends GeneratedDatabase {
     idxComercioNombre,
     idxPrecioProductoFecha,
     idxPrecioFecha,
+    idxValoracionProducto,
+    idxValoracionUsuario,
   ];
 }
 
@@ -3204,6 +3702,24 @@ final class $$ProductosTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ValoracionesTable, List<Valoracion>>
+  _valoracionesRefsTable(_$BaseDeDatos db) => MultiTypedResultKey.fromTable(
+    db.valoraciones,
+    aliasName: 'productos__id__valoraciones__producto_id',
+  );
+
+  $$ValoracionesTableProcessedTableManager get valoracionesRefs {
+    final manager = $$ValoracionesTableTableManager(
+      $_db,
+      $_db.valoraciones,
+    ).filter((f) => f.productoId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_valoracionesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ProductosTableFilterComposer
@@ -3319,6 +3835,31 @@ class $$ProductosTableFilterComposer
           }) => $$PreciosTableFilterComposer(
             $db: $db,
             $table: $db.precios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> valoracionesRefs(
+    Expression<bool> Function($$ValoracionesTableFilterComposer f) f,
+  ) {
+    final $$ValoracionesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.valoraciones,
+      getReferencedColumn: (t) => t.productoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ValoracionesTableFilterComposer(
+            $db: $db,
+            $table: $db.valoraciones,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3528,6 +4069,31 @@ class $$ProductosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> valoracionesRefs<T extends Object>(
+    Expression<T> Function($$ValoracionesTableAnnotationComposer a) f,
+  ) {
+    final $$ValoracionesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.valoraciones,
+      getReferencedColumn: (t) => t.productoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ValoracionesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.valoraciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProductosTableTableManager
@@ -3543,7 +4109,11 @@ class $$ProductosTableTableManager
           $$ProductosTableUpdateCompanionBuilder,
           (Producto, $$ProductosTableReferences),
           Producto,
-          PrefetchHooks Function({bool articuloId, bool preciosRefs})
+          PrefetchHooks Function({
+            bool articuloId,
+            bool preciosRefs,
+            bool valoracionesRefs,
+          })
         > {
   $$ProductosTableTableManager(_$BaseDeDatos db, $ProductosTable table)
     : super(
@@ -3632,62 +4202,94 @@ class $$ProductosTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({articuloId = false, preciosRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (preciosRefs) db.precios],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (articuloId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.articuloId,
-                        referencedTable: $$ProductosTableReferences
-                            ._articuloIdTable(db),
-                        referencedColumn: $$ProductosTableReferences
-                            ._articuloIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                articuloId = false,
+                preciosRefs = false,
+                valoracionesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (preciosRefs) db.precios,
+                    if (valoracionesRefs) db.valoraciones,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (articuloId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.articuloId,
+                            referencedTable: $$ProductosTableReferences
+                                ._articuloIdTable(db),
+                            referencedColumn: $$ProductosTableReferences
+                                ._articuloIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (preciosRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Producto,
+                          $ProductosTable,
+                          Precio,
+                          $PreciosTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProductosTableReferences
+                              ._preciosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProductosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).preciosRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'producto_id',
+                          typedResults: items,
+                        ),
+                      if (valoracionesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Producto,
+                          $ProductosTable,
+                          Valoracion,
+                          $ValoracionesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProductosTableReferences
+                              ._valoracionesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProductosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).valoracionesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'producto_id',
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (preciosRefs)
-                    await $_getPrefetchedDataByColumns<
-                      Producto,
-                      $ProductosTable,
-                      Precio,
-                      $PreciosTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ProductosTableReferences
-                          ._preciosRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ProductosTableReferences(db, table, p0).preciosRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'producto_id',
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3704,7 +4306,11 @@ typedef $$ProductosTableProcessedTableManager =
       $$ProductosTableUpdateCompanionBuilder,
       (Producto, $$ProductosTableReferences),
       Producto,
-      PrefetchHooks Function({bool articuloId, bool preciosRefs})
+      PrefetchHooks Function({
+        bool articuloId,
+        bool preciosRefs,
+        bool valoracionesRefs,
+      })
     >;
 typedef $$ComerciosTableCreateCompanionBuilder = ComerciosCompanion Function({
   required String id,
@@ -4516,6 +5122,29 @@ typedef $$UsuariosTableUpdateCompanionBuilder = UsuariosCompanion Function({
   Value<int> rowid,
 });
 
+final class $$UsuariosTableReferences
+    extends BaseReferences<_$BaseDeDatos, $UsuariosTable, Usuario> {
+  $$UsuariosTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ValoracionesTable, List<Valoracion>>
+  _valoracionesRefsTable(_$BaseDeDatos db) => MultiTypedResultKey.fromTable(
+    db.valoraciones,
+    aliasName: 'usuarios__id__valoraciones__usuario_id',
+  );
+
+  $$ValoracionesTableProcessedTableManager get valoracionesRefs {
+    final manager = $$ValoracionesTableTableManager(
+      $_db,
+      $_db.valoraciones,
+    ).filter((f) => f.usuarioId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_valoracionesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$UsuariosTableFilterComposer
     extends Composer<_$BaseDeDatos, $UsuariosTable> {
   $$UsuariosTableFilterComposer({
@@ -4549,6 +5178,31 @@ class $$UsuariosTableFilterComposer
     column: $table.actualizadoEn,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> valoracionesRefs(
+    Expression<bool> Function($$ValoracionesTableFilterComposer f) f,
+  ) {
+    final $$ValoracionesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.valoraciones,
+      getReferencedColumn: (t) => t.usuarioId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ValoracionesTableFilterComposer(
+            $db: $db,
+            $table: $db.valoraciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UsuariosTableOrderingComposer
@@ -4611,6 +5265,31 @@ class $$UsuariosTableAnnotationComposer
     column: $table.actualizadoEn,
     builder: (column) => column,
   );
+
+  Expression<T> valoracionesRefs<T extends Object>(
+    Expression<T> Function($$ValoracionesTableAnnotationComposer a) f,
+  ) {
+    final $$ValoracionesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.valoraciones,
+      getReferencedColumn: (t) => t.usuarioId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ValoracionesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.valoraciones,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UsuariosTableTableManager
@@ -4624,9 +5303,9 @@ class $$UsuariosTableTableManager
           $$UsuariosTableAnnotationComposer,
           $$UsuariosTableCreateCompanionBuilder,
           $$UsuariosTableUpdateCompanionBuilder,
-          (Usuario, BaseReferences<_$BaseDeDatos, $UsuariosTable, Usuario>),
+          (Usuario, $$UsuariosTableReferences),
           Usuario,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool valoracionesRefs})
         > {
   $$UsuariosTableTableManager(_$BaseDeDatos db, $UsuariosTable table)
     : super(
@@ -4675,15 +5354,40 @@ class $$UsuariosTableTableManager
               .map(
                 (e) => (
                   e.readTable<$UsuariosTable, Usuario>(table),
-                  BaseReferences<_$BaseDeDatos, $UsuariosTable, Usuario>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  $$UsuariosTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({valoracionesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (valoracionesRefs) db.valoraciones],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (valoracionesRefs)
+                    await $_getPrefetchedDataByColumns<
+                      Usuario,
+                      $UsuariosTable,
+                      Valoracion,
+                      $ValoracionesTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$UsuariosTableReferences
+                          ._valoracionesRefsTable(db),
+                      managerFromTypedResult: (p0) => $$UsuariosTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).valoracionesRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'usuario_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -4698,9 +5402,450 @@ typedef $$UsuariosTableProcessedTableManager =
       $$UsuariosTableAnnotationComposer,
       $$UsuariosTableCreateCompanionBuilder,
       $$UsuariosTableUpdateCompanionBuilder,
-      (Usuario, BaseReferences<_$BaseDeDatos, $UsuariosTable, Usuario>),
+      (Usuario, $$UsuariosTableReferences),
       Usuario,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool valoracionesRefs})
+    >;
+typedef $$ValoracionesTableCreateCompanionBuilder =
+    ValoracionesCompanion Function({
+      required String id,
+      required String usuarioId,
+      required String productoId,
+      Value<String?> gusto,
+      Value<String?> observacion,
+      required String creadoEn,
+      required String actualizadoEn,
+      Value<int> rowid,
+    });
+typedef $$ValoracionesTableUpdateCompanionBuilder =
+    ValoracionesCompanion Function({
+      Value<String> id,
+      Value<String> usuarioId,
+      Value<String> productoId,
+      Value<String?> gusto,
+      Value<String?> observacion,
+      Value<String> creadoEn,
+      Value<String> actualizadoEn,
+      Value<int> rowid,
+    });
+
+final class $$ValoracionesTableReferences
+    extends BaseReferences<_$BaseDeDatos, $ValoracionesTable, Valoracion> {
+  $$ValoracionesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsuariosTable _usuarioIdTable(_$BaseDeDatos db) =>
+      db.usuarios.createAlias('valoraciones__usuario_id__usuarios__id');
+
+  $$UsuariosTableProcessedTableManager get usuarioId {
+    final $_column = $_itemColumn<String>('usuario_id')!;
+
+    final manager = $$UsuariosTableTableManager(
+      $_db,
+      $_db.usuarios,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_usuarioIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProductosTable _productoIdTable(_$BaseDeDatos db) =>
+      db.productos.createAlias('valoraciones__producto_id__productos__id');
+
+  $$ProductosTableProcessedTableManager get productoId {
+    final $_column = $_itemColumn<String>('producto_id')!;
+
+    final manager = $$ProductosTableTableManager(
+      $_db,
+      $_db.productos,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_productoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ValoracionesTableFilterComposer
+    extends Composer<_$BaseDeDatos, $ValoracionesTable> {
+  $$ValoracionesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gusto => $composableBuilder(
+    column: $table.gusto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get observacion => $composableBuilder(
+    column: $table.observacion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get creadoEn => $composableBuilder(
+    column: $table.creadoEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actualizadoEn => $composableBuilder(
+    column: $table.actualizadoEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UsuariosTableFilterComposer get usuarioId {
+    final $$UsuariosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableFilterComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProductosTableFilterComposer get productoId {
+    final $$ProductosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productoId,
+      referencedTable: $db.productos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductosTableFilterComposer(
+            $db: $db,
+            $table: $db.productos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ValoracionesTableOrderingComposer
+    extends Composer<_$BaseDeDatos, $ValoracionesTable> {
+  $$ValoracionesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gusto => $composableBuilder(
+    column: $table.gusto,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get observacion => $composableBuilder(
+    column: $table.observacion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get creadoEn => $composableBuilder(
+    column: $table.creadoEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actualizadoEn => $composableBuilder(
+    column: $table.actualizadoEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UsuariosTableOrderingComposer get usuarioId {
+    final $$UsuariosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableOrderingComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProductosTableOrderingComposer get productoId {
+    final $$ProductosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productoId,
+      referencedTable: $db.productos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductosTableOrderingComposer(
+            $db: $db,
+            $table: $db.productos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ValoracionesTableAnnotationComposer
+    extends Composer<_$BaseDeDatos, $ValoracionesTable> {
+  $$ValoracionesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get gusto =>
+      $composableBuilder(column: $table.gusto, builder: (column) => column);
+
+  GeneratedColumn<String> get observacion => $composableBuilder(
+    column: $table.observacion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get creadoEn =>
+      $composableBuilder(column: $table.creadoEn, builder: (column) => column);
+
+  GeneratedColumn<String> get actualizadoEn => $composableBuilder(
+    column: $table.actualizadoEn,
+    builder: (column) => column,
+  );
+
+  $$UsuariosTableAnnotationComposer get usuarioId {
+    final $$UsuariosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.usuarioId,
+      referencedTable: $db.usuarios,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsuariosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.usuarios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProductosTableAnnotationComposer get productoId {
+    final $$ProductosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productoId,
+      referencedTable: $db.productos,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.productos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ValoracionesTableTableManager
+    extends
+        RootTableManager<
+          _$BaseDeDatos,
+          $ValoracionesTable,
+          Valoracion,
+          $$ValoracionesTableFilterComposer,
+          $$ValoracionesTableOrderingComposer,
+          $$ValoracionesTableAnnotationComposer,
+          $$ValoracionesTableCreateCompanionBuilder,
+          $$ValoracionesTableUpdateCompanionBuilder,
+          (Valoracion, $$ValoracionesTableReferences),
+          Valoracion,
+          PrefetchHooks Function({bool usuarioId, bool productoId})
+        > {
+  $$ValoracionesTableTableManager(_$BaseDeDatos db, $ValoracionesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ValoracionesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ValoracionesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ValoracionesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> usuarioId = const Value.absent(),
+                Value<String> productoId = const Value.absent(),
+                Value<String?> gusto = const Value.absent(),
+                Value<String?> observacion = const Value.absent(),
+                Value<String> creadoEn = const Value.absent(),
+                Value<String> actualizadoEn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ValoracionesCompanion(
+                id: id,
+                usuarioId: usuarioId,
+                productoId: productoId,
+                gusto: gusto,
+                observacion: observacion,
+                creadoEn: creadoEn,
+                actualizadoEn: actualizadoEn,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String usuarioId,
+                required String productoId,
+                Value<String?> gusto = const Value.absent(),
+                Value<String?> observacion = const Value.absent(),
+                required String creadoEn,
+                required String actualizadoEn,
+                Value<int> rowid = const Value.absent(),
+              }) => ValoracionesCompanion.insert(
+                id: id,
+                usuarioId: usuarioId,
+                productoId: productoId,
+                gusto: gusto,
+                observacion: observacion,
+                creadoEn: creadoEn,
+                actualizadoEn: actualizadoEn,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ValoracionesTable, Valoracion>(table),
+                  $$ValoracionesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({usuarioId = false, productoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (usuarioId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.usuarioId,
+                        referencedTable: $$ValoracionesTableReferences
+                            ._usuarioIdTable(db),
+                        referencedColumn: $$ValoracionesTableReferences
+                            ._usuarioIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (productoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.productoId,
+                        referencedTable: $$ValoracionesTableReferences
+                            ._productoIdTable(db),
+                        referencedColumn: $$ValoracionesTableReferences
+                            ._productoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ValoracionesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$BaseDeDatos,
+      $ValoracionesTable,
+      Valoracion,
+      $$ValoracionesTableFilterComposer,
+      $$ValoracionesTableOrderingComposer,
+      $$ValoracionesTableAnnotationComposer,
+      $$ValoracionesTableCreateCompanionBuilder,
+      $$ValoracionesTableUpdateCompanionBuilder,
+      (Valoracion, $$ValoracionesTableReferences),
+      Valoracion,
+      PrefetchHooks Function({bool usuarioId, bool productoId})
     >;
 
 class $BaseDeDatosManager {
@@ -4716,4 +5861,6 @@ class $BaseDeDatosManager {
       $$PreciosTableTableManager(_db, _db.precios);
   $$UsuariosTableTableManager get usuarios =>
       $$UsuariosTableTableManager(_db, _db.usuarios);
+  $$ValoracionesTableTableManager get valoraciones =>
+      $$ValoracionesTableTableManager(_db, _db.valoraciones);
 }

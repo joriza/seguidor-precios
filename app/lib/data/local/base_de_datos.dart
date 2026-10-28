@@ -9,10 +9,18 @@ import 'tablas.dart';
 
 part 'base_de_datos.g.dart';
 
-/// Base local (fuente de verdad del dispositivo) — esquema v1 según
+/// Base local (fuente de verdad del dispositivo) — esquema v2 según
 /// docs/modelo-de-datos.md. Append-only en `precios` se garantiza en la
 /// capa de datos: no se exponen update/delete para esa tabla.
-@DriftDatabase(tables: [Articulos, Productos, Comercios, Precios, Usuarios])
+/// v2 (v0.1.5): agrega `valoraciones` (valoración personal por usuario).
+@DriftDatabase(tables: [
+  Articulos,
+  Productos,
+  Comercios,
+  Precios,
+  Usuarios,
+  Valoraciones,
+])
 class BaseDeDatos extends _$BaseDeDatos {
   /// Instancia de producción: archivo en el directorio de documentos.
   BaseDeDatos() : super(_abrir());
@@ -21,10 +29,17 @@ class BaseDeDatos extends _$BaseDeDatos {
   BaseDeDatos.memoria() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          // v1 → v2: la tabla valoraciones es nueva; las existentes no
+          // cambian (sin pérdida de datos en la actualización).
+          if (from < 2) {
+            await m.createTable(valoraciones);
+          }
+        },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },

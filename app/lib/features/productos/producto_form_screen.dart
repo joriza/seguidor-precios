@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
+import '../../data/valoraciones.dart';
 import '../../data/local/normalizacion.dart';
 
 /// S5 (R1/R7/R11): alta y edición de producto.
@@ -42,6 +43,10 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   bool _guardando = false;
   String? _error;
 
+  /// v0.1.5: valoración personal — neutro por defecto.
+  String _gusto = 'neutro';
+  final TextEditingController _observacion = TextEditingController();
+
   bool get _esEdicion => widget.producto != null;
 
   @override
@@ -58,6 +63,9 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _unidad = widget.producto?.unidad ?? 'unidad';
     _articuloId = widget.producto?.articuloId;
     _cargarArticulos();
+    if (_esEdicion) {
+      _cargarValoracion();
+    }
   }
 
   @override
@@ -67,7 +75,19 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _marca.dispose();
     _contenido.dispose();
     _categoria.dispose();
+    _observacion.dispose();
     super.dispose();
+  }
+
+  /// Carga la valoración personal existente del producto (solo edición).
+  Future<void> _cargarValoracion() async {
+    final valoracion =
+        await valoracionDe(widget.baseDeDatos, widget.producto!.id);
+    if (!mounted || valoracion == null) return;
+    setState(() {
+      _gusto = valoracion.gusto ?? 'neutro';
+      _observacion.text = valoracion.observacion ?? '';
+    });
   }
 
   Future<void> _cargarArticulos() async {
@@ -139,6 +159,14 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
               ..where((t) => t.id.equals(id)))
             .getSingle();
       }
+      await guardarValoracion(
+        widget.baseDeDatos,
+        guardado.id,
+        gusto: _gusto == 'neutro' ? null : _gusto,
+        observacion: _observacion.text.trim().isEmpty
+            ? null
+            : _observacion.text.trim(),
+      );
       widget.alGuardar?.call(guardado);
       if (mounted) Navigator.of(context).pop(guardado);
     } catch (_) {
@@ -246,6 +274,35 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                   DropdownMenuItem<String>(value: a.id, child: Text(a.nombre)),
               ],
               onChanged: (String? a) => setState(() => _articuloId = a),
+            ),
+            const SizedBox(height: 20),
+            Text('Mi valoración',
+                style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            SegmentedButton<String>(
+              segments: const <ButtonSegment<String>>[
+                ButtonSegment<String>(value: 'neutro', label: Text('Neutro')),
+                ButtonSegment<String>(
+                    value: 'si', label: Text('Me gusta 👍')),
+                ButtonSegment<String>(
+                    value: 'no', label: Text('No me gusta 👎')),
+              ],
+              selected: <String>{_gusto},
+              onSelectionChanged: (Set<String> sel) =>
+                  setState(() => _gusto = sel.first),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _observacion,
+              textCapitalization: TextCapitalization.sentences,
+              maxLength: 140,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Mi observación (opcional)',
+                hintText: 'Ej.: salió bueno, para repetir',
+                border: OutlineInputBorder(),
+              ),
             ),
             if (_error != null) ...<Widget>[
               const SizedBox(height: 12),

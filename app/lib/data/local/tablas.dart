@@ -105,3 +105,28 @@ class Usuarios extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// v0.1.5: valoración personal del producto (observación breve + me gusta /
+/// no me gusta, neutro por defecto = sin fila o gusto null). Por usuario:
+/// en la etapa colaborativa cada aportante conserva la suya y luego se
+/// pondera con las ajenas sin perder la propia.
+@DataClassName('Valoracion')
+@TableIndex(name: 'idx_valoracion_producto', columns: {#productoId})
+@TableIndex(name: 'idx_valoracion_usuario', columns: {#usuarioId})
+class Valoraciones extends Table {
+  TextColumn get id => text()();
+  TextColumn get usuarioId => text().references(Usuarios, #id)();
+  TextColumn get productoId => text().references(Productos, #id)();
+
+  /// 'si' | 'no' | null (neutro — sin valoración cargada).
+  TextColumn get gusto => text().nullable()();
+
+  /// Observación personal breve (ej.: "salió bueno", "no repito").
+  TextColumn get observacion => text().nullable()();
+
+  TextColumn get creadoEn => text()();
+  TextColumn get actualizadoEn => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

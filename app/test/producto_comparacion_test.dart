@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
+import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 import 'package:seguidor_precios/features/precios/producto_comparacion_screen.dart';
 
 void main() {
@@ -100,12 +101,28 @@ void main() {
     await tester.tap(find.byIcon(Icons.edit_outlined));
     await tester.pumpAndSettle();
 
-    // Formulario precargado con los datos actuales.
-    expect(find.text('Guardar cambios'), findsOneWidget);
+    // Nombre cerca del tope del formulario: escribirlo antes de scrollear.
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Nombre del producto *'),
       'Mayonesa Marca A 500g',
     );
+
+    // El ListView del formulario es lazy y la pantalla de comparación tiene
+    // el suyo debajo de la ruta: acotar al ListView del formulario, que es
+    // lazy ('Guardar cambios' bajo el pliegue desde v0.1.5 no existe hasta
+    // arrastrar).
+    final Finder scrollable = find
+        .descendant(
+            of: find.byType(ProductoFormScreen),
+            matching: find.byType(Scrollable))
+        .first;
+    await tester.scrollUntilVisible(find.text('Guardar cambios'), 200,
+        scrollable: scrollable);
+    await tester.ensureVisible(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+
+    // Formulario precargado con los datos actuales.
+    expect(find.text('Guardar cambios'), findsOneWidget);
     // El botón queda bajo el pliegue en el formulario largo: llevarlo a vista.
     await tester.ensureVisible(find.text('Guardar cambios'));
     await tester.pumpAndSettle();

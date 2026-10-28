@@ -273,6 +273,17 @@ void main() {
     expect(find.byType(ProductoFormScreen), findsOneWidget);
     // Precargado con los datos actuales del producto.
     expect(find.text('Mayonesa Marca A'), findsOneWidget);
+    // El ListView del formulario es lazy: 'Guardar cambios' queda bajo el
+    // pliegue (v0.1.5 agregó la sección Mi valoración) y no existe hasta
+    // arrastrar. Scroll hasta construirlo y recién entonces verificarlo.
+    final Finder scrollable = find
+        .descendant(
+            of: find.byType(ListView), matching: find.byType(Scrollable))
+        .first;
+    await tester.scrollUntilVisible(find.text('Guardar cambios'), 200,
+        scrollable: scrollable);
+    await tester.ensureVisible(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
     expect(find.text('Guardar cambios'), findsOneWidget);
   });
 }

@@ -25,6 +25,7 @@ Future<Map<String, dynamic>> exportarBackup(BaseDeDatos db) async {
   final articulos = await db.select(db.articulos).get();
   final productos = await db.select(db.productos).get();
   final precios = await db.select(db.precios).get();
+  final valoraciones = await db.select(db.valoraciones).get();
 
   return <String, dynamic>{
     'formato': formatoBackup,
@@ -35,6 +36,7 @@ Future<Map<String, dynamic>> exportarBackup(BaseDeDatos db) async {
     'articulos': articulos.map((a) => a.toJson()).toList(),
     'productos': productos.map((p) => p.toJson()).toList(),
     'precios': precios.map((p) => p.toJson()).toList(),
+    'valoraciones': valoraciones.map((v) => v.toJson()).toList(),
   };
 }
 
@@ -113,6 +115,7 @@ Future<ResumenImportacion> importarBackup(
         'articulos',
         'productos',
         'precios',
+        'valoraciones',
       ])
         k: (raiz[k] as List? ?? const <dynamic>[]),
     };
@@ -166,6 +169,16 @@ Future<ResumenImportacion> importarBackup(
           null,
       (p) => db.into(db.precios).insert(p),
       Precio.fromJson,
+    );
+    await importarTabla<Valoracion>(
+      dinamicas['valoraciones']!,
+      db.valoraciones,
+      (v) async =>
+          await (db.select(db.valoraciones)..where((t) => t.id.equals(v.id)))
+              .getSingleOrNull() !=
+          null,
+      (v) => db.into(db.valoraciones).insert(v),
+      Valoracion.fromJson,
     );
   });
 
