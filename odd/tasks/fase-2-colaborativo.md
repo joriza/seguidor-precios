@@ -176,6 +176,15 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   identificado: `b04e9e8c-3906-4ec0-b16c-643d64331775` (auth user 17:40:12, su intento de
   sync); admin pendiente de activar con CREATE OR REPLACE FUNCTION es_admin() usando ese uid
   (SQL entregado al dueño). Pendiente: retry de “Sincronizar ahora” en el teléfono del dueño.
+- L17 — Fallo de sync 2.0 (tras 0003/0004 + v0.2.1 con backfill): el push del dueño avanzó
+  bien (usuario ✓, los 424 de semilla ✓, cerealitas ✓ y 3 productos viejos v0.1.x ✓ — todo
+  al servidor 18:51:51) pero murió en comercio (0) antes de precio. La reproducción por API
+  del comercio devolvía 201, así que el error específico era invisible: el gestor atrapaba
+  la excepción y la UI mostraba solo “No se pudo sincronizar ahora” (catch (_) sin detalle).
+  FIX de transparencia (`0631d7c`): GestorSync expone ultimoError + debugPrint a consola y
+  los SnackBar de app.dart/refresco.dart muestran el detalle real. Suite 201/201. Release
+  v0.2.2+8 vía CI: el dueño reintenta la sync y el propio teléfono muestra el error exacto
+  (o se lee por USB con flutter run adjunto).
 - L16 — SEGUNDA causa del fallo de sync del dueño (post-0003/0004): su usuario y producto
   subieron ✓, pero el precio murió en FK — apunta a un comercio de la era v0.1.x que nunca
   entró al outbox (los hooks nacieron en v0.2.0; su outbox tenía exactamente producto+precio,
