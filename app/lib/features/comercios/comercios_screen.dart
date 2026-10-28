@@ -2,13 +2,19 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../sync/gestor_sync.dart';
+import '../sync/refresco.dart';
 import 'alta_comercio_dialog.dart';
 
 /// Sección Comercios: listado y alta (S7, R9).
 class ComerciosScreen extends StatefulWidget {
-  const ComerciosScreen({super.key, required this.baseDeDatos});
+  const ComerciosScreen({super.key, required this.baseDeDatos, this.gestorSync});
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: con backend configurado, el pull-to-refresh sincroniza antes de
+  /// recargar; sin backend, solo recarga lo local.
+  final GestorSync? gestorSync;
 
   @override
   State<ComerciosScreen> createState() => _ComerciosScreenState();
@@ -41,6 +47,11 @@ class _ComerciosScreenState extends State<ComerciosScreen> {
     await _cargar();
   }
 
+  /// T4: pull-to-refresh — sync (si hay backend) y recarga local.
+  Future<void> _refrescar() async {
+    await refrescarLista(context, widget.gestorSync, _cargar);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_cargando) {
@@ -60,8 +71,11 @@ class _ComerciosScreenState extends State<ComerciosScreen> {
         Expanded(
           child: _comercios.isEmpty
               ? const Center(child: Text('Todavía no hay comercios'))
-              : ListView.builder(
-                  itemCount: _comercios.length,
+              : RefreshIndicator(
+                  onRefresh: _refrescar,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _comercios.length,
                   itemBuilder: (BuildContext contexto, int i) {
                     final Comercio c = _comercios[i];
                     final String? tipo = c.tipo;
@@ -71,7 +85,8 @@ class _ComerciosScreenState extends State<ComerciosScreen> {
                       subtitle: Text(tipo ?? 'Sin tipo'),
                     );
                   },
-                ),
+                  ),
+              ),
         ),
       ],
     );

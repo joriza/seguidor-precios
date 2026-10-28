@@ -1,11 +1,9 @@
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
-import '../../data/valoraciones.dart';
 import '../../data/local/normalizacion.dart';
+import '../../data/productos.dart';
+import '../../data/valoraciones.dart';
 
 /// S5 (R1/R7/R11): alta y edición de producto.
 ///
@@ -112,7 +110,6 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
       _error = null;
     });
 
-    final ahora = DateTime.now().toUtc().toIso8601String();
     final codigo = _codigo.text.trim();
     final nombre = _nombre.text.trim();
     final marca = _marca.text.trim();
@@ -120,45 +117,31 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     final neto = _contenidoNetoNormalizado();
 
     try {
-      Producto guardado;
-      if (_esEdicion) {
-        await (widget.baseDeDatos.update(widget.baseDeDatos.productos)
-              ..where((t) => t.id.equals(widget.producto!.id)))
-            .write(ProductosCompanion(
-              codigoBarras: Value(codigo.isEmpty ? null : codigo),
-              nombre: Value(nombre),
-              marca: Value(marca.isEmpty ? null : marca),
-              unidad: Value(_unidad),
-              contenidoNeto: Value(neto),
-              categoria: Value(categoria.isEmpty ? null : categoria),
-              articuloId: Value(_articuloId),
-              actualizadoEn: Value(ahora),
-            ));
-        guardado = await (widget.baseDeDatos.select(widget.baseDeDatos.productos)
-              ..where((t) => t.id.equals(widget.producto!.id)))
-            .getSingle();
-      } else {
-        final id = const Uuid().v4();
-        final usuario = await usuarioActual(widget.baseDeDatos);
-        await widget.baseDeDatos.into(widget.baseDeDatos.productos).insert(
-              ProductosCompanion.insert(
-                id: id,
-                codigoBarras: Value(codigo.isEmpty ? null : codigo),
-                nombre: nombre,
-                unidad: _unidad,
-                contenidoNeto: Value(neto),
-                marca: Value(marca.isEmpty ? null : marca),
-                categoria: Value(categoria.isEmpty ? null : categoria),
-                articuloId: Value(_articuloId),
-                creadoPor: usuario.id,
-                creadoEn: ahora,
-                actualizadoEn: ahora,
-              ),
+      // T4: la escritura es local y queda encolada para la sync (regla de
+      // sync 2). Si el código de barras ya existe localmente, el insert
+      // lanza y se muestra el error de siempre.
+      final Producto guardado = _esEdicion
+          ? await editarProducto(
+              widget.baseDeDatos,
+              widget.producto!.id,
+              codigoBarras: codigo.isEmpty ? null : codigo,
+              nombre: nombre,
+              marca: marca.isEmpty ? null : marca,
+              unidad: _unidad,
+              contenidoNeto: neto,
+              categoria: categoria.isEmpty ? null : categoria,
+              articuloId: _articuloId,
+            )
+          : await altaProducto(
+              widget.baseDeDatos,
+              nombre: nombre,
+              codigoBarras: codigo.isEmpty ? null : codigo,
+              marca: marca.isEmpty ? null : marca,
+              unidad: _unidad,
+              contenidoNeto: neto,
+              categoria: categoria.isEmpty ? null : categoria,
+              articuloId: _articuloId,
             );
-        guardado = await (widget.baseDeDatos.select(widget.baseDeDatos.productos)
-              ..where((t) => t.id.equals(id)))
-            .getSingle();
-      }
       await guardarValoracion(
         widget.baseDeDatos,
         guardado.id,

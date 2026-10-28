@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../sync/gestor_sync.dart';
+import '../sync/refresco.dart';
 import 'historial_producto_screen.dart';
 
 /// S10 (R8): historial — productos con precios registrados.
 class HistorialScreen extends StatefulWidget {
-  const HistorialScreen({super.key, required this.baseDeDatos});
+  const HistorialScreen({super.key, required this.baseDeDatos, this.gestorSync});
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: con backend configurado, el pull-to-refresh sincroniza antes de
+  /// recargar; sin backend, solo recarga lo local.
+  final GestorSync? gestorSync;
 
   @override
   State<HistorialScreen> createState() => _HistorialScreenState();
@@ -43,6 +49,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
     });
   }
 
+  /// T4: pull-to-refresh — sync (si hay backend) y recarga local.
+  Future<void> _refrescar() async {
+    await refrescarLista(context, widget.gestorSync, _cargar);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_cargando) {
@@ -53,9 +64,12 @@ class _HistorialScreenState extends State<HistorialScreen> {
         child: Text('Sin precios registrados todavía'),
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: _productos.length,
+    return RefreshIndicator(
+      onRefresh: _refrescar,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(8),
+        itemCount: _productos.length,
       itemBuilder: (BuildContext contexto, int i) {
         final Map<String, dynamic> p = _productos[i];
         final String nombre = p['marca'] == null || (p['marca'] as String).isEmpty
@@ -79,7 +93,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
             );
           },
         );
-      },
+        },
+      ),
     );
   }
 }

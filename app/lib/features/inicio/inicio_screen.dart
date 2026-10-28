@@ -8,12 +8,18 @@ import 'package:share_plus/share_plus.dart';
 import '../../data/backup.dart';
 import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
+import '../sync/gestor_sync.dart';
+import '../sync/refresco.dart';
 
 /// Inicio (S13/S14): acceso a datos, backup y etiqueta de aportante.
 class InicioScreen extends StatefulWidget {
-  const InicioScreen({super.key, required this.baseDeDatos});
+  const InicioScreen({super.key, required this.baseDeDatos, this.gestorSync});
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: con backend configurado, el pull-to-refresh sincroniza antes de
+  /// recargar; sin backend, solo recarga lo local.
+  final GestorSync? gestorSync;
 
   @override
   State<InicioScreen> createState() => _InicioScreenState();
@@ -58,6 +64,11 @@ class _InicioScreenState extends State<InicioScreen> {
     setState(() => _usuario = u);
   }
 
+  /// T4: pull-to-refresh — sync (si hay backend) y recarga local.
+  Future<void> _refrescar() async {
+    await refrescarLista(context, widget.gestorSync, _cargarUsuario);
+  }
+
   Future<void> _cambiarEtiqueta(BuildContext context) async {
     final TextEditingController controlador =
         TextEditingController(text: _usuario?.etiqueta);
@@ -98,9 +109,12 @@ class _InicioScreenState extends State<InicioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: <Widget>[
+    return RefreshIndicator(
+      onRefresh: _refrescar,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: <Widget>[
         const Icon(Icons.home, size: 64),
         const SizedBox(height: 8),
         Text(
@@ -178,7 +192,8 @@ class _InicioScreenState extends State<InicioScreen> {
             ),
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 

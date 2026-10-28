@@ -1,9 +1,8 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
+import '../../data/precios.dart';
 import '../comercios/alta_comercio_dialog.dart';
 
 /// S8 (R8/R1): registro de precio de un producto — append-only.
@@ -95,21 +94,17 @@ class _RegistroPrecioScreenState extends State<RegistroPrecioScreen> {
 
     final valor = double.parse(_precioController.text.trim().replaceAll(',', '.'));
     final precio = (valor * 100).roundToDouble() / 100;
-    final id = const Uuid().v4();
 
     try {
-      final usuario = await usuarioActual(widget.baseDeDatos);
-      await widget.baseDeDatos.into(widget.baseDeDatos.precios).insert(
-            PreciosCompanion.insert(
-              id: id,
-              productoId: widget.producto.id,
-              comercioId: _comercioId!,
-              precio: precio,
-              fechaToma: _fechaController.text,
-              cargadoPor: usuario.id,
-              cargadoEn: DateTime.now().toUtc().toIso8601String(),
-            ),
-          );
+      // T4: local primero y encolado para la sync (regla de sync 2); el
+      // precio es append-only (regla de sync 4).
+      await registrarPrecio(
+        widget.baseDeDatos,
+        productoId: widget.producto.id,
+        comercioId: _comercioId!,
+        precio: precio,
+        fechaToma: _fechaController.text,
+      );
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {

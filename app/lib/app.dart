@@ -5,25 +5,41 @@ import 'package:flutter/material.dart';
 import 'data/local/base_de_datos.dart';
 import 'data/identidad.dart';
 import 'data/semilla.dart';
+import 'data/sync/servicio_sync.dart';
 import 'features/articulos/articulos_screen.dart';
 import 'features/busqueda/busqueda_screen.dart';
 import 'features/comercios/comercios_screen.dart';
 import 'features/escaner/escaner_screen.dart';
 import 'features/historial/historial_screen.dart';
 import 'features/inicio/inicio_screen.dart';
+import 'features/sync/gestor_sync.dart';
+import 'features/sync/indicador_sync.dart';
 
 /// Raíz de la aplicación: tema Material 3, UI en español rioplatense (AD-007).
 class SeguidorPreciosApp extends StatelessWidget {
-  const SeguidorPreciosApp({super.key, required this.baseDeDatos});
+  const SeguidorPreciosApp({
+    super.key,
+    required this.baseDeDatos,
+    this.gestorSync,
+  });
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: gestor de sync inyectable (los tests usan fakes, sin red). Si no
+  /// viene, se crea uno con la configuración real: mientras haya
+  /// placeholders es un no-op silencioso — la app se usa igual sin nube
+  /// (R3) y nada del arranque toca la red.
+  final GestorSync? gestorSync;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Seguidor de Precios',
       theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
-      home: HomeShell(baseDeDatos: baseDeDatos),
+      home: HomeShell(
+        baseDeDatos: baseDeDatos,
+        gestorSync: gestorSync ?? GestorSync(baseDeDatos: baseDeDatos),
+      ),
     );
   }
 }
@@ -31,9 +47,16 @@ class SeguidorPreciosApp extends StatelessWidget {
 /// Shell de navegación: seis secciones; el escáner y la búsqueda consultan
 /// la base (Fase 0: cinco; T12 agrega Buscar).
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, required this.baseDeDatos});
+  const HomeShell({
+    super.key,
+    required this.baseDeDatos,
+    required this.gestorSync,
+  });
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: ping (R14), aviso de sync (R15), indicador y sync manual.
+  final GestorSync gestorSync;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -47,6 +70,11 @@ class _HomeShellState extends State<HomeShell> {
   /// sin esto, mostraban la instantánea del arranque y el historial o los
   /// comercios parecían vacíos tras registrar.
   int _visita = 0;
+
+  /// T4: estado de sync del indicador; se carga al arrancar y se refresca
+  /// al cambiar de pestaña y tras cada sincronización.
+  EstadoSync _estadoSync = const EstadoSync(habilitado: false);
+  bool _sincronizando = false;
 
   @override
   void initState() {
@@ -107,6 +135,9 @@ class _HomeShellState extends State<HomeShell> {
     // Con el usuario resuelto, el semillero entra en segundo plano: no
     // bloquea la UI y la dedup por EAN lo hace idempotente.
     unawaited(_importarSemillaSiFalta());
+    // T4: ping R14 y aviso condicionado R15. Sin backend configurado es un
+    // no-op silencioso: la app se usa igual (R3).
+    unawaited(_arranqueRed());
   }
 
   Future<void> _importarSemillaSiFalta() async {
@@ -115,6 +146,137 @@ class _HomeShellState extends State<HomeShell> {
     } catch (_) {
       // El semillero es una conveniencia: si el asset faltara o estuviera
       // corrupto, la app funciona igual con altas manuales.
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // T4 — UX de red (R14/R15): ping al iniciar, aviso con confirmación,
+  // indicador de estado y sync manual. La sync nunca es automática.
+  // ---------------------------------------------------------------------
+
+  /// Arranque de red: ping R14 con cualquier conectividad y, solo con WiFi
+  /// + (outbox pendiente o >7 días sin sync), aviso R15 con confirmación.
+  Future<void> _arranqueRed() async {
+    final ArranqueRed arranque = await widget.gestorSync.alIniciar();
+    await _refrescarEstadoSync();
+    if (!arranque.avisoPendiente || !mounted) return;
+    await _mostrarAvisoSync();
+  }
+
+  Future<void> _refrescarEstadoSync() async {
+    final EstadoSync estado = await widget.gestorSync.estado();
+    if (!mounted) return;
+    setState(() => _estadoSync = estado);
+  }
+
+  /// Aviso R15: nunca sincroniza sin confirmación explícita del usuario.
+  Future<void> _mostrarAvisoSync() async {
+    final EstadoSync estado = await widget.gestorSync.estado();
+    if (!mounted) return;
+    final bool hayPendientes = (estado.pendientes ?? 0) > 0;
+    final bool? sincronizar = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogo) => AlertDialog(
+        key: const ValueKey('dialogo-aviso-sync'),
+        title: const Text('¿Sincronizar con la nube?'),
+        content: Text(
+          hayPendientes
+              ? 'Tenés ${estado.pendientes} cambio(s) sin sincronizar. ¿Los '
+                  'compartís con el grupo ahora? Puedes hacerlo después '
+                  'desde el ícono de nube.'
+              : 'Hace más de $diasParaAvisarSync días que no sincronizás. '
+                  '¿Querés traer las novedades del grupo ahora? También '
+                  'podés hacerlo después desde el ícono de nube.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            key: const ValueKey('btn-sync-mas-tarde'),
+            onPressed: () => Navigator.pop(dialogo, false),
+            child: const Text('Más tarde'),
+          ),
+          FilledButton(
+            key: const ValueKey('btn-sync-ahora'),
+            onPressed: () => Navigator.pop(dialogo, true),
+            child: const Text('Sincronizar'),
+          ),
+        ],
+      ),
+    );
+    if (sincronizar == true && mounted) {
+      await _sincronizar(mostrarResultado: true);
+    }
+  }
+
+  /// Sync manual o confirmada: la única vía por la que viajan datos
+  /// (R15). Al terminar refresca el indicador y las listas de datos.
+  Future<void> _sincronizar({bool mostrarResultado = false}) async {
+    if (_sincronizando || !widget.gestorSync.habilitado) return;
+    setState(() => _sincronizando = true);
+    final ResultadoSync? resultado = await widget.gestorSync.sincronizar();
+    if (!mounted) return;
+    setState(() {
+      _sincronizando = false;
+      _visita++; // las pantallas de datos se recrean con lo recién bajado
+    });
+    unawaited(_refrescarEstadoSync());
+    if (mostrarResultado) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            resultado == null
+                ? 'No se pudo sincronizar; tus datos están a salvo en el '
+                    'dispositivo.'
+                : 'Sincronización completa: ${resultado.filasSubidas} '
+                    'subida(s), ${resultado.filasDescargadas} '
+                    'descargada(s).',
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Diálogo del indicador: estado de sync y, si hay backend, sync manual.
+  Future<void> _dialogoEstadoSync() async {
+    final EstadoSync estado = await widget.gestorSync.estado();
+    if (!mounted) return;
+    final bool? sincronizar = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogo) => AlertDialog(
+        key: const ValueKey('dialogo-estado-sync'),
+        title: const Text('Sincronización'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              estado.habilitado
+                  ? 'Nube colaborativa configurada.'
+                  : 'Sin nube configurada: la app funciona 100% en este '
+                      'dispositivo.',
+            ),
+            const SizedBox(height: 8),
+            Text('Cambios pendientes de subir: ${estado.pendientes ?? 0}'),
+            Text(
+              'Última sync exitosa: ${estado.ultimoSyncExitoso == null ? 'nunca' : textoFechaSync(estado.ultimoSyncExitoso!)}',
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(dialogo),
+            child: const Text('Cerrar'),
+          ),
+          if (estado.habilitado)
+            FilledButton(
+              key: const ValueKey('btn-sync-dialogo'),
+              onPressed: () => Navigator.pop(dialogo, true),
+              child: const Text('Sincronizar ahora'),
+            ),
+        ],
+      ),
+    );
+    if (sincronizar == true && mounted) {
+      await _sincronizar(mostrarResultado: true);
     }
   }
 
@@ -133,27 +295,48 @@ class _HomeShellState extends State<HomeShell> {
         InicioScreen(
           key: ValueKey('inicio-$_visita'),
           baseDeDatos: widget.baseDeDatos,
+          gestorSync: widget.gestorSync,
         ),
         EscanerScreen(baseDeDatos: widget.baseDeDatos),
         BusquedaScreen(baseDeDatos: widget.baseDeDatos),
         ArticulosScreen(
           key: ValueKey('articulos-$_visita'),
           baseDeDatos: widget.baseDeDatos,
+          gestorSync: widget.gestorSync,
         ),
         HistorialScreen(
           key: ValueKey('historial-$_visita'),
           baseDeDatos: widget.baseDeDatos,
+          gestorSync: widget.gestorSync,
         ),
         ComerciosScreen(
           key: ValueKey('comercios-$_visita'),
           baseDeDatos: widget.baseDeDatos,
+          gestorSync: widget.gestorSync,
         ),
       ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_index])),
+      appBar: AppBar(
+        title: Text(_titles[_index]),
+        actions: <Widget>[
+          // T4: indicador de sync + sync manual desde su diálogo.
+          IconButton(
+            key: const ValueKey('indicador-sync'),
+            tooltip: textoTooltipSync(_estadoSync),
+            onPressed: _sincronizando ? null : _dialogoEstadoSync,
+            icon: _sincronizando
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(iconoSync(_estadoSync)),
+          ),
+        ],
+      ),
       body: IndexedStack(index: _index, children: _pantallas()),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
@@ -162,6 +345,7 @@ class _HomeShellState extends State<HomeShell> {
             _index = i;
             _visita++; // refresca las pantallas de datos (S1, v0.1.2)
           }
+          unawaited(_refrescarEstadoSync()); // T4: indicador al día
         }),
 
         destinations: const <Widget>[

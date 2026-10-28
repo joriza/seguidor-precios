@@ -1,10 +1,11 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../data/identidad.dart';
+import '../../data/articulos.dart';
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
+import '../sync/gestor_sync.dart';
+import '../sync/refresco.dart';
 import 'articulo_detalle_screen.dart';
 
 /// S6 (R11): administración de artículos — alta, renombre y conteo de
@@ -12,9 +13,13 @@ import 'articulo_detalle_screen.dart';
 /// hacerse desde el formulario de producto (S5); la unidad base se define
 /// al crear el artículo y no cambia (da estabilidad a las comparaciones).
 class ArticulosScreen extends StatefulWidget {
-  const ArticulosScreen({super.key, required this.baseDeDatos});
+  const ArticulosScreen({super.key, required this.baseDeDatos, this.gestorSync});
 
   final BaseDeDatos baseDeDatos;
+
+  /// T4: si hay backend configurado, el pull-to-refresh sincroniza antes
+  /// de recargar; si no, solo recarga lo local.
+  final GestorSync? gestorSync;
 
   @override
   State<ArticulosScreen> createState() => _ArticulosScreenState();
@@ -119,30 +124,25 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
     );
 
     if (aceptado != true) return;
-    final ahora = DateTime.now().toUtc().toIso8601String();
     final nombre = nombreController.text.trim();
 
+    // T4: alta/cambio local + encolado para la sync (regla de sync 2). El
+    // renombre es la única edición de un artículo (S6).
     if (existente == null) {
-      final usuario = await usuarioActual(widget.baseDeDatos);
-      await widget.baseDeDatos.into(widget.baseDeDatos.articulos).insert(
-            ArticulosCompanion.insert(
-              id: const Uuid().v4(),
-              nombre: nombre,
-              unidadBase: unidadBase,
-              creadoPor: usuario.id,
-              creadoEn: ahora,
-              actualizadoEn: ahora,
-            ),
-          );
+      await altaArticulo(
+        widget.baseDeDatos,
+        nombre: nombre,
+        unidadBase: unidadBase,
+      );
     } else {
-      await (widget.baseDeDatos.update(widget.baseDeDatos.articulos)
-            ..where((t) => t.id.equals(existente.id)))
-          .write(ArticulosCompanion(
-            nombre: Value(nombre),
-            actualizadoEn: Value(ahora),
-          ));
+      await renombrarArticulo(widget.baseDeDatos, existente.id, nombre: nombre);
     }
     await _cargar();
+  }
+
+  /// T4: pull-to-refresh — sync (si hay backend) y recarga local.
+  Future<void> _refrescar() async {
+    await refrescarLista(context, widget.gestorSync, _cargar);
   }
 
   @override
@@ -176,9 +176,12 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
                     ],
                   ),
                 )
-              : ListView.builder(
-                  itemCount: _articulos.length,
-                  itemBuilder: (BuildContext contexto, int i) {
+              : RefreshIndicator(
+                  onRefresh: _refrescar,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _articulos.length,
+                    itemBuilder: (BuildContext contexto, int i) {
                     final Articulo a = _articulos[i];
                     final int cantidad = _productosPorArticulo[a.id] ?? 0;
                     return ListTile(
@@ -204,7 +207,8 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
                       ),
                     );
                   },
-                ),
+                  ),
+              ),
         ),
       ],
     );
