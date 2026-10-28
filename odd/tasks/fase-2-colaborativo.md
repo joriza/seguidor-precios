@@ -59,7 +59,7 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   escanear EAN inexistente; precarga nombre/marca/contenido confirmada por el usuario; offline
   o sin resultado → flujo manual actual. Route: worker, tras T4. Superficie:
   `app/lib/features/escaner/**`, `app/lib/data/enriquecimiento.dart`, `app/pubspec.yaml` (http).
-  Commit: pendiente.
+  Commit: `156d528`.
 - T6 — Docs de la fase al día (S5): AD-016 creada; tabla de decisiones abiertas actualizada;
   `modelo-de-datos.md` (valoraciones sync-only); `hoja-de-ruta.md` (estado Fase 2 aprobada);
   `desarrollo.md` + `README.md` (estados vigentes). Commit: docs de este cierre (ver Log L3).
@@ -136,3 +136,9 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   política). RESULTADO: semillero cargado y verificado — 424 productos en el servidor
   (`Content-Range: 0-423/424`); upsert idempotente (re-ejecutar no duplica). El backend
   colaborativo quedó OPERATIVO con datos reales; ejercicio de sync en dispositivo: T7.
+- L12 — T5 completada y commiteada (`156d528`): puerto ServicioEnriquecimiento + cliente OFF
+  API v2 (timeout 6s, mapeo nombre/marca/contenido/unidad), consulta en segundo plano al
+  escanear EAN inexistente con guardas anti-carrera, precarga en el form SIEMPRE con
+  confirmación (ningún camino guarda solo, testeado), sin conexión/sin resultado → flujo
+  manual intacto; +http ^1.6.0; 20 tests nuevos; suite 199/199. Primera consulta real a OFF:
+  T7 (dispositivo).
