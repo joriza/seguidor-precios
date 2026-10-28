@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/identidad.dart';
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
-import 'package:seguidor_precios/data/sync/cola_saliente.dart';
 import 'package:seguidor_precios/data/sync/servicio_sync.dart';
 
 import 'cliente_remoto_falso.dart';

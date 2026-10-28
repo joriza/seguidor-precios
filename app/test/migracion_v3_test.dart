@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 

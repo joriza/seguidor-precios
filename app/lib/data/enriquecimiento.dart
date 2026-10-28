@@ -74,7 +74,7 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
   @override
   Future<DatosEnriquecidos?> consultar(String ean) async {
     if (!RegExp(r'^\d{8,13}$').hasMatch(ean)) return null;
-    if (_hayConexion != null && !await _hayConexion!()) return null;
+    if (_hayConexion != null && !await _hayConexion()) return null;
     final http.Client cliente = _cliente ?? http.Client();
     try {
       final http.Response respuesta = await cliente

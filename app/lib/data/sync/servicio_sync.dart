@@ -172,7 +172,7 @@ Future<(int, int, int)> _pushTodo(
       }
       if (pares.isEmpty) continue;
 
-      final respuesta = await cliente.subirLote(
+      await cliente.subirLote(
         tabla: tabla,
         filas: pares.map((p) => p.fila).toList(),
       );

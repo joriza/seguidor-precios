@@ -7,7 +7,6 @@ import 'package:seguidor_precios/data/identidad.dart';
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/data/precios.dart';
 import 'package:seguidor_precios/data/productos.dart';
-import 'package:seguidor_precios/data/sync/cola_saliente.dart';
 
 /// Hooks de encolado de T4 (regla de sync 2): toda alta/cambio local de
 /// artículo, producto, comercio o precio queda en el outbox además de en

@@ -70,7 +70,7 @@ class ClienteSupabase implements ClienteRemoto {
     required String id,
   }) async {
     final fila = await _cliente.from(tabla).select().eq('id', id).maybeSingle();
-    return fila as Map<String, dynamic>?;
+    return fila;
   }
 
   @override
