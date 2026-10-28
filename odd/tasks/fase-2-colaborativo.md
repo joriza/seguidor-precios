@@ -54,7 +54,7 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   (pull-to-refresh). Route: worker, tras T2. Superficie: `app/lib/features/**`,
   `app/lib/app.dart`, `app/lib/main.dart` (cableado de arranque) y hooks de encolado en repos de
   `app/lib/data/**` (producto/comercio/precio aún no encolan; no modificar el núcleo de sync).
-  Commit: pendiente.
+  Commit: `9f294dc`.
 - T5 — Enriquecimiento EAN desconocido (S3): consulta Open Food Facts API v2 con conexión al
   escanear EAN inexistente; precarga nombre/marca/contenido confirmada por el usuario; offline
   o sin resultado → flujo manual actual. Route: worker, tras T4. Superficie:
@@ -111,3 +111,15 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   regla 6 literal (sin merge de campos entre filas); el test previo que esperaba merge LWW de
   campos se ajustó al contrato. `pubspec.lock` de app commiteado (práctica estándar Flutter).
   Pendiente de ejercicio real con red: T7.
+- L9 — T4 completada y commiteada (`9f294dc`): ping R14 al iniciar, aviso R15 (solo WiFi +
+  pendientes o >7 días; decisión testeada: “nunca sincronizó” con outbox vacío NO cuenta como
+  >7 días — no molesta a instalaciones nuevas), indicador de estado en AppBar con diálogo y
+  “Sincronizar ahora”, pull-to-refresh en 4 listas, 4 repos con encolado (producto/comercio/
+  precio/artículo) re-wire de las 4 pantallas; núcleo de sync intacto. Suite 179/179. Decisión
+  registrada: main.dart crea ClienteSupabase solo si `estaConfigurada` — con config real del
+  dueño (2026-10-28) el arranque ya hace ping/sync real; ejercicio en dispositivo: T7.
+- L10 — Claves del proyecto Supabase del dueño: las legacy JWT (anon/service_role) están
+  DESACTIVADAS en su proyecto (403 con JWT bien formado, 219 chars exactos) — el proyecto
+  usa el sistema nuevo de claves. Pivot a claves nuevas: `sb_publishable_...` (va a
+  config_backend.dart, pública por diseño AD-002) y `sb_secret_...` (solo `.env` del loader).
+  Pendiente del dueño: pasar ambas.
