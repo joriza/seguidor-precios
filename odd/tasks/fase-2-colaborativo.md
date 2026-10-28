@@ -64,9 +64,12 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   `modelo-de-datos.md` (valoraciones sync-only); `hoja-de-ruta.md` (estado Fase 2 aprobada);
   `desarrollo.md` + `README.md` (estados vigentes). Commit: `8d8743f` — DDL final documentado
   (modelo-de-datos § Esquema backend) y runbook de operación (desarrollo.md); sin pendientes.
-- T7 — Release v0.2.0 + QR + validación en teléfono (S5). BLOQUEADO por el dueño: crear proyecto
-  Supabase (free, región sa-east-1, activar anonymous sign-ins), aplicar SQL en Studio, pasar
-  Project URL + anon key, ejecutar T3, y dar visto de publicación.
+- T7 — Release v0.2.0 + QR + validación en teléfono (S5). Backend creado por el dueño y
+  semillero cargado (Log L11); release v0.2.0 PUBLICADO vía GitHub Actions (`fb550d8`, CI run
+  40735111050, APK `seguidor-precios-v0.2.0-debug.apk` 186 MB, título y notas corregidos a
+  Fase 2). PENDIENTE del dueño: instalar vía QR y validar en teléfono (sync real, indicador,
+  enriquecimiento OFF), comunicar su `auth_uid` para activar admin (AD-015, reemplaza
+  `<<UID_DUENO>>`), y decidir merge de `fase-2-colaborativo` a `main`.
 
 ## Log
 
@@ -149,3 +152,12 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   GitHub Actions (release.yml: analyze+tests+build APK firmado con keystore commiteado →
   release al pushear tag v*); sin SDK local en la máquina (los v0.1.x ya se construían así).
   Merge a main: pendiente de decisión del dueño tras validar el release.
+- L14 — RELEASE v0.2.0 PUBLICADO (2026-10-28): tag reubicado con autorización del dueño
+  (primer intento falló en CI: el flutter estable del runner trata los infos de analyze como
+  fatales — 9 corregidos, `No issues found!` con `--fatal-infos`; sin SDK Android local: los
+  APK se construyen en GitHub Actions, release.yml). CI run 40735111050 verde (6m26s):
+  analyze + 199 tests + build APK debug firmado (keystore commiteado) + release. Asset
+  `seguidor-precios-v0.2.0-debug.apk` (186 MB) verificado descargable (HTTP 206); título y
+  notas del release corregidos a Fase 2. QR de descarga: `apk-debug/qr-instalar-v0.2.0.png`
+  (gitignored). Mantenimiento workflow pendiente (no bloqueante): actions/checkout apunta a
+  Node 20 deprecado. Validación en dispositivo del dueño: ÚNICO check pendiente de la fase.
