@@ -588,3 +588,13 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO service_role;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
 
 COMMIT;
+
+-- =============================================================================
+-- Migración 0003: UPDATE completo para la sync (correctivo)
+-- =============================================================================
+
+BEGIN;
+
+GRANT UPDATE ON usuario, articulo, producto, comercio, precio, valoracion TO authenticated;
+
+COMMIT;
