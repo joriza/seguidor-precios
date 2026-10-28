@@ -62,8 +62,8 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   Commit: `156d528`.
 - T6 — Docs de la fase al día (S5): AD-016 creada; tabla de decisiones abiertas actualizada;
   `modelo-de-datos.md` (valoraciones sync-only); `hoja-de-ruta.md` (estado Fase 2 aprobada);
-  `desarrollo.md` + `README.md` (estados vigentes). Commit: docs de este cierre (ver Log L3).
-  Falta: docs final con DDL Postgres y nota de operación al cerrar la fase.
+  `desarrollo.md` + `README.md` (estados vigentes). Commit: `8d8743f` — DDL final documentado
+  (modelo-de-datos § Esquema backend) y runbook de operación (desarrollo.md); sin pendientes.
 - T7 — Release v0.2.0 + QR + validación en teléfono (S5). BLOQUEADO por el dueño: crear proyecto
   Supabase (free, región sa-east-1, activar anonymous sign-ins), aplicar SQL en Studio, pasar
   Project URL + anon key, ejecutar T3, y dar visto de publicación.
@@ -142,3 +142,10 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   confirmación (ningún camino guarda solo, testeado), sin conexión/sin resultado → flujo
   manual intacto; +http ^1.6.0; 20 tests nuevos; suite 199/199. Primera consulta real a OFF:
   T7 (dispositivo).
+- L13 — T6 completada (`8d8743f`) y release preparado (`f13226c`): docs del DDL backend y
+  runbook; versión `0.2.0+6` (el bump de v0.1.5 había quedado salteado — por eso la app
+  mostraba 0.1.4); limpieza de 7 warnings de `flutter analyze` (fatales en el CI del release:
+  cast/`!` innecesarios y 5 imports sin usar), suite 199/199 re-verificada. Publicación vía
+  GitHub Actions (release.yml: analyze+tests+build APK firmado con keystore commiteado →
+  release al pushear tag v*); sin SDK local en la máquina (los v0.1.x ya se construían así).
+  Merge a main: pendiente de decisión del dueño tras validar el release.
