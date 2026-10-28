@@ -131,6 +131,22 @@ primer inicio y viaja con cada dato cargado (R17/R18). La etiqueta se **sincroni
 grupo vea quién aportó; `auth_uid` (nullable) se completa en el primer login anónimo y resuelve la
 identidad de los datos creados offline (regla de sync 9).
 
+### valoracion (v2 — v0.1.5)
+
+| Campo | Tipo | Regla |
+| --- | --- | --- |
+| `id` | UUID | PK |
+| `usuario_id` | UUID | FK → usuario; la valoración es **personal** |
+| `producto_id` | UUID | FK → producto |
+| `gusto` | TEXT | `si` / `no` / **NULL** (neutro por defecto: sin fila cargada) |
+| `observacion` | TEXT | opcional; nota personal breve (ej.: "salió bueno, para repetir") |
+| `creado_en` / `actualizado_en` | TIMESTAMP | columnas de sync |
+
+- Una fila por (usuario, producto): volver a neutro sin observación **elimina la fila** (quedan cero datos).
+- Esquema local v2 (v0.1.5): migración agrega la tabla sin tocar las existentes.
+- Viaja en el backup JSON (incluida desde v0.1.5; los backups anteriores siguen importables).
+- Fase 2 (colaborativa): se pondera con las valoraciones de otros aportantes **sin perder la propia**.
+
 ## Precio por unidad de medida (normalización) — R11
 
 Para comparar presentaciones distintas, cada precio se normaliza a la unidad base del artículo:
