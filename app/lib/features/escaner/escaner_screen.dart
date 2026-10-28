@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../data/enriquecimiento.dart';
 import '../../data/local/normalizacion.dart';
 import '../../data/valoraciones.dart';
 
@@ -9,6 +12,7 @@ import '../../data/local/base_de_datos.dart';
 import '../precios/producto_comparacion_screen.dart';
 import '../precios/registro_precio_screen.dart';
 import '../productos/producto_form_screen.dart';
+import '../sync/red.dart';
 
 /// S4 (R6): escáner con cámara (ML Kit, on-device) + ingreso manual del código.
 ///
@@ -19,10 +23,16 @@ class EscanerScreen extends StatefulWidget {
     super.key,
     required this.baseDeDatos,
     this.mostrarCamara = true,
+    this.enriquecimiento,
   });
 
   final BaseDeDatos baseDeDatos;
   final bool mostrarCamara;
+
+  /// T5 (S3): puerto de enriquecimiento inyectable (pruebas usan fakes o
+  /// el cliente OFF con http mockeado). Si no viene, el estado arma el
+  /// default según [mostrarCamara].
+  final ServicioEnriquecimiento? enriquecimiento;
 
   @override
   State<EscanerScreen> createState() => _EscanerScreenState();
@@ -33,6 +43,23 @@ class _EscanerScreenState extends State<EscanerScreen> {
   bool _buscando = false;
   String? _mensaje;
   Producto? _productoEncontrado;
+
+  /// T5 (S3): datos precargados de Open Food Facts para el EAN sin
+  /// resultado local. Solo se pasan al formulario: el usuario SIEMPRE
+  /// confirma antes de guardar (nunca se guarda solo).
+  DatosEnriquecidos? _datosEnriquecidos;
+
+  /// T5 (S3): servicio de enriquecimiento. En uso real (cámara activa)
+  /// consulta Open Food Facts respetando la heurística de conectividad de
+  /// red.dart. Con la cámara apagada (pruebas de widget, sin hardware) es
+  /// nulo: las pruebas nunca tocan la red real; las que prueban
+  /// enriquecimiento inyectan fakes explícitos (mismo criterio de
+  /// mostrarCamara).
+  late final ServicioEnriquecimiento _enriquecimiento =
+      widget.enriquecimiento ??
+          (widget.mostrarCamara
+              ? ServicioEnriquecimientoOFF(hayConexion: _hayConexion)
+              : const ServicioEnriquecimientoNulo());
 
   /// S4 (v0.1.2): último precio conocido del producto encontrado — propio o
   /// ajeno (misma base local, cualquier aportante).
@@ -71,6 +98,32 @@ class _EscanerScreenState extends State<EscanerScreen> {
     _buscar();
   }
 
+  /// Conectividad para el enriquecimiento (R14: cualquier tipo alcanza;
+  /// solo sin interfaces no consulta).
+  Future<bool> _hayConexion() async =>
+      await detectarConexion() != TipoConexion.ninguna;
+
+  /// T5 (S3): consulta OFF en segundo plano tras un EAN sin resultado.
+  /// Nunca lanza y nunca escribe: el resultado solo se muestra como
+  /// precarga; el usuario confirma creando el producto.
+  Future<void> _enriquecer(String ean) async {
+    final DatosEnriquecidos? datos;
+    try {
+      datos = await _enriquecimiento.consultar(ean);
+    } catch (_) {
+      return; // OFF caído o timeout: flujo manual como hoy
+    }
+    if (!mounted) return;
+    if (datos == null) return; // sin resultado: formulario vacío como hoy
+    // El resultado puede llegar tarde: solo vale si sigue el mismo EAN
+    // pendiente de crear.
+    if (_productoEncontrado != null) return;
+    if (_controladorCodigo.text.trim() != ean) return;
+    setState(() {
+      _datosEnriquecidos = datos;
+    });
+  }
+
   Future<void> _buscar() async {
     final codigo = _controladorCodigo.text.trim();
     if (codigo.isEmpty || _buscando) return;
@@ -94,10 +147,14 @@ class _EscanerScreenState extends State<EscanerScreen> {
       _productoEncontrado = producto;
       _ultimoPrecio = ultimo;
       _valoracion = valoracion;
+      _datosEnriquecidos = null; // cada búsqueda parte de cero
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo desde la sección Artículos (Fase 1.5).'
           : 'Producto encontrado: ${producto.nombre}';
     });
+    // T5 (S3): con el producto inexistente, consulta OFF en segundo plano
+    // (si hay conectividad) y precarga para confirmación del usuario.
+    if (producto == null) unawaited(_enriquecer(codigo));
   }
 
   /// Último precio conocido del producto (R1): la toma de fecha más reciente.
@@ -202,6 +259,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
         builder: (_) => ProductoFormScreen(
           baseDeDatos: widget.baseDeDatos,
           codigoBarrasInicial: _controladorCodigo.text.trim(),
+          datosIniciales: _datosEnriquecidos,
         ),
       ),
     );
@@ -273,6 +331,14 @@ class _EscanerScreenState extends State<EscanerScreen> {
           FilledButton.tonal(
             onPressed: _crearProducto,
             child: const Text('Crear producto'),
+          ),
+        ],
+        if (_datosEnriquecidos != null) ...<Widget>[
+          const SizedBox(height: 8),
+          Text(
+            'Datos encontrados en Open Food Facts: ${_datosEnriquecidos!.nombre}'
+            '${_datosEnriquecidos!.marca == null ? '' : ' (${_datosEnriquecidos!.marca})'}'
+            ' — revisalos y confirmá al crear el producto.',
           ),
         ],
         if (_productoEncontrado != null) ...<Widget>[

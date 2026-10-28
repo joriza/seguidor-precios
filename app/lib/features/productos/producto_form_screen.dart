@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/enriquecimiento.dart';
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
 import '../../data/productos.dart';
@@ -16,12 +17,18 @@ class ProductoFormScreen extends StatefulWidget {
     required this.baseDeDatos,
     this.producto,
     this.codigoBarrasInicial,
+    this.datosIniciales,
     this.alGuardar,
   });
 
   final BaseDeDatos baseDeDatos;
   final Producto? producto;
   final String? codigoBarrasInicial;
+
+  /// T5 (S3): datos precargados desde Open Food Facts al crear un producto
+  /// nuevo. Solo aplican al alta (la edición manda) y el usuario siempre
+  /// confirma antes de guardar.
+  final DatosEnriquecidos? datosIniciales;
   final void Function(Producto producto)? alGuardar;
 
   @override
@@ -53,12 +60,20 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _codigo = TextEditingController(
       text: widget.producto?.codigoBarras ?? widget.codigoBarrasInicial ?? '',
     );
-    _nombre = TextEditingController(text: widget.producto?.nombre ?? '');
-    _marca = TextEditingController(text: widget.producto?.marca ?? '');
-    _contenido =
-        TextEditingController(text: widget.producto?.contenidoNeto?.toString() ?? '');
+    _nombre = TextEditingController(
+      text: widget.producto?.nombre ?? widget.datosIniciales?.nombre ?? '',
+    );
+    _marca = TextEditingController(
+      text: widget.producto?.marca ?? widget.datosIniciales?.marca ?? '',
+    );
+    _contenido = TextEditingController(
+      text: widget.producto?.contenidoNeto?.toString() ??
+          widget.datosIniciales?.contenidoNeto?.toString() ??
+          '',
+    );
     _categoria = TextEditingController(text: widget.producto?.categoria ?? '');
-    _unidad = widget.producto?.unidad ?? 'unidad';
+    _unidad =
+        widget.producto?.unidad ?? widget.datosIniciales?.unidad ?? 'unidad';
     _articuloId = widget.producto?.articuloId;
     _cargarArticulos();
     if (_esEdicion) {
@@ -173,8 +188,15 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            TextFormField(
+        children: <Widget>[
+          if (widget.datosIniciales != null) ...<Widget>[
+            Text(
+              'Datos precargados desde Open Food Facts — revisalos y confirmá antes de guardar.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+          ],
+          TextFormField(
               controller: _codigo,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
