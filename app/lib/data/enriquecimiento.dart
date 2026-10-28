@@ -58,7 +58,10 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
     Future<bool> Function()? hayConexion,
     this.timeout = const Duration(seconds: 6),
     this.urlBase = 'https://world.openfoodfacts.org/api/v2/product',
-  })  : _cliente = cliente,
+  })  :
+        // ignore: prefer_initializing_formals
+        _cliente = cliente,
+        // ignore: prefer_initializing_formals
         _hayConexion = hayConexion;
 
   final http.Client? _cliente;

@@ -34,6 +34,6 @@ Future<Precio> registrarPrecio(
         ),
       );
   await encolarUpsert(db, 'precio', nuevoId, ahora: momento);
-  return (await (db.select(db.precios)..where((t) => t.id.equals(nuevoId))))
+  return await (db.select(db.precios)..where((t) => t.id.equals(nuevoId)))
       .getSingle();
 }

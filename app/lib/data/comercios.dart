@@ -34,6 +34,6 @@ Future<Comercio> altaComercio(
         ),
       );
   await encolarUpsert(db, 'comercio', nuevoId, ahora: momento);
-  return (await (db.select(db.comercios)..where((t) => t.id.equals(nuevoId))))
+  return await (db.select(db.comercios)..where((t) => t.id.equals(nuevoId)))
       .getSingle();
 }

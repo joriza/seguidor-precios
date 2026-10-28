@@ -32,7 +32,7 @@ void main() {
         'status': status,
         'status_verbose': status == 1 ? 'product found' : 'product not found',
         'code': ean,
-        if (product != null) 'product': product,
+        'product': ?product,
       });
 
   test('mapea product_name, brands y quantity a nombre, marca y contenido',

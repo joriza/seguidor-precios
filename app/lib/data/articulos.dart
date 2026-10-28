@@ -33,7 +33,7 @@ Future<Articulo> altaArticulo(
         ),
       );
   await encolarUpsert(db, 'articulo', nuevoId, ahora: momento);
-  return (await (db.select(db.articulos)..where((t) => t.id.equals(nuevoId))))
+  return await (db.select(db.articulos)..where((t) => t.id.equals(nuevoId)))
       .getSingle();
 }
 
@@ -52,6 +52,6 @@ Future<Articulo> renombrarArticulo(
         ),
       );
   await encolarUpsert(db, 'articulo', id, ahora: momento);
-  return (await (db.select(db.articulos)..where((t) => t.id.equals(id))))
+  return await (db.select(db.articulos)..where((t) => t.id.equals(id)))
       .getSingle();
 }

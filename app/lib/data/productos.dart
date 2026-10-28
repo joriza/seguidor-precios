@@ -44,7 +44,7 @@ Future<Producto> altaProducto(
         ),
       );
   await encolarUpsert(db, 'producto', nuevoId, ahora: momento);
-  return (await (db.select(db.productos)..where((t) => t.id.equals(nuevoId))))
+  return await (db.select(db.productos)..where((t) => t.id.equals(nuevoId)))
       .getSingle();
 }
 
@@ -75,6 +75,6 @@ Future<Producto> editarProducto(
         ),
       );
   await encolarUpsert(db, 'producto', id, ahora: momento);
-  return (await (db.select(db.productos)..where((t) => t.id.equals(id))))
+  return await (db.select(db.productos)..where((t) => t.id.equals(id)))
       .getSingle();
 }
