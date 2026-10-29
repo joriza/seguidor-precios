@@ -2,7 +2,7 @@
 
 ## Fase 0 — Fundaciones
 
-*Prevista: ~1 semana. Estado: pendiente.*
+*Estado: **completada** (v0.1.0).*
 
 | # | Tarea |
 | --- | --- |
@@ -16,7 +16,7 @@
 
 ## Fase 1 — MVP 100% local (R1, R2, R3, R5, R6, R7, R8, R9, R10, R11, R12, R13, R17)
 
-*Prevista: ~3-4 semanas (creció por el catálogo semilla y el comparador por artículo). Estado: pendiente.*
+*Estado: **completada** (v0.1.5).*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |
@@ -42,10 +42,11 @@ promedio; el backup restaura en otra instalación.
 
 ## Fase 2 — Colaborativo (R4, R5, R10, R14, R15, R18)
 
-*Prevista: ~2-3 semanas. Estado: **implementada** — código completo (suite 199/199) y backend
-Supabase operativo con el semillero cargado (424 productos). Pendiente: validación en dispositivo
-y release v0.2.0. Decisiones: valoraciones solo se sincronizan (ponderación comunitaria
-postergada); enriquecimiento incluido (2.7); moderación mínima (AD-016).*
+*Estado: **cerrada y validada** — implementada, probada en el dispositivo del dueño con sync real
+verificada en servidor, releases v0.2.0/v0.2.1/v0.2.2 publicados y mergeada a `main`. Correctivos de
+campo aplicados en caliente: migraciones 0002-0004 y backfill v4. El juicio dual previo a Fase 3
+confirmó 2 críticos del pull (C1 paginación con timestamps iguales, C2 colisión de EAN local vs
+servidor) que pasan a Fase 3 con prioridad máxima — ver Log L20 del ODD.*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |
@@ -97,6 +98,22 @@ vía Supabase Studio (R18).
 
 **Criterio de salida:** la app pública funciona contra infraestructura propia con los mismos datos
 migrados; backups y monitoreo activos.
+
+## Backlog de mejoras de producto (propuestas, pendientes de priorizar)
+
+*Propuestas del 2026-10-28 a partir de la revisión del recorrido de productos (semilla / manual /
+Open Food Facts), ordenadas por impacto. Candidatas a Fase 3 o ajustes intermedios según el uso
+real. Fuera de este backlog quedan los 2 críticos del pull confirmados por el juicio (C1/C2, Log
+L20 del ODD), que tienen prioridad máxima sobre todo lo de acá.*
+
+| # | Fricción | Mejora propuesta |
+| --- | --- | --- |
+| 1 | Clasificación manual: los productos semilla nacen sin artículo y asignarlos es tarea individual. OFF ya trae categorías que hoy se descartan | Enriquecimiento sugiere artículo (mapeo categoría OFF → artículos propios); pantalla de clasificación en lote |
+| 2 | Semilla congelada: la instalación nueva recibe el pack de v0.1.1 por APK y nunca se actualiza | Con nube activa: instalación nueva = seed mínimo offline + pull del catálogo real del servidor (la semilla queda como plan B sin conexión) |
+| 3 | Enriquecimiento solo al crear: productos viejos o mal cargados nunca se completan desde OFF | Botón “Completar desde OFF” en la ficha de producto (para productos con EAN y datos flojos) |
+| 4 | Mensaje desactualizado del escáner: dice “crealo desde la sección Artículos (Fase 1.5)” pero el escáner ya abre el formulario con precarga | Corregir el texto (trivial) |
+| 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” |
+| 6 | OFF trae más datos útiles que se descartan (imagen del producto, nutrición) | Fase 3+: foto del producto en la ficha |
 
 ## Riesgos
 
