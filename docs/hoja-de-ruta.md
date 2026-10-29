@@ -46,7 +46,8 @@ promedio; el backup restaura en otra instalación.
 verificada en servidor, releases v0.2.0/v0.2.1/v0.2.2 publicados y mergeada a `main`. Correctivos de
 campo aplicados en caliente: migraciones 0002-0004 y backfill v4. El juicio dual previo a Fase 3
 confirmó 2 críticos del pull (C1 paginación con timestamps iguales, C2 colisión de EAN local vs
-servidor) que pasan a Fase 3 con prioridad máxima — ver Log L20 del ODD.*
+servidor) que pasaron a Fase 3 con prioridad máxima — ver Log L20 del ODD — y quedaron corregidos
+en `fase-3` (d04dea1: pull keyset por (actualizado_en, id) + convergencia de ids de semilla).*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |
@@ -68,7 +69,10 @@ vía Supabase Studio (R18).
 
 ## Fase 3 — Valor agregado (post-MVP)
 
-*Estado: pendiente; se prioriza con datos de uso reales.*
+*Estado: **en curso** — arrancada con los críticos C1/C2 (corregidos en d04dea1) y la cuenta
+multi-dispositivo 3.7 (magic link por email + convergencia de identidad, implementada en d84bf53/b7abaa7
+con migración 0005, pendiente de validación en dispositivo — release v0.3.0). El resto de las tareas
+(3.1-3.6, 3.8 y el backlog de mejoras #1-#6) se prioriza con datos de uso reales.*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |

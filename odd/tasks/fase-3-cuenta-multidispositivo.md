@@ -33,9 +33,10 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   unidad: item 2 (seguridad/RLS) — verificación inline del padre (ver Log L4/L5); el runtime no
   admitió verificador independiente delegado (la delegación no declaraba Risk line).
 - T4 (S3) — Multi-dispositivo: restaurar identidad/datos en instalación nueva vía login. Ruta:
-  worker + tests. Commit: en curso (worker background).
+  worker + tests. Commit: b7abaa7 (feat(sync)).
 - T5 (S1-S3) — Estado en docs/hoja-de-ruta.md (Fase 3 en curso), release v0.3.0 y validación en
-  dispositivo del dueño. Ruta: parent + dueño.
+  dispositivo del dueño. Ruta: parent + dueño. Release: tag v0.3.0 (v0.3.0+9); validación
+  pendiente del dueño.
 
 ## Log
 
@@ -70,6 +71,25 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   sincronizada va por INSERT con WITH CHECK propio; colisión uq_usuario_auth_uid (segunda
   instalación misma cuenta) = frontera T4 documentada en el header de 0005. Interplay vivo
   (RLS real + SMTP + template) queda a la validación de campo T5.
+- L6 — T4 ejecutado por worker en background (task mvtw5cox-3-tn37) con TDD (8 tests, 6 RED que
+  reproducen el 23505 uq_usuario_auth_uid en vivo): convergencia de identidad espejo de C2 pero
+  por auth_uid — al detectar fila remota de usuario con el auth_uid de la cuenta local, se
+  adopta el id del servidor, re-apunta dependientes (valoraciones.usuario_id, precios.cargado_por,
+  creado_por), merge LWW de etiqueta (gana local → re-encola bajo id canónico), descarta el
+  duplicado + su entrada de outbox, y re-ancla la adoptada al primer lugar de la tabla
+  (usuarioActual resuelve identidad por orden de escaneo) con PRAGMA defer_foreign_keys dentro
+  de la misma transacción. Trigger tanto en push (lookup idUsuarioPorAuthUid antes de subir,
+  espejo del bloque EAN) como en pull (_aplicarFilaRemota). Sin cambio de esquema: el lookup es
+  SELECT colaborativo de 0001 → la garantía de adopción de 0005 no puede regresar; uq queda de
+  backstop para clientes viejos. Verificación del padre: función leída inline (transacción,
+  LWW, punteros sin tocar datos, defer FK con restauración exacta de ids), suite 225/225 (217 +
+  8) y analyze limpios observados inline. Commit b7abaa7 (614 líneas). ASSESS: medium,
+  reviewDue false (under_budget). Franja total de la rama: 1875+ líneas — para PR usar
+  chained-pr con slices (fix 372 / feat cuenta 849 / feat sync 614); decisión de entrega en
+  cierre de fase. Release: hoja-de-ruta actualizada (Fase 3 en curso; nota de críticos
+  corregidos en Fase 2), pubspec 0.3.0+9, tag v0.3.0 → CI release. Límites documentados (sin
+  bloqueo): la fila anónima vieja del servidor queda inerte; atribución cosmética de filas ya
+  subidas conserva creado_por viejo hasta que cambien.
 - L4 — T3 ejecutado por worker en background (task mvtuuyxz-2-r0dh) con TDD (13 tests RED→GREEN:
   pedido de magic link signInWithOtp, completado con código de 6 dígitos verifyOTP in-app — el
   deep-link del email queda como follow-up fuera de superficies —, vinculación de la fila local
