@@ -29,9 +29,11 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
 - T2 (S2) — Fix C2: convergencia de ids de semilla con el servidor en el pull. Ruta: worker +
   tests. Commit: d04dea1 (ídem T1).
 - T3 (S3) — Cuenta por email (magic link): UI de login opcional + vinculación de identidad +
-  ajuste de auth en backend. Ruta: worker + tests. Commit: feat(cuenta).
+  ajuste de auth en backend. Ruta: worker + tests. Commit: d84bf53 (feat(cuenta)). Riesgo de la
+  unidad: item 2 (seguridad/RLS) — verificación inline del padre (ver Log L4/L5); el runtime no
+  admitió verificador independiente delegado (la delegación no declaraba Risk line).
 - T4 (S3) — Multi-dispositivo: restaurar identidad/datos en instalación nueva vía login. Ruta:
-  worker + tests. Commit: feat(cuenta).
+  worker + tests. Commit: en curso (worker background).
 - T5 (S1-S3) — Estado en docs/hoja-de-ruta.md (Fase 3 en curso), release v0.3.0 y validación en
   dispositivo del dueño. Ruta: parent + dueño.
 
@@ -56,3 +58,32 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   (docs ODD) + d04dea1 (fix, 372 líneas). Riesgo declarado por el worker: el filtro keyset
   or(...) de PostgREST no se ejercitó contra Supabase vivo en tests (fake emula el contrato);
   la primera pull real del dueño (T5) lo valida en campo.
+- L5 — Verificación de seguridad de 0005 por el padre (ítem 2), tras rechazo del runtime al
+  verificador independiente delegado: (1) en 0001 actualizacion_propia ya era FOR UPDATE →
+  recrearla como FOR UPDATE no pierde cobertura (INSERT=alta_colaborativa, SELECT=
+  lectura_colaborativa); (2) adopción acotada: USING exige auth_uid de sesión o fila anónima
+  (es_usuario_anonimo, SECURITY DEFINER, search_path '', REVOKE PUBLIC + GRANT authenticated,
+  booleano puro) y WITH CHECK fuerza auth_uid = auth.uid() → cuenta verificada jamás adoptable;
+  (3) idempotente y transaccional; (4) admin_dueno no es tocado por 0005; (5) flujo cliente:
+  push genérico .upsert() — post-vinculación la fila del servidor lleva el auth_uid anónimo
+  VIEJO y la sesión el uid NUEVO → gobierna el UPDATE que 0005 habilita; instalación nunca
+  sincronizada va por INSERT con WITH CHECK propio; colisión uq_usuario_auth_uid (segunda
+  instalación misma cuenta) = frontera T4 documentada en el header de 0005. Interplay vivo
+  (RLS real + SMTP + template) queda a la validación de campo T5.
+- L4 — T3 ejecutado por worker en background (task mvtuuyxz-2-r0dh) con TDD (13 tests RED→GREEN:
+  pedido de magic link signInWithOtp, completado con código de 6 dígitos verifyOTP in-app — el
+  deep-link del email queda como follow-up fuera de superficies —, vinculación de la fila local
+  EXISTENTE sin duplicar identidad, errores en español por modo de fallo). Migración 0005
+  (nueva): política actualizacion_propia de usuario re-creada FOR UPDATE con adopción SOLO de
+  filas cuyo auth_uid es anónimo (es_usuario_anonimo SECURITY DEFINER); WITH CHECK sin cambios.
+  Verificación del padre sobre blobs commiteados: en 0001 actualizacion_propia ya era FOR UPDATE
+  (INSERT vive en alta_colaborativa, SELECT en lectura_colaborativa) → sin pérdida de cobertura;
+  cuenta verificada nunca adoptable. Suite 217/217 (204 + 13) y analyze limpios, observados
+  inline. Commit d84bf53 (849 líneas). ASSESS nativo: nativeRisk medium, reviewDue false
+  (under_budget); escalado item 2 (seguridad/RLS) → plan con verificador independiente
+  (gentle-ai-verify en background, lee blobs commiteados d84bf53). Pasos del lado del dueño
+  (reportados por el worker, pendientes): (1) aplicar 0005 en Studio (idempotente); (2) template
+  Magic Link con {{ .Token }}; (3) SMTP propio (builtin ~2 emails/hora); (4) Site URL;
+  (5) chequeo de campo en T5. Franja de commits: unidad T3 de 849 líneas excede la guía de
+  ~400 — para PR usar chained-pr (slices: docs+fix 372 / feat 849) o aceptar slice único;
+  decisión de entrega en T5.
