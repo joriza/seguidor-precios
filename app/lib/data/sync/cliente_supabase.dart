@@ -94,6 +94,21 @@ class ClienteSupabase implements ClienteRemoto {
   }
 
   @override
+  Future<String?> idUsuarioPorAuthUid(String authUid) async {
+    // SELECT colaborativo (migración 0001): cualquier autenticado puede
+    // leer usuario, así que el lookup no necesita RPC ni cambio de
+    // esquema; el uq_usuario_auth_uid del servidor garantiza que hay
+    // a lo sumo una fila con ese auth_uid.
+    final fila = await _cliente
+        .from('usuario')
+        .select('id')
+        .eq('auth_uid', authUid)
+        .limit(1)
+        .maybeSingle();
+    return fila == null ? null : fila['id'] as String?;
+  }
+
+  @override
   Future<Map<String, dynamic>?> traerFila({
     required String tabla,
     required String id,

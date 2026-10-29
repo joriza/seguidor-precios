@@ -49,6 +49,14 @@ abstract class ClienteRemoto {
   /// los duplicados; la fila canónica conserva sus propios datos.
   Future<String?> idCanonicoPorEan(String codigoBarras);
 
+  /// Id de la fila de usuario que ya lleva ese `auth_uid` en el servidor
+  /// (T4, multi-dispositivo), o null si ninguna fila remota lo lleva.
+  /// Es el espejo de [idCanonicoPorEan] para la identidad: el servidor
+  /// garantiza a lo sumo una fila por `auth_uid` (uq_usuario_auth_uid),
+  /// así que subir la identidad de una cuenta ya conocida chocaría con
+  /// 23505 — primero hay que converger a ESA fila.
+  Future<String?> idUsuarioPorAuthUid(String authUid);
+
   /// Trae una fila remota por id; null si no existe. Se usa para copiar
   /// localmente la fila canónica tras un dedup antes de re-apuntar.
   Future<Map<String, dynamic>?> traerFila({

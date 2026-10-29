@@ -10,7 +10,10 @@ import '../local/base_de_datos.dart';
 /// Núcleo de sync offline-first (T2 de la fase): push por lotes en orden de
 /// dependencias, pull incremental con merge última-escritura-gana, borrado
 /// lógico, dedup por EAN con re-apunte local de precios e identidad
-/// anónima. Sigue las reglas 1-9 de docs/arquitectura.md.
+/// anónima. T4 (fase 3): la identidad del aportante también converge — si
+/// el servidor ya tiene la fila de la cuenta (otra instalación), el local
+/// adopta ese id en lugar de bifurcar la identidad (uq_usuario_auth_uid).
+/// Sigue las reglas 1-9 de docs/arquitectura.md.
 ///
 /// El servicio solo habla con [ClienteRemoto]: los tests corren contra un
 /// cliente falso, sin red.
@@ -103,8 +106,11 @@ Future<void> _guardarAuthUid(
 /// S3 (R17/AD-003): vincula la identidad local a la cuenta real con la
 /// que se entró por enlace mágico: `auth_uid` del usuario local pasa al
 /// uid de la cuenta — MISMA fila, sin duplicar identidad — y el cambio
-/// viaja en la próxima sync (regla de sync 9). Idempotente: si ya está
-/// vinculado a esa cuenta no reescribe ni re-encola nada.
+/// viaja en la próxima sync (regla de sync 9). Si el servidor ya tiene la
+/// fila de esa cuenta (otra instalación), la próxima sync converge a esa
+/// fila en lugar de subir un duplicado: [_convergerUsuarioPorAuthUid].
+/// Idempotente: si ya está vinculado a esa cuenta no reescribe ni
+/// re-encola nada.
 Future<void> linkLocalIdentity(BaseDeDatos db, String uidCuenta) async {
   final usuario = await usuarioActual(db);
   if (usuario.authUid == uidCuenta) return;
@@ -175,6 +181,32 @@ Future<(int, int, int)> _pushTodo(
               // El canónico debería estar; si no lo está (carrera remota
               // rara), la entrada queda pendiente para el próximo intento
               // sin romper la sesión.
+              continue;
+            }
+          }
+        }
+        if (tabla == 'usuario') {
+          // T4 (S3): la cuenta ya vive en el servidor bajo otro id (sincronó
+          // desde otra instalación). Subir la fila local chocaría con
+          // uq_usuario_auth_uid (23505) y bifurcaría la identidad: primero
+          // converge a la fila del servidor.
+          final uid = fila['auth_uid'] as String?;
+          if (uid != null && uid.isNotEmpty) {
+            final idRemoto = await cliente.idUsuarioPorAuthUid(uid);
+            if (idRemoto != null && idRemoto != entrada.filaId) {
+              final remota = await cliente.traerFila(tabla: tabla, id: idRemoto);
+              if (remota != null) {
+                reApuntados += await _convergerUsuarioPorAuthUid(
+                  db,
+                  desdeId: entrada.filaId,
+                  filaRemota: remota,
+                );
+                await _descartarEntrada(db, tabla, entrada.filaId);
+                continue;
+              }
+              // La fila remota debería estar; si no lo está (carrera
+              // remota rara), la entrada queda pendiente para el próximo
+              // intento sin romper la sesión.
               continue;
             }
           }
@@ -314,6 +346,19 @@ Future<void> _aplicarFilaRemota(
 
   switch (tabla) {
     case 'usuario':
+      // T4 (S3): si la fila remota lleva el auth_uid de OTRA fila local (la
+      // cuenta ya sincronó desde otra instalación y baja con el pull),
+      // converge a la identidad del servidor en lugar de insertar un
+      // duplicado con el mismo auth_uid.
+      final colisionUid = await _colisionAuthUidLocal(db, fila);
+      if (colisionUid != null) {
+        await _convergerUsuarioPorAuthUid(
+          db,
+          desdeId: colisionUid.id,
+          filaRemota: fila,
+        );
+        return;
+      }
       final local = await (db.select(db.usuarios)..where((t) => t.id.equals(id))).getSingleOrNull();
       if (local == null) {
         await db.into(db.usuarios).insert(_companionUsuarioDesdeRemota(fila));
@@ -406,6 +451,21 @@ Future<Producto?> _colisionEanLocal(
       .getSingleOrNull();
 }
 
+/// Fila local que ya lleva el auth_uid de la fila remota bajo OTRO id (la
+/// misma cuenta vista desde dos instalaciones, T4), o null.
+Future<Usuario?> _colisionAuthUidLocal(
+  BaseDeDatos db,
+  Map<String, dynamic> filaRemota,
+) async {
+  final uid = filaRemota['auth_uid'] as String?;
+  if (uid == null || uid.isEmpty) return null;
+  return (db.select(db.usuarios)
+        ..where((t) =>
+            t.authUid.equals(uid) &
+            t.id.equals(filaRemota['id'] as String).not()))
+      .getSingleOrNull();
+}
+
 /// Convergencia de un EAN semilla con el servidor (C2, regla de sync 6 y
 /// 4): la identidad pasa a ser la del servidor —nunca inserta el EAN
 /// mientras el duplicado lo ocupa—, el contenido gana por LWW, los precios
@@ -464,6 +524,105 @@ Future<void> _convergerProductoPorEan(
     if (contenidoLocal != null) {
       await encolarUpsert(db, 'producto', canonicoId);
     }
+  });
+}
+
+/// Convergencia de identidad multi-dispositivo (T4, regla de sync 9): el
+/// servidor ya tiene la fila de la cuenta —sincronó desde otra
+/// instalación— y acá hay un duplicado local con el mismo auth_uid. Es la
+/// misma situación que C2 resuelve por EAN para productos, pero para la
+/// identidad del aportante: la identidad local pasa a ser la del servidor,
+/// los aportes del dispositivo se re-apuntan (solo el puntero), la
+/// etiqueta gana por LWW y, si ganó lo local, vuelve a subir bajo el id
+/// del servidor. El duplicado desaparece con su entrada de outbox, así el
+/// push nunca intenta el INSERT que el servidor rechazaría con 23505
+/// contra uq_usuario_auth_uid. Todo en una transacción (regla de sync 6).
+///
+/// Devuelve la cantidad de filas re-apuntadas.
+Future<int> _convergerUsuarioPorAuthUid(
+  BaseDeDatos db, {
+  required String desdeId,
+  required Map<String, dynamic> filaRemota,
+}) {
+  final canonicoId = filaRemota['id'] as String;
+  return db.transaction(() async {
+    final duplicado = await (db.select(db.usuarios)
+          ..where((t) => t.id.equals(desdeId)))
+        .getSingleOrNull();
+    if (duplicado == null) return 0; // ya convergió en un intento previo
+
+    final contenidoLocal = _localGana(
+            filaRemota['actualizado_en'] as String?, duplicado.actualizadoEn)
+        ? await _leerFilaLocal(db, 'usuario', duplicado.id)
+        : null;
+
+    final existente = await (db.select(db.usuarios)
+          ..where((t) => t.id.equals(canonicoId)))
+        .getSingleOrNull();
+    if (existente == null) {
+      await db.into(db.usuarios).insert(_companionUsuarioDesdeRemota(
+          contenidoLocal != null
+              ? {...contenidoLocal, 'id': canonicoId}
+              : filaRemota));
+    } else if (contenidoLocal != null) {
+      await (db.update(db.usuarios)..where((t) => t.id.equals(canonicoId)))
+          .write(_companionUsuarioParaActualizar(contenidoLocal));
+    } else if (_servidorGana(filaRemota, existente.actualizadoEn)) {
+      await (db.update(db.usuarios)..where((t) => t.id.equals(canonicoId)))
+          .write(_companionUsuarioParaActualizar(filaRemota));
+    }
+
+    // Los aportes del dispositivo siguen a la identidad adoptada: cambia
+    // el puntero, nunca el dato del precio (inmutabilidad, regla 1).
+    var apuntados = 0;
+    apuntados += await (db.update(db.valoraciones)
+          ..where((t) => t.usuarioId.equals(desdeId)))
+        .write(ValoracionesCompanion(usuarioId: Value(canonicoId)));
+    apuntados += await (db.update(db.precios)
+          ..where((t) => t.cargadoPor.equals(desdeId)))
+        .write(PreciosCompanion(cargadoPor: Value(canonicoId)));
+    apuntados += await (db.update(db.articulos)
+          ..where((t) => t.creadoPor.equals(desdeId)))
+        .write(ArticulosCompanion(creadoPor: Value(canonicoId)));
+    apuntados += await (db.update(db.productos)
+          ..where((t) => t.creadoPor.equals(desdeId)))
+        .write(ProductosCompanion(creadoPor: Value(canonicoId)));
+    apuntados += await (db.update(db.comercios)
+          ..where((t) => t.creadoPor.equals(desdeId)))
+        .write(ComerciosCompanion(creadoPor: Value(canonicoId)));
+
+    await _descartarEntrada(db, 'usuario', desdeId);
+    await (db.delete(db.usuarios)..where((t) => t.id.equals(desdeId))).go();
+
+    // usuarioActual y leerUsuario resuelven la identidad propia como la
+    // PRIMERA fila de la tabla (orden de escaneo). Al borrar el duplicado
+    // la adoptada podría quedar después de la fila de otro aportante: se
+    // re-ancla al inicio, dentro de la misma transacción.
+    final todas = await db.select(db.usuarios).get();
+    if (todas.isNotEmpty && todas.first.id != canonicoId) {
+      // Las FK de valoraciones hacia usuarios se re-verifican al commit:
+      // los ids se restauran exactos, así que la ventana no deja huella.
+      await db.customStatement('PRAGMA defer_foreign_keys = ON');
+      final propia = todas.firstWhere((u) => u.id == canonicoId);
+      final resto = todas.where((u) => u.id != canonicoId).toList();
+      await (db.delete(db.usuarios)).go();
+      for (final u in [propia, ...resto]) {
+        await db.into(db.usuarios).insert(
+              UsuariosCompanion.insert(
+                id: u.id,
+                etiqueta: u.etiqueta,
+                authUid: Value(u.authUid),
+                creadoEn: u.creadoEn,
+                actualizadoEn: u.actualizadoEn,
+              ),
+            );
+      }
+    }
+
+    if (contenidoLocal != null) {
+      await encolarUpsert(db, 'usuario', canonicoId);
+    }
+    return apuntados;
   });
 }
 

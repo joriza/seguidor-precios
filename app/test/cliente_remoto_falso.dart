@@ -52,6 +52,10 @@ class ClienteRemotoFalso implements ClienteRemoto {
   /// EAN consultados por [idCanonicoPorEan], en orden (traza del test).
   final List<String> idsDedupConsultados = [];
 
+  /// T4 (S3): auth_uid consultados por [idUsuarioPorAuthUid], en orden
+  /// (traza del test).
+  final List<String> idsUsuarioConsultados = [];
+
   void sembrar(String tabla, List<Map<String, dynamic>> filas) {
     (remoto[tabla] ??= []).addAll(filas);
   }
@@ -98,6 +102,23 @@ class ClienteRemotoFalso implements ClienteRemoto {
     if (errorAlSubir == tabla) {
       throw Exception('servidor caído al subir $tabla');
     }
+    if (tabla == 'usuario') {
+      // El servidor rechaza con 23505 toda fila que daría a DOS filas de
+      // usuario el mismo auth_uid (uq_usuario_auth_uid, migración 0001):
+      // exactamente lo que pasaría si una segunda instalación subiera su
+      // identidad local ya vinculada a una cuenta que el servidor conoce.
+      for (final fila in filas) {
+        final uid = fila['auth_uid'] as String?;
+        if (uid == null) continue;
+        final choca = (remoto['usuario'] ?? const <Map<String, dynamic>>[])
+            .any((r) => r['auth_uid'] == uid && r['id'] != fila['id']);
+        if (choca) {
+          throw Exception(
+              '23505: duplicate key value violates unique constraint '
+              '"uq_usuario_auth_uid" (auth_uid=$uid)');
+        }
+      }
+    }
     ordenSubidas.add(tabla);
     lotesSubidos.add(filas);
 
@@ -122,6 +143,23 @@ class ClienteRemotoFalso implements ClienteRemoto {
       ..sort((a, b) {
         final porCreado = (a['creado_en'] as String)
             .compareTo(b['creado_en'] as String);
+        if (porCreado != 0) return porCreado;
+        return (a['id'] as String).compareTo(b['id'] as String);
+      });
+    return candidatos.isEmpty ? null : candidatos.first['id'] as String;
+  }
+
+  @override
+  Future<String?> idUsuarioPorAuthUid(String authUid) async {
+    idsUsuarioConsultados.add(authUid);
+    // Criterio del servidor (uq_usuario_auth_uid): a lo sumo una fila por
+    // auth_uid; el desempate (creado_en, id) replica el de dedup_ean.
+    final candidatos = (remoto['usuario'] ?? const <Map<String, dynamic>>[])
+        .where((r) => r['auth_uid'] == authUid)
+        .toList()
+      ..sort((a, b) {
+        final porCreado =
+            (a['creado_en'] as String).compareTo(b['creado_en'] as String);
         if (porCreado != 0) return porCreado;
         return (a['id'] as String).compareTo(b['id'] as String);
       });
