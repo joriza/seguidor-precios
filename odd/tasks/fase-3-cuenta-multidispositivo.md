@@ -23,9 +23,11 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
 
 ## Tasks
 
-- T1 (S1) — Fix C1: paginación del pull sin inanición. Ruta: worker + tests. Commit: fix(sync).
+- T1 (S1) — Fix C1: paginación del pull sin inanición. Ruta: worker + tests. Commit:
+  d04dea1 (fix(sync), unidad única junto con T2: comparten la ruta del pull y el grupo de
+  tests).
 - T2 (S2) — Fix C2: convergencia de ids de semilla con el servidor en el pull. Ruta: worker +
-  tests. Commit: fix(sync).
+  tests. Commit: d04dea1 (ídem T1).
 - T3 (S3) — Cuenta por email (magic link): UI de login opcional + vinculación de identidad +
   ajuste de auth en backend. Ruta: worker + tests. Commit: feat(cuenta).
 - T4 (S3) — Multi-dispositivo: restaurar identidad/datos en instalación nueva vía login. Ruta:
@@ -43,3 +45,14 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
 - L2 — "Recuera aplicar todo lo mas posible en 1 agente en paralelo para preservar el contexto
   actual": el trabajo pesado se delega a UN worker por vez, en background/paralelo, para preservar
   el contexto de la sesión padre.
+- L3 — T1+T2 ejecutados por worker en background (task mvtu0zzt-1-iyt8) con TDD: RED reproduce
+  C1 (solo 100/251 bajan; inanición) y C2 (SqliteException UNIQUE codigo_barras desde
+  _aplicarFilaRemota, crash antes de guardarCursor — síntoma exacto del teléfono del dueño);
+  GREEN: pull keyset (actualizado_en, id) con cursor por página aplicada (C1) y convergencia
+  atómica por EAN (libera EAN → merge LWW bajo id del servidor, re-encola edit local ganador,
+  re-apunta precios/valoraciones, descarta duplicado + entrada de outbox) sin migración de
+  esquema (v4 intacta, supabase/migrations sin tocar). Verificación del padre: suite 204/204
+  (201 previos + 3 nuevos) y analyze --fatal-infos limpio, observados inline. Commits: aad13e8
+  (docs ODD) + d04dea1 (fix, 372 líneas). Riesgo declarado por el worker: el filtro keyset
+  or(...) de PostgREST no se ejercitó contra Supabase vivo en tests (fake emula el contrato);
+  la primera pull real del dueño (T5) lo valida en campo.
