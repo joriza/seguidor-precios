@@ -59,6 +59,23 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   (docs ODD) + d04dea1 (fix, 372 líneas). Riesgo declarado por el worker: el filtro keyset
   or(...) de PostgREST no se ejercitó contra Supabase vivo en tests (fake emula el contrato);
   la primera pull real del dueño (T5) lo valida en campo.
+- L4 — T3 ejecutado por worker en background (task mvtuuyxz-2-r0dh) con TDD (13 tests RED→GREEN:
+  pedido de magic link signInWithOtp, completado con código de 6 dígitos verifyOTP in-app — el
+  deep-link del email queda como follow-up fuera de superficies —, vinculación de la fila local
+  EXISTENTE sin duplicar identidad, errores en español por modo de fallo). Migración 0005
+  (nueva): política actualizacion_propia de usuario re-creada FOR UPDATE con adopción SOLO de
+  filas cuyo auth_uid es anónimo (es_usuario_anonimo SECURITY DEFINER); WITH CHECK sin cambios.
+  Verificación del padre sobre blobs commiteados: en 0001 actualizacion_propia ya era FOR UPDATE
+  (INSERT vive en alta_colaborativa, SELECT en lectura_colaborativa) → sin pérdida de cobertura;
+  cuenta verificada nunca adoptable. Suite 217/217 (204 + 13) y analyze limpios, observados
+  inline. Commit d84bf53 (849 líneas). ASSESS nativo: nativeRisk medium, reviewDue false
+  (under_budget); escalado item 2 (seguridad/RLS) → plan con verificador independiente
+  (gentle-ai-verify en background, lee blobs commiteados d84bf53). Pasos del lado del dueño
+  (reportados por el worker, pendientes): (1) aplicar 0005 en Studio (idempotente); (2) template
+  Magic Link con {{ .Token }}; (3) SMTP propio (builtin ~2 emails/hora); (4) Site URL;
+  (5) chequeo de campo en T5. Franja de commits: unidad T3 de 849 líneas excede la guía de
+  ~400 — para PR usar chained-pr (slices: docs+fix 372 / feat 849) o aceptar slice único;
+  decisión de entrega en T5.
 - L5 — Verificación de seguridad de 0005 por el padre (ítem 2), tras rechazo del runtime al
   verificador independiente delegado: (1) en 0001 actualizacion_propia ya era FOR UPDATE →
   recrearla como FOR UPDATE no pierde cobertura (INSERT=alta_colaborativa, SELECT=
@@ -90,20 +107,8 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   corregidos en Fase 2), pubspec 0.3.0+9, tag v0.3.0 → CI release. Límites documentados (sin
   bloqueo): la fila anónima vieja del servidor queda inerte; atribución cosmética de filas ya
   subidas conserva creado_por viejo hasta que cambien.
-- L4 — T3 ejecutado por worker en background (task mvtuuyxz-2-r0dh) con TDD (13 tests RED→GREEN:
-  pedido de magic link signInWithOtp, completado con código de 6 dígitos verifyOTP in-app — el
-  deep-link del email queda como follow-up fuera de superficies —, vinculación de la fila local
-  EXISTENTE sin duplicar identidad, errores en español por modo de fallo). Migración 0005
-  (nueva): política actualizacion_propia de usuario re-creada FOR UPDATE con adopción SOLO de
-  filas cuyo auth_uid es anónimo (es_usuario_anonimo SECURITY DEFINER); WITH CHECK sin cambios.
-  Verificación del padre sobre blobs commiteados: en 0001 actualizacion_propia ya era FOR UPDATE
-  (INSERT vive en alta_colaborativa, SELECT en lectura_colaborativa) → sin pérdida de cobertura;
-  cuenta verificada nunca adoptable. Suite 217/217 (204 + 13) y analyze limpios, observados
-  inline. Commit d84bf53 (849 líneas). ASSESS nativo: nativeRisk medium, reviewDue false
-  (under_budget); escalado item 2 (seguridad/RLS) → plan con verificador independiente
-  (gentle-ai-verify en background, lee blobs commiteados d84bf53). Pasos del lado del dueño
-  (reportados por el worker, pendientes): (1) aplicar 0005 en Studio (idempotente); (2) template
-  Magic Link con {{ .Token }}; (3) SMTP propio (builtin ~2 emails/hora); (4) Site URL;
-  (5) chequeo de campo en T5. Franja de commits: unidad T3 de 849 líneas excede la guía de
-  ~400 — para PR usar chained-pr (slices: docs+fix 372 / feat 849) o aceptar slice único;
-  decisión de entrega en T5.
+- L7 — RELEASE v0.3.0 PUBLICADA: run de CI 40937603113 verde (6m19s), asset
+  `seguidor-precios-v0.3.0-debug.apk` publicado en github.com/joriza/seguidor-precios/releases/
+  tag/v0.3.0. Pendiente de T5: instalación sobre la v0.2.2 existente (sin desinstalar), primera
+  pull real con keyset (catálogo completo) y vinculación de cuenta en el teléfono del dueño;
+  después, la decisión de merge `fase-3` → `main` es del dueño.
