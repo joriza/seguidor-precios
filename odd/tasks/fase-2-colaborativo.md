@@ -176,6 +176,17 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   identificado: `b04e9e8c-3906-4ec0-b16c-643d64331775` (auth user 17:40:12, su intento de
   sync); admin pendiente de activar con CREATE OR REPLACE FUNCTION es_admin() usando ese uid
   (SQL entregado al dueño). Pendiente: retry de “Sincronizar ahora” en el teléfono del dueño.
+- L20 — JUICIO (judgment-day, dual ciego) sobre la Fase 2 antes de Fase 3: target inmutable
+  `3a4be4c..55b2d53` (sha256 88b674e9…), jueces jd-judge-a/b en paralelo. Resultado: 2
+  CRITICAL CONFIRMADOS por ambos (C1: inanición de paginación del pull con ≥100 timestamps
+  iguales — un dispositivo nuevo solo baja 100/424 del catálogo; C2: colisión de EAN en el
+  pull — ids sem-<ean> locales vs uuid5 del servidor violan el UNIQUE local → el pull del
+  teléfono del dueño está roto: sube pero nunca baja, crash antes de guardarCursor), 5
+  sospechosos (backfill en dispositivos ya-sincronizados; forja de creado_por vía 0003;
+  sesgo de reloj en LWW; usuarioActual sin orden; valoraciones duplicadas), 1 info (sesión
+  perdida sin re-login). El dueño decidió NO corregir ahora → veredicto ESCALATED; C1 y C2
+  pasan al backlog de Fase 3 con prioridad máxima (C2 deja al teléfono del dueño sin baja de
+  datos hasta corregirse). Ledger: apk-debug/judgment-fase2-ledger.json (gitignored).
 - L19 — FASE 2 CERRADA Y MERGEADA (2026-10-28): `fase-2-colaborativo` → `main` por
   fast-forward (`3a4be4c..55b2d53`, 28 commits) con autorización del dueño (“mergee fase-2”).
   La rama queda como referencia histórica; los tags v0.2.0/v0.2.1/v0.2.2 ya apuntan a commits
