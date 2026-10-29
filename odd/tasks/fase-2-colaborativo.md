@@ -176,6 +176,12 @@ sync manual siempre disponible; indicador de estado; carga inicial del semillero
   identificado: `b04e9e8c-3906-4ec0-b16c-643d64331775` (auth user 17:40:12, su intento de
   sync); admin pendiente de activar con CREATE OR REPLACE FUNCTION es_admin() usando ese uid
   (SQL entregado al dueño). Pendiente: retry de “Sincronizar ahora” en el teléfono del dueño.
+- L19 — FASE 2 CERRADA Y MERGEADA (2026-10-28): `fase-2-colaborativo` → `main` por
+  fast-forward (`3a4be4c..55b2d53`, 28 commits) con autorización del dueño (“mergee fase-2”).
+  La rama queda como referencia histórica; los tags v0.2.0/v0.2.1/v0.2.2 ya apuntan a commits
+  de la línea principal. Único pendiente administrativo abierto: el dueño aplica el SQL de
+  es_admin con su uid (b04e9e8c…) cuando quiera. Fase 3 (login por email, multi-dispositivo)
+  queda trazada en docs/hoja-de-ruta.md.
 - L17 — Fallo de sync 2.0 (tras 0003/0004 + v0.2.1 con backfill): el push del dueño avanzó
   bien (usuario ✓, los 424 de semilla ✓, cerealitas ✓ y 3 productos viejos v0.1.x ✓ — todo
   al servidor 18:51:51) pero murió en comercio (0) antes de precio. La reproducción por API
