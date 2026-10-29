@@ -546,6 +546,170 @@ void main() {
     });
   });
 
+  group('críticos del juicio fase-2 (C1 paginación, C2 colisión de EAN)', () {
+    test(
+        'C1: pull con ≥100 filas de igual actualizado_en baja todo el catálogo y el cursor solo avanza sobre datos guardados',
+        () async {
+      // Un cargador masivo sube en lotes de 100 y el trigger del servidor
+      // estampa el mismo now() a todo el lote: quedan bloques de 100+ filas
+      // con actualizado_en idéntico (caso real del juicio: 424 productos,
+      // un dispositivo nuevo solo bajaba los primeros 100).
+      const tLote = '2026-01-05T10:00:00.000Z';
+      final cargador = List.generate(250, (i) {
+        final id = 'p-${i.toString().padLeft(3, '0')}';
+        return {
+          'id': id,
+          'codigo_barras': null,
+          'articulo_id': null,
+          'nombre': 'Producto $id',
+          'marca': null,
+          'categoria': null,
+          'unidad': 'g',
+          'contenido_neto': null,
+          'notas': null,
+          'creado_por': 'u2',
+          'creado_en': tLote,
+          'actualizado_en': tLote,
+          'borrado_en': null,
+        };
+      });
+      cliente.sembrar('producto', cargador);
+      cliente.sembrar('producto', [
+        {
+          'id': 'p-posterior',
+          'codigo_barras': null,
+          'articulo_id': null,
+          'nombre': 'Subido después',
+          'marca': null,
+          'categoria': null,
+          'unidad': 'g',
+          'contenido_neto': null,
+          'notas': null,
+          'creado_por': 'u2',
+          'creado_en': t9,
+          'actualizado_en': t9,
+          'borrado_en': null,
+        },
+      ]);
+
+      final resultado = await sincronizarAhora(db, cliente, tamanoLote: 100);
+
+      // Todo el catálogo aterrizó, no solo la primera página.
+      expect(await db.select(db.productos).get(), hasLength(251));
+      // 251 del servidor + el eco del usuario propio que subió el push.
+      expect(resultado.filasDescargadas, 252);
+      // El cursor quedó en el último dato efectivamente guardado, no
+      // atascado en el bloque de timestamps iguales.
+      expect(await leerCursor(db, 'producto'), t9);
+      // Tres páginas de producto (100 + 100 + 51): la ventana de descarga
+      // avanzó en lugar de re-descargar siempre la misma página.
+      expect(
+        cliente.descargasPedidas.where((d) => d.startsWith('producto')),
+        hasLength(3),
+      );
+    });
+
+    test(
+        'C2: el pull de un EAN semilla converge al id del servidor sin violar el UNIQUE, guarda el cursor y conserva precios y valoraciones',
+        () async {
+      // Semilla local (importar_semilla usa id sem-<ean>) con precio y
+      // valoración apuntados; el servidor tiene el mismo EAN bajo uuid5.
+      await insertarProducto('sem-7791234567890',
+          codigoBarras: '7791234567890', nombre: 'Semilla', actualizadoEn: t1);
+      await insertarPrecio('pr1',
+          productoId: 'sem-7791234567890', valor: 1500, cargadoEn: t1);
+      await db.into(db.valoraciones).insert(
+            ValoracionesCompanion.insert(
+              id: 'v1',
+              usuarioId: usuarioId,
+              productoId: 'sem-7791234567890',
+              gusto: const Value('si'),
+              creadoEn: t1,
+              actualizadoEn: t1,
+            ),
+          );
+      cliente.sembrar('producto', [
+        {
+          'id': 'p-servidor-uuid5',
+          'codigo_barras': '7791234567890',
+          'articulo_id': null,
+          'nombre': 'Del servidor',
+          'marca': 'Marca S',
+          'categoria': null,
+          'unidad': 'g',
+          'contenido_neto': 500,
+          'notas': null,
+          'creado_por': 'u2',
+          'creado_en': t1,
+          'actualizado_en': t2,
+          'borrado_en': null,
+        },
+      ]);
+
+      // Hoy esto crashea con la violación de UNIQUE antes de guardarCursor:
+      // el teléfono del dueño sube pero nunca baja.
+      await sincronizarAhora(db, cliente);
+
+      // Converge: la identidad local pasa a ser la del servidor.
+      expect(await leerFilaProductoLocal(db, 'sem-7791234567890'), isNull);
+      final convergida = await leerFilaProductoLocal(db, 'p-servidor-uuid5');
+      expect(convergida, isNotNull);
+      expect(convergida!.codigoBarras, '7791234567890');
+      expect(convergida.nombre, 'Del servidor'); // el servidor es más nuevo
+      expect(convergida.actualizadoEn, t2);
+      // Precios y valoraciones siguen vinculados e intactos.
+      final precio =
+          await (db.select(db.precios)..where((p) => p.id.equals('pr1'))).getSingle();
+      expect(precio.productoId, 'p-servidor-uuid5');
+      expect(precio.precio, 1500);
+      final valoracion = await (db.select(db.valoraciones)
+            ..where((v) => v.id.equals('v1')))
+          .getSingle();
+      expect(valoracion.productoId, 'p-servidor-uuid5');
+      // El pull terminó: cursor guardado y sync marcada exitosa (R15).
+      expect(await leerCursor(db, 'producto'), t2);
+      expect(await ultimoSyncExitoso(db), isNotNull);
+    });
+
+    test(
+        'C2: si la semilla local es más nueva, su contenido gana bajo el id del servidor y vuelve a subir',
+        () async {
+      await insertarProducto('sem-7791234567890',
+          codigoBarras: '7791234567890', nombre: 'Edité yo', actualizadoEn: t5);
+      cliente.sembrar('producto', [
+        {
+          'id': 'p-servidor-uuid5',
+          'codigo_barras': '7791234567890',
+          'articulo_id': null,
+          'nombre': 'Versión vieja del servidor',
+          'marca': null,
+          'categoria': null,
+          'unidad': 'g',
+          'contenido_neto': null,
+          'notas': null,
+          'creado_por': 'u2',
+          'creado_en': t1,
+          'actualizado_en': t2,
+          'borrado_en': null,
+        },
+      ]);
+
+      await sincronizarAhora(db, cliente);
+
+      expect(await leerFilaProductoLocal(db, 'sem-7791234567890'), isNull);
+      final convergida = await leerFilaProductoLocal(db, 'p-servidor-uuid5');
+      expect(convergida!.nombre, 'Edité yo');
+      expect(convergida.codigoBarras, '7791234567890');
+      // El contenido local ganó: queda encolado bajo el id canónico para
+      // que el servidor también converja (regla 4).
+      final entradas = await (db.select(db.outbox)
+            ..where((e) => e.tabla.equals('producto')))
+          .get();
+      expect(entradas.map((e) => e.filaId), ['p-servidor-uuid5']);
+      expect(await leerCursor(db, 'producto'), t2);
+    });
+  });
+
   group('dedup por EAN — re-apunte local de precios (regla de sync 6)', () {
     test(
         'el push de un duplicado re-apunta precios y valoraciones al id canónico',

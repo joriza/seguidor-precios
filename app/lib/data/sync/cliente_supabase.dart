@@ -95,13 +95,23 @@ class ClienteSupabase implements ClienteRemoto {
     required String tabla,
     required String columnaCursor,
     required String desde,
+    String? desdeId,
     required int limite,
   }) async {
-    final filas = await _cliente
-        .from(tabla)
-        .select()
-        .gte(columnaCursor, desde)
+    var consulta = _cliente.from(tabla).select().gte(columnaCursor, desde);
+    if (desdeId != null) {
+      // Keyset (C1 del juicio fase-2): con ≥100 filas de igual
+      // `actualizado_en`, el gte solo re-descargaría la misma página; la
+      // ventana avanza por (cursor, id): filas con cursor mayor, o igual
+      // con id mayor.
+      consulta = consulta.or(
+        '$columnaCursor.gt.$desde,'
+        'and($columnaCursor.eq.$desde,id.gt.$desdeId)',
+      );
+    }
+    final filas = await consulta
         .order(columnaCursor)
+        .order('id') // desempate estable para paginar por (cursor, id)
         .limit(limite);
     return filas.cast<Map<String, dynamic>>().toList();
   }

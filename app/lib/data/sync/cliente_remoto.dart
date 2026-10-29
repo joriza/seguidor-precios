@@ -44,13 +44,21 @@ abstract class ClienteRemoto {
   /// producto y comercio son lógicas y viajan como upsert con `borrado_en`.
   Future<void> borrarFila({required String tabla, required String id});
 
-  /// Descarga filas con `columnaCursor >= desde`, ordenadas por el cursor,
-  /// hasta [limite]. `actualizado_en` para todas las tablas salvo precio
-  /// (append-only: su cursor es `cargado_en`, regla de sync 3).
+  /// Descarga filas con `columnaCursor >= desde`, ordenadas por
+  /// (columnaCursor, id), hasta [limite]. `actualizado_en` para todas las
+  /// tablas salvo precio (append-only: su cursor es `cargado_en`, regla de
+  /// sync 3).
+  ///
+  /// Con [desdeId] la ventana avanza más allá de (desde, desdeId) — keyset
+  /// (C1 del juicio fase-2): devuelve solo filas con cursor mayor, o igual
+  /// con id mayor, siempre en ese orden. Un lote lleno de timestamps
+  /// idénticos (el `now()` común de un cargador masivo) así no repite la
+  /// misma página para nunca.
   Future<List<Map<String, dynamic>>> descargarCambios({
     required String tabla,
     required String columnaCursor,
     required String desde,
+    String? desdeId,
     required int limite,
   });
 }

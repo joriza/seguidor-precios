@@ -115,20 +115,36 @@ class ClienteRemotoFalso implements ClienteRemoto {
     required String tabla,
     required String columnaCursor,
     required String desde,
+    String? desdeId,
     required int limite,
   }) async {
     if (errorAlDescargar == tabla) {
       throw Exception('servidor caído al descargar $tabla');
     }
-    descargasPedidas.add('$tabla:$columnaCursor:$desde');
+    descargasPedidas.add(desdeId == null
+        ? '$tabla:$columnaCursor:$desde'
+        : '$tabla:$columnaCursor:$desde:$desdeId');
+    // Mismo contrato que el adapter real (PostgREST): orden por
+    // (columnaCursor asc, id asc) y, con keyset, la ventana avanza más
+    // allá de (desde, desdeId): solo filas con cursor mayor, o igual con
+    // id mayor. Así un bloque de timestamps iguales no repite la página.
     final filas = [...(remoto[tabla] ?? const <Map<String, dynamic>>[])]..sort(
-        (a, b) => (a[columnaCursor] as String).compareTo(b[columnaCursor] as String),
+        (a, b) {
+          final porCursor =
+              (a[columnaCursor] as String).compareTo(b[columnaCursor] as String);
+          if (porCursor != 0) return porCursor;
+          return (a['id'] as String).compareTo(b['id'] as String);
+        },
       );
-    return filas
-        .where((f) => _masNueva(f[columnaCursor] as String, desde) ||
-            f[columnaCursor] == desde)
-        .take(limite)
-        .toList();
+    bool dentroDeLaVentana(Map<String, dynamic> f) {
+      final ts = f[columnaCursor] as String;
+      if (!_masNueva(ts, desde) && ts != desde) return false;
+      if (desdeId == null) return true;
+      if (_masNueva(ts, desde)) return true;
+      return (f['id'] as String).compareTo(desdeId) > 0;
+    }
+
+    return filas.where(dentroDeLaVentana).take(limite).toList();
   }
 
   void _guardarFila(String tabla, Map<String, dynamic> fila) {

@@ -250,13 +250,14 @@ Future<int> _pullTodo(
   for (final tabla in tablasEnOrden) {
     final columna = _columnaCursor(tabla);
     var cursor = await leerCursor(db, tabla) ?? cursorInicial;
+    String? ultimoId;
 
     while (true) {
-      final cursorAntes = cursor;
       final lote = await cliente.descargarCambios(
         tabla: tabla,
         columnaCursor: columna,
         desde: cursor,
+        desdeId: ultimoId,
         limite: tamanoLote,
       );
       if (lote.isEmpty) break;
@@ -266,12 +267,17 @@ Future<int> _pullTodo(
         descargadas++;
         final ts = fila[columna] as String?;
         if (ts != null && momentoMasReciente(ts, cursor)) cursor = ts;
+        ultimoId = fila['id'] as String?;
       }
+      // El cursor queda en el último dato efectivamente guardado; guardar
+      // por lote permite retomar desde ahí si la sesión se corta (R15).
       await guardarCursor(db, tabla, cursor);
 
-      // `>= cursor` re-descarga empates de una sola vez; si el cursor no
-      // avanzó con un lote lleno, seguiría repitiendo: se corta.
-      if (lote.length < tamanoLote || cursor == cursorAntes) break;
+      // Keyset (C1 del juicio fase-2): la ventana (cursor, id) avanza
+      // aunque todo el lote comparta el mismo `actualizado_en`, así que un
+      // lote lleno ya no repite la misma página: solo un lote corto
+      // (última página) termina la tabla.
+      if (lote.length < tamanoLote) break;
     }
   }
 
@@ -319,7 +325,16 @@ Future<void> _aplicarFilaRemota(
     case 'producto':
       final local = await (db.select(db.productos)..where((t) => t.id.equals(id))).getSingleOrNull();
       if (local == null) {
-        await db.into(db.productos).insert(_companionProductoDesdeRemota(fila));
+        // C2 del juicio fase-2: el servidor puede traer un EAN que ya vive
+        // local bajo otro id (semilla sem-<ean> vs uuid5). Insertar directo
+        // violaría el UNIQUE de codigo_barras: primero converge a la
+        // identidad del servidor.
+        final colision = await _colisionEanLocal(db, fila);
+        if (colision != null) {
+          await _convergerProductoPorEan(db, colision, fila);
+        } else {
+          await db.into(db.productos).insert(_companionProductoDesdeRemota(fila));
+        }
       } else if (_servidorGana(fila, local.actualizadoEn)) {
         await (db.update(db.productos)..where((t) => t.id.equals(id)))
             .write(_companionProductoParaActualizar(fila));
@@ -364,6 +379,82 @@ bool _servidorGana(Map<String, dynamic> fila, String localTs) {
 
 bool _localGana(String? remota, String localTs) =>
     remota == null || momentoMasReciente(localTs, remota);
+
+/// Fila local que ya ocupa el EAN de la fila remota bajo OTRO id (semilla
+/// `sem-<ean>` vs uuid5 del servidor, C2 del juicio fase-2), o null.
+Future<Producto?> _colisionEanLocal(
+  BaseDeDatos db,
+  Map<String, dynamic> filaRemota,
+) async {
+  final ean = filaRemota['codigo_barras'] as String?;
+  if (ean == null || ean.isEmpty) return null;
+  return (db.select(db.productos)
+        ..where((t) =>
+            t.codigoBarras.equals(ean) &
+            t.id.equals(filaRemota['id'] as String).not()))
+      .getSingleOrNull();
+}
+
+/// Convergencia de un EAN semilla con el servidor (C2, regla de sync 6 y
+/// 4): la identidad pasa a ser la del servidor —nunca inserta el EAN
+/// mientras el duplicado lo ocupa—, el contenido gana por LWW, los precios
+/// y valoraciones se re-apuntan al id canónico (solo el puntero) y el
+/// duplicado desaparece con su entrada de outbox. Todo en una transacción:
+/// si algo falla, no queda ni a medio converger ni se guarda el cursor.
+///
+/// A diferencia de [_reApuntarProducto] (push), acá sí aplica el merge LWW
+/// completo: si la edición local es más nueva, se conserva bajo el id del
+/// servidor y vuelve a subir para que el servidor también converja.
+Future<void> _convergerProductoPorEan(
+  BaseDeDatos db,
+  Producto colision,
+  Map<String, dynamic> filaRemota,
+) {
+  final canonicoId = filaRemota['id'] as String;
+  return db.transaction(() async {
+    final contenidoLocal = _localGana(
+            filaRemota['actualizado_en'] as String?, colision.actualizadoEn)
+        ? await _leerFilaLocal(db, 'producto', colision.id)
+        : null;
+
+    // El duplicado libera su EAN primero: el UNIQUE es sobre codigo_barras
+    // y el canónico llega con el mismo código.
+    await (db.update(db.productos)..where((t) => t.id.equals(colision.id)))
+        .write(const ProductosCompanion(codigoBarras: Value(null)));
+
+    final existente = await (db.select(db.productos)
+          ..where((t) => t.id.equals(canonicoId)))
+        .getSingleOrNull();
+    if (existente == null) {
+      await db.into(db.productos).insert(_companionProductoDesdeRemota(
+          contenidoLocal != null
+              ? {...contenidoLocal, 'id': canonicoId}
+              : filaRemota));
+    } else if (contenidoLocal != null) {
+      await (db.update(db.productos)..where((t) => t.id.equals(canonicoId)))
+          .write(_companionProductoParaActualizar(contenidoLocal));
+    } else if (_servidorGana(filaRemota, existente.actualizadoEn)) {
+      await (db.update(db.productos)..where((t) => t.id.equals(canonicoId)))
+          .write(_companionProductoParaActualizar(filaRemota));
+    }
+
+    // Precios y valoraciones siguen a la identidad del servidor; el dato
+    // del precio no cambia (inmutabilidad, regla de integridad 1).
+    await (db.update(db.precios)
+          ..where((t) => t.productoId.equals(colision.id)))
+        .write(PreciosCompanion(productoId: Value(canonicoId)));
+    await (db.update(db.valoraciones)
+          ..where((t) => t.productoId.equals(colision.id)))
+        .write(ValoracionesCompanion(productoId: Value(canonicoId)));
+
+    await _descartarEntrada(db, 'producto', colision.id);
+    await (db.delete(db.productos)..where((t) => t.id.equals(colision.id)))
+        .go();
+    if (contenidoLocal != null) {
+      await encolarUpsert(db, 'producto', canonicoId);
+    }
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Mapeo local → remoto (snake_case, docs/modelo-de-datos.md). El campo
