@@ -6,8 +6,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/backup.dart';
+import '../../data/cuenta.dart';
 import '../../data/identidad.dart';
 import '../../data/local/base_de_datos.dart';
+import '../../data/sync/config_backend.dart';
+import '../cuenta/dialogo_cuenta.dart';
 import '../sync/gestor_sync.dart';
 import '../sync/refresco.dart';
 
@@ -30,9 +33,19 @@ class _InicioScreenState extends State<InicioScreen> {
   int? _productosSemilla;
   String? _version;
 
+  /// S3 (R17/AD-003): cuenta opcional por email. Sin nube configurada la
+  /// entrada no se ofrece (isEnabled false) y la pantalla queda igual.
+  late final AccountService _cuenta;
+  String? _emailCuenta;
+
   @override
   void initState() {
     super.initState();
+    _cuenta = AccountService(
+      baseDeDatos: widget.baseDeDatos,
+      cliente: widget.gestorSync?.cliente,
+      config: widget.gestorSync?.config ?? configBackend,
+    );
     _cargarUsuario();
     _cargarCatalogoYVersion();
   }
@@ -60,8 +73,33 @@ class _InicioScreenState extends State<InicioScreen> {
   Future<void> _cargarUsuario() async {
     // Solo lectura: la creación del usuario es del primer inicio (shell).
     final Usuario? u = await leerUsuario(widget.baseDeDatos);
+    final String? email = await _cuenta.linkedEmail();
     if (!mounted) return;
-    setState(() => _usuario = u);
+    setState(() {
+      _usuario = u;
+      _emailCuenta = email;
+    });
+  }
+
+  /// S3 (R17/AD-003): entrada opcional a la cuenta por email. Al cerrar el
+  /// diálogo con vinculación confirmada, recarga el estado y avisa; si se
+  /// cancela, nada cambió.
+  Future<void> _abrirCuenta() async {
+    final String? email = await showDialog<String>(
+      context: context,
+      builder: (_) => AccountDialog(service: _cuenta),
+    );
+    if (email == null || !mounted) return;
+    await _cargarUsuario();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Cuenta vinculada a $email. Tu identidad se actualiza en la '
+          'próxima sincronización.',
+        ),
+      ),
+    );
   }
 
   /// T4: pull-to-refresh — sync (si hay backend) y recarga local.
@@ -127,6 +165,39 @@ class _InicioScreenState extends State<InicioScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
+        // S3 (R17/AD-003): cuenta opcional por email. Sin nube configurada
+        // la entrada no aparece y la pantalla funciona igual: la cuenta
+        // nunca bloquea el uso de la app (R3).
+        if (_cuenta.isEnabled)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text('Cuenta (opcional)',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const Text(
+                    'Vinculá tu email con un enlace mágico para llevar tus '
+                    'datos a otro dispositivo. No cambia nada de lo que ya '
+                    'cargaste.',
+                  ),
+                  const SizedBox(height: 12),
+                  ListTile(
+                    key: const ValueKey('btn-cuenta'),
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.mark_email_unread_outlined),
+                    title: const Text('Cuenta por email'),
+                    subtitle: Text(_emailCuenta == null
+                        ? 'Sin cuenta: la app funciona igual sin ella'
+                        : 'Vinculada a $_emailCuenta'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: _abrirCuenta,
+                  ),
+                ],
+              ),
+            ),
+          ),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),

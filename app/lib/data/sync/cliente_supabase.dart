@@ -52,6 +52,35 @@ class ClienteSupabase implements ClienteRemoto {
   }
 
   @override
+  Future<void> requestMagicLink(String email) async {
+    // shouldCreateUser por defecto (true): el email nuevo crea la cuenta
+    // y uno existente entra a la suya — en ambos casos el enlace mágico
+    // convierte al anónimo en cuenta real (AD-003).
+    await _cliente.auth.signInWithOtp(email: email, shouldCreateUser: true);
+  }
+
+  @override
+  Future<String> completeMagicLink({
+    required String email,
+    required String code,
+  }) async {
+    final respuesta = await _cliente.auth.verifyOTP(
+      email: email,
+      token: code,
+      type: OtpType.email,
+    );
+    final sesion = respuesta.session ?? _cliente.auth.currentSession;
+    if (sesion == null) {
+      throw StateError('Supabase no devolvió sesión al verificar el código');
+    }
+    await _guardarSesion(sesion);
+    return sesion.user.id;
+  }
+
+  @override
+  Future<String?> accountEmail() async => _cliente.auth.currentUser?.email;
+
+  @override
   Future<void> ping() async {
     await _cliente.rpc('ping');
   }

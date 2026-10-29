@@ -100,6 +100,17 @@ Future<void> _guardarAuthUid(
   await encolarUpsert(db, 'usuario', usuarioId);
 }
 
+/// S3 (R17/AD-003): vincula la identidad local a la cuenta real con la
+/// que se entró por enlace mágico: `auth_uid` del usuario local pasa al
+/// uid de la cuenta — MISMA fila, sin duplicar identidad — y el cambio
+/// viaja en la próxima sync (regla de sync 9). Idempotente: si ya está
+/// vinculado a esa cuenta no reescribe ni re-encola nada.
+Future<void> linkLocalIdentity(BaseDeDatos db, String uidCuenta) async {
+  final usuario = await usuarioActual(db);
+  if (usuario.authUid == uidCuenta) return;
+  await _guardarAuthUid(db, usuario.id, uidCuenta);
+}
+
 // ---------------------------------------------------------------------------
 // Push: outbox → lotes en orden de dependencias (reglas de sync 1, 2 y 6).
 // ---------------------------------------------------------------------------

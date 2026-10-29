@@ -23,6 +23,23 @@ class ClienteRemotoFalso implements ClienteRemoto {
   /// Sesión anónima simulada (null = sin sesión).
   String? uidSesion;
 
+  /// S3 (R17/AD-003): email de la cuenta de la sesión actual (null si la
+  /// sesión es anónima o no hay sesión).
+  String? emailSesion;
+
+  /// S3: uid que devuelve [completeMagicLink] (cuenta real simulada).
+  String uidCuentaEmail = 'uid-email-1';
+
+  /// S3: enlaces mágicos pedidos (emails ya normalizados), en orden.
+  final List<String> enlacesPedidos = [];
+
+  /// S3: verificaciones OTP (email, código), en orden.
+  final List<(String, String)> codigosVerificados = [];
+
+  /// S3: error a lanzar en [requestMagicLink] / [completeMagicLink].
+  Object? errorAlPedirEnlace;
+  Object? errorAlCompletarEnlace;
+
   int iniciosSesionAnonimos = 0;
   int pings = 0;
 
@@ -48,6 +65,27 @@ class ClienteRemotoFalso implements ClienteRemoto {
 
   @override
   Future<String?> uidSesionActual() async => uidSesion;
+
+  @override
+  Future<void> requestMagicLink(String email) async {
+    final error = errorAlPedirEnlace;
+    if (error != null) throw error;
+    enlacesPedidos.add(email);
+  }
+
+  @override
+  Future<String> completeMagicLink(
+      {required String email, required String code}) async {
+    final error = errorAlCompletarEnlace;
+    if (error != null) throw error;
+    codigosVerificados.add((email, code));
+    uidSesion = uidCuentaEmail;
+    emailSesion = email;
+    return uidCuentaEmail;
+  }
+
+  @override
+  Future<String?> accountEmail() async => emailSesion;
 
   @override
   Future<void> ping() async => pings++;

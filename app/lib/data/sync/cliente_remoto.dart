@@ -13,6 +13,23 @@ abstract class ClienteRemoto {
   /// Inicia sesión anónima (AD-003) y devuelve el uid nuevo.
   Future<String> iniciarSesionAnonima();
 
+  /// Pide el enlace mágico (S3, R17/AD-003): Supabase envía al email el
+  /// enlace y el código de 6 dígitos. No abre sesión todavía; la sesión
+  /// llega con [completeMagicLink].
+  Future<void> requestMagicLink(String email);
+
+  /// Completa el login con el código del email (OTP de email) y devuelve
+  /// el uid de la cuenta (nueva o existente). Deja la sesión guardada para
+  /// que sobreviva al cierre de la app, igual que la anónima.
+  Future<String> completeMagicLink({
+    required String email,
+    required String code,
+  });
+
+  /// Email de la cuenta de la sesión activa, o null si la sesión es
+  /// anónima o no hay sesión. Alimenta el estado visible en la UI.
+  Future<String?> accountEmail();
+
   /// Ping mínimo anti-pausa (R14): RPC `ping`, no sincroniza datos.
   Future<void> ping();
 
