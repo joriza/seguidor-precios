@@ -229,3 +229,9 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   Link con {{ .Token }} en Supabase Studio (pasos HTML dados al dueño) + instalar v0.3.4 en su
   teléfono y reintentar la vinculación de email; resto: auth_uid en tabla, sync post-vínculo, C1
   completo (~428), T4, admin.
+- L17 — VALIDACIÓN DE CAMPO v0.3.4 (equipo nuevo, usuario Noe): la sincronización funcionó
+  correctamente — el fix de auto-reparación de padres queda validado en campo y C1 (catálogo
+  completo en primera sync de instalación nueva) queda VALIDADO. Restan del checklist: template
+  Magic Link con {{ .Token }} (el dueño aún no lo pegó), vinculación de email en el teléfono del
+  dueño, auth_uid en tabla, sync post-vínculo, T4 (segunda instalación CON la misma cuenta — Noe
+  era identidad anónima propia, no restaura), prueba admin.
