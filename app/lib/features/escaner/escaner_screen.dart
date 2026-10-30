@@ -41,6 +41,10 @@ class EscanerScreen extends StatefulWidget {
 class _EscanerScreenState extends State<EscanerScreen> {
   final TextEditingController _controladorCodigo = TextEditingController();
   bool _buscando = false;
+
+  /// Propuesta del dueño (v0.3.6): teclado numérico por defecto,
+  /// alternable a alfabético desde el propio campo.
+  bool _tecladoNumerico = true;
   String? _mensaje;
   Producto? _productoEncontrado;
 
@@ -311,11 +315,25 @@ class _EscanerScreenState extends State<EscanerScreen> {
         if (widget.mostrarCamara) const SizedBox(height: 16),
         TextField(
           controller: _controladorCodigo,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
+          // Propuesta del dueño (v0.3.6): el teclado por defecto es
+          // numérico (es un código de barras), pero se puede alternar a
+          // alfabético desde el propio campo.
+          keyboardType:
+              _tecladoNumerico ? TextInputType.number : TextInputType.text,
+          decoration: InputDecoration(
             labelText: 'Código de barras (ingreso manual)',
             hintText: 'Ej.: 7790001001001',
-            border: OutlineInputBorder(),
+            helperText: 'Para buscar por nombre, usá la pestaña Buscar',
+            border: const OutlineInputBorder(),
+            suffixIcon: IconButton(
+              key: const ValueKey('btn-teclado'),
+              tooltip: _tecladoNumerico
+                  ? 'Cambiar a teclado alfabético'
+                  : 'Cambiar a teclado numérico',
+              icon: Icon(_tecladoNumerico ? Icons.numbers : Icons.abc),
+              onPressed: () =>
+                  setState(() => _tecladoNumerico = !_tecladoNumerico),
+            ),
           ),
           onSubmitted: (_) => _buscar(),
         ),

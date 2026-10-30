@@ -286,4 +286,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Guardar cambios'), findsOneWidget);
   });
+
+  testWidgets(
+      'el ingreso manual alterna el teclado entre numérico y alfabético '
+      '(propuesta del dueño, v0.3.6)', (tester) async {
+    await tester.pumpWidget(envolver(
+      EscanerScreen(baseDeDatos: db, mostrarCamara: false),
+    ));
+
+    // Por defecto es numérico: es un campo de código de barras.
+    TextField campo = tester.widget<TextField>(find.byType(TextField));
+    expect(campo.keyboardType, TextInputType.number);
+
+    // El dueño puede pasarlo a alfabético para otra búsqueda.
+    await tester.tap(find.byKey(const ValueKey('btn-teclado')));
+    await tester.pump();
+    campo = tester.widget<TextField>(find.byType(TextField));
+    expect(campo.keyboardType, TextInputType.text);
+
+    // Y volver a numérico.
+    await tester.tap(find.byKey(const ValueKey('btn-teclado')));
+    await tester.pump();
+    campo = tester.widget<TextField>(find.byType(TextField));
+    expect(campo.keyboardType, TextInputType.number);
+  });
 }
