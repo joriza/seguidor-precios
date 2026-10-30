@@ -63,7 +63,9 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  int _index = 0;
+  // S5 (v0.3.5): el uso principal es escanear para consultar/agregar — la
+  // app abre en el escáner; Inicio queda a un toque en la barra.
+  int _index = 1;
 
   /// S1 (v0.1.2): contador de visitas a pestañas. Las pantallas de datos se
   /// recrean al volver a su pestaña (key cambia → initState recarga la base):

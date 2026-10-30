@@ -107,6 +107,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
   /// Nunca lanza y nunca escribe: el resultado solo se muestra como
   /// precarga; el usuario confirma creando el producto.
   Future<void> _enriquecer(String ean) async {
+    // S3 (v0.3.5): los códigos internos S-* nunca consultan OFF; solo
+    // EANs reales se enriquecen.
+    if (ean.startsWith('S-')) return;
     final DatosEnriquecidos? datos;
     try {
       datos = await _enriquecimiento.consultar(ean);
@@ -149,7 +152,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
       _valoracion = valoracion;
       _datosEnriquecidos = null; // cada búsqueda parte de cero
       _mensaje = producto == null
-          ? 'No existe un producto con ese código — crealo desde la sección Artículos (Fase 1.5).'
+          ? 'No existe un producto con ese código — crealo con el botón de abajo.'
           : 'Producto encontrado: ${producto.nombre}';
     });
     // T5 (S3): con el producto inexistente, consulta OFF en segundo plano

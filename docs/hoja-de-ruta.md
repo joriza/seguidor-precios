@@ -113,10 +113,21 @@ migrados; backups y monitoreo activos.
 
 ## Backlog de mejoras de producto (propuestas, pendientes de priorizar)
 
-*Propuestas del 2026-10-28 a partir de la revisión del recorrido de productos (semilla / manual /
-Open Food Facts), ordenadas por impacto. Candidatas a Fase 3 o ajustes intermedios según el uso
-real. Fuera de este backlog quedan los 2 críticos del pull confirmados por el juicio (C1/C2, Log
-L20 del ODD), que tienen prioridad máxima sobre todo lo de acá.*
+*Propuestas del 2026-10-28 (más #9 del 2026-10-30), pendientes de priorizar. Fuera de este
+backlog quedan los 2 críticos del pull confirmados por el juicio (C1/C2, Log L20 del ODD), ya
+corregidos y validados en campo (v0.3.4, L17 fase-3).*
+
+***Orden acordado (2026-10-30, el dueño delega la priorización):**
+1. #8 búsqueda ≥3 caracteres — **HECHA (v0.3.5)**;
+2. #9 escáner como pantalla por defecto + #4 texto del escáner — **en curso (v0.3.5)**;
+3. #7 producto sin EAN con código interno `S-<TOK>-<NNNN>` — **en curso (v0.3.5)**;
+4. #1 clasificación en lote + sugerencia de artículo desde OFF;
+5. #5 verificar EAN al abrir el formulario;
+6. #3 «Completar desde OFF»;
+7. #2 catálogo vivo (gran parte ya cubierta por el fix C1: la instalación nueva baja el
+catálogo completo; resta achicar la semilla offline);
+8. #6 foto del producto.
+Después: tareas Fase 3 (3.1-3.6, 3.8).*
 
 | # | Fricción | Mejora propuesta |
 | --- | --- | --- |
@@ -127,7 +138,8 @@ L20 del ODD), que tienen prioridad máxima sobre todo lo de acá.*
 | 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” |
 | 6 | OFF trae más datos útiles que se descartan (imagen del producto, nutrición) | Fase 3+: foto del producto en la ficha |
 | 7 | Artículos sin código de barras (verdulería de barrio): hoy no entran al sistema los productos a granel | Alta de producto sin EAN con código interno secuencial asignado por la app; buscable por ese código o descripción (propuesta del dueño, 2026-10-30) |
-| 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) |
+| 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
+| 9 | El uso principal es escanear para consultar/agregar, pero la app abre en Inicio | Que el escáner sea la pantalla por defecto al abrir la app (propuesta del dueño, 2026-10-30) — **en curso v0.3.5** |
 
 ## Riesgos
 

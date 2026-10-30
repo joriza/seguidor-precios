@@ -20,13 +20,7 @@ void main() {
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationDestination), findsNWidgets(6));
-    expect(
-      find.descendant(of: find.byType(AppBar), matching: find.text('Inicio')),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.text('Escanear'));
-    await tester.pumpAndSettle();
+    // S5 (v0.3.5): el uso principal es escanear — la app abre en Escanear.
     expect(
       find.descendant(of: find.byType(AppBar), matching: find.text('Escanear')),
       findsOneWidget,
