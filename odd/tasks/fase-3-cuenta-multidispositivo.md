@@ -222,3 +222,10 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   durable es sync_autoreparacion_padres_test.dart). Hallazgo forense: el push sube lotes reducidos
   cuando el dedup descarta intercalado — el sello único de 96 filas implica outbox de exactamente
   96 canónicos limpios = re-encolados de la convergencia del pull. tag v0.3.4 (v0.3.4+13).
+- L16 — RELEASE v0.3.4 PUBLICADA (run de release 41126402199 verde, 5m56s, asset
+  `seguidor-precios-v0.3.4-debug.apk` en releases/tag/v0.3.4; QR apk-debug/qr-instalar-v0.3.4.png).
+  Checklist del dueño: (1) EN EL EQUIPO NUEVO: instalar v0.3.4 y sincronizar — la primera sync
+  ahora auto-repara y baja el catálogo completo (~428 productos + precios); (2) template Magic
+  Link con {{ .Token }} en Supabase Studio (pasos HTML dados al dueño) + instalar v0.3.4 en su
+  teléfono y reintentar la vinculación de email; resto: auth_uid en tabla, sync post-vínculo, C1
+  completo (~428), T4, admin.
