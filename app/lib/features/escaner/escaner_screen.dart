@@ -40,6 +40,7 @@ class EscanerScreen extends StatefulWidget {
 
 class _EscanerScreenState extends State<EscanerScreen> {
   final TextEditingController _controladorCodigo = TextEditingController();
+  final FocusNode _focusCodigo = FocusNode();
   bool _buscando = false;
 
   /// Propuesta del dueño (v0.3.6): teclado numérico por defecto,
@@ -47,6 +48,19 @@ class _EscanerScreenState extends State<EscanerScreen> {
   bool _tecladoNumerico = true;
   String? _mensaje;
   Producto? _productoEncontrado;
+
+  /// Cambia el tipo de teclado del ingreso manual. Android NO reconstruye
+  /// el IME si el campo ya está enfocado y solo cambia `keyboardType`
+  /// (flutter/flutter#62856): se cicla el foco — unfocus + refocus en el
+  /// siguiente frame — para forzar el teclado nuevo sin que el usuario
+  /// toque el campo de nuevo.
+  void _alternarTeclado() {
+    setState(() => _tecladoNumerico = !_tecladoNumerico);
+    _focusCodigo.unfocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) FocusScope.of(context).requestFocus(_focusCodigo);
+    });
+  }
 
   /// T5 (S3): datos precargados de Open Food Facts para el EAN sin
   /// resultado local. Solo se pasan al formulario: el usuario SIEMPRE
@@ -85,6 +99,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
   @override
   void dispose() {
     _controladorCodigo.dispose();
+    _focusCodigo.dispose();
     _controladorCamara?.dispose();
     super.dispose();
   }
@@ -315,6 +330,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
         if (widget.mostrarCamara) const SizedBox(height: 16),
         TextField(
           controller: _controladorCodigo,
+          focusNode: _focusCodigo,
           // Propuesta del dueño (v0.3.6): el teclado por defecto es
           // numérico (es un código de barras), pero se puede alternar a
           // alfabético desde el propio campo.
@@ -331,8 +347,7 @@ class _EscanerScreenState extends State<EscanerScreen> {
                   ? 'Cambiar a teclado alfabético'
                   : 'Cambiar a teclado numérico',
               icon: Icon(_tecladoNumerico ? Icons.numbers : Icons.abc),
-              onPressed: () =>
-                  setState(() => _tecladoNumerico = !_tecladoNumerico),
+              onPressed: _alternarTeclado,
             ),
           ),
           onSubmitted: (_) => _buscar(),

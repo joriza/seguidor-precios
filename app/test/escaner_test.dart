@@ -300,9 +300,13 @@ void main() {
 
     // El dueño puede pasarlo a alfabético para otra búsqueda.
     await tester.tap(find.byKey(const ValueKey('btn-teclado')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     campo = tester.widget<TextField>(find.byType(TextField));
     expect(campo.keyboardType, TextInputType.text);
+    // El ciclo de foco re-enfoca el campo: el usuario sigue escribiendo
+    // sin retocar (y el IME se reconstruye con el teclado nuevo).
+    final editable = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editable.focusNode.hasFocus, isTrue);
 
     // Y volver a numérico.
     await tester.tap(find.byKey(const ValueKey('btn-teclado')));
