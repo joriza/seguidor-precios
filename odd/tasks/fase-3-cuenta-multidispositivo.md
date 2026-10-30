@@ -199,3 +199,26 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   re-touch de actualizado_en por la trigger del servidor al re-subirlos — verificar ninguna
   combinación deja un canónico ausente con el cursor del precio avanzado. Diagnóstico delegado a
   worker con estas premisas; fix y release v0.3.4 en el mismo alcance.
+- L15 — CAUSA RAÍZ + FIX v0.3.4 (worker mvvdtuhi-1-i1ef, verificado por el padre): la FK 787 de
+  campo estaba en el pull de precio insertando con padres ausentes localmente — su única garantía
+  era el orden producto→comercio→precio DENTRO de una sesión, y se rompe cuando el padre aterriza
+  o es re-apuntado en el servidor ENTRE el pull de producto y el de precio (el dueño corría el
+  cargador tools/cargar_semilla_supabase.py por tandas esa noche; 96 productos escritos por el
+  teléfono en UN statement a las 19:12:48.957816). Peor: con el cursor de producto por encima del
+  sello del padre, los reintentos con gte(cursor) lo saltean para siempre. CORRECCIÓN a la
+  deducción de L14: el estado "cursor entre gemelas + padre ausente" es inconstruible en SQLite
+  (la gemela local retiene al padre por FK, probado en la matriz N5); el fallo real fue la PRIMERA
+  fila de precio cuyo padre faltaba (SQLite no nombra filas: el error de campo no identifica a
+  dc13c0e0), y el +1 de descargas es el eco propio del usuario del dispositivo (expectativa 439→440
+  corregida en sync_primera_instalacion_test.dart, pre-existente en HEAD probado por diferencial).
+  FIX mínimo (regla de sync 1: el id es la identidad): _asegurarPadreRemoto trae el padre ausente
+  por id (traerFila) y lo aplica por la MISMA ruta del pull (merge LWW + convergencia por
+  EAN/auth_uid incluidos) antes de insertar precio/valoración; el pull de producto también repara
+  articulo_id. Si el padre tampoco existe server-side, la sesión aborta sin guardar el cursor
+  (contrato R15 fijado por test) y el reintento lo re-busca. Robusto a todos los entrelazados
+  porque ignora cursores. TDD: RED 4 fallos FK + matriz multi-intento N1-N7 (ServidorFiel con
+  triggers por statement y ventana del cargador concurrente) → GREEN; suite commiteada 234/234 y
+  analyze limpios (verificados por el padre; los tests temporales tmp_* se descartaron, el pin
+  durable es sync_autoreparacion_padres_test.dart). Hallazgo forense: el push sube lotes reducidos
+  cuando el dedup descarta intercalado — el sello único de 96 filas implica outbox de exactamente
+  96 canónicos limpios = re-encolados de la convergencia del pull. tag v0.3.4 (v0.3.4+13).

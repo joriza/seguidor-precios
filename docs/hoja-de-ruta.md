@@ -74,8 +74,10 @@ multi-dispositivo 3.7 (magic link por email + convergencia de identidad, impleme
 con migración 0005). La validación de campo corrigió la vinculación de cuenta en v0.3.3: el flujo
 PKCE por defecto de supabase-dart exige un storage que la app no provee y `signInWithOtp` rompía
 con AssertionError antes de tocar la red; ahora usa flujo implícito (código de 6 dígitos in-app,
-sin deep links). El resto de las tareas (3.1-3.6, 3.8 y el backlog de mejoras #1-#8) se prioriza
-con datos de uso reales.*
+sin deep links). En v0.3.4 el pull se vuelve auto-reparante: los padres ausentes de un precio o
+valoración (y el artículo de un producto) se traen por id desde el servidor antes de insertar —
+un servidor que aterriza filas a mitad de sesión ya no rompe la FK (L15 del ODD). El resto de
+las tareas (3.1-3.6, 3.8 y el backlog de mejoras #1-#8) se prioriza con datos de uso reales.*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |

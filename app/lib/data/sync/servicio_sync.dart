@@ -306,7 +306,7 @@ Future<int> _pullTodo(
       if (lote.isEmpty) break;
 
       for (final fila in lote) {
-        await _aplicarFilaRemota(db, tabla, fila);
+        await _aplicarFilaRemota(db, cliente, tabla, fila);
         descargadas++;
         final ts = fila[columna] as String?;
         if (ts != null && momentoMasReciente(ts, cursor)) cursor = ts;
@@ -336,8 +336,12 @@ String _columnaCursor(String tabla) =>
 /// del servidor como árbitro. El borrado es lógico (regla 5): `borrado_en`
 /// se copia, la fila nunca se quita. Precio es append-only: si existe, no
 /// se toca. Si la fila local es más nueva, se conserva y queda encolada.
+///
+/// Los padres de precio/valoración (y el artículo de un producto) se
+/// auto-reparan por id antes de insertar: ver [_asegurarPadreRemoto].
 Future<void> _aplicarFilaRemota(
   BaseDeDatos db,
+  ClienteRemoto cliente,
   String tabla,
   Map<String, dynamic> fila,
 ) async {
@@ -381,6 +385,7 @@ Future<void> _aplicarFilaRemota(
     case 'producto':
       final local = await (db.select(db.productos)..where((t) => t.id.equals(id))).getSingleOrNull();
       if (local == null) {
+        await _asegurarPadreRemoto(db, cliente, 'articulo', fila['articulo_id']);
         // C2 del juicio fase-2: el servidor puede traer un EAN que ya vive
         // local bajo otro id (semilla sem-<ean> vs uuid5). Insertar directo
         // violaría el UNIQUE de codigo_barras: primero converge a la
@@ -392,6 +397,7 @@ Future<void> _aplicarFilaRemota(
           await db.into(db.productos).insert(_companionProductoDesdeRemota(fila));
         }
       } else if (_servidorGana(fila, local.actualizadoEn)) {
+        await _asegurarPadreRemoto(db, cliente, 'articulo', fila['articulo_id']);
         await (db.update(db.productos)..where((t) => t.id.equals(id)))
             .write(_companionProductoParaActualizar(fila));
       } else if (_localGana(remota, local.actualizadoEn)) {
@@ -410,12 +416,21 @@ Future<void> _aplicarFilaRemota(
     case 'precio':
       final local = await (db.select(db.precios)..where((t) => t.id.equals(id))).getSingleOrNull();
       if (local == null) {
+        // Auto-reparación (FK 787 de campo, v0.3.4): el padre puede no estar
+        // local aunque el pull de producto ya corrió en esta sesión — el
+        // servidor lo aterrizó o re-apuntó a mitad de sesión, o el cursor de
+        // producto quedó por encima de su ventana. Se trae por id y luego
+        // inserta el precio.
+        await _asegurarPadreRemoto(db, cliente, 'producto', fila['producto_id']);
+        await _asegurarPadreRemoto(db, cliente, 'comercio', fila['comercio_id']);
         await db.into(db.precios).insert(_companionPrecioDesdeRemota(fila));
       }
       // Append-only: un precio existente nunca se modifica (regla 4).
     case 'valoracion':
       final local = await (db.select(db.valoraciones)..where((t) => t.id.equals(id))).getSingleOrNull();
       if (local == null) {
+        await _asegurarPadreRemoto(db, cliente, 'usuario', fila['usuario_id']);
+        await _asegurarPadreRemoto(db, cliente, 'producto', fila['producto_id']);
         await db.into(db.valoraciones).insert(_companionValoracionDesdeRemota(fila));
       } else if (_servidorGana(fila, local.actualizadoEn)) {
         await (db.update(db.valoraciones)..where((t) => t.id.equals(id)))
@@ -464,6 +479,62 @@ Future<Usuario?> _colisionAuthUidLocal(
             t.authUid.equals(uid) &
             t.id.equals(filaRemota['id'] as String).not()))
       .getSingleOrNull();
+}
+
+/// ¿Existe la fila local de [tabla] con ese id? (chequeo barato antes de
+/// pedir el padre al servidor en la auto-reparación.)
+Future<bool> _existeFilaLocal(
+  BaseDeDatos db,
+  String tabla,
+  String id,
+) async {
+  switch (tabla) {
+    case 'usuario':
+      return await (db.select(db.usuarios)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull() !=
+        null;
+    case 'articulo':
+      return await (db.select(db.articulos)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull() !=
+        null;
+    case 'producto':
+      return await (db.select(db.productos)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull() !=
+        null;
+    case 'comercio':
+      return await (db.select(db.comercios)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull() !=
+        null;
+  }
+  return false;
+}
+
+/// Auto-reparación del pull (FK 787 de campo, v0.3.4): los padres de un
+/// precio/valoración (o el artículo de un producto) pueden faltar localmente
+/// aunque el pull de producto ya haya corrido en la sesión — el servidor
+/// aterrizó o re-apuntó la fila a mitad de sesión (cargador/dedup del
+/// dueño), o el cursor de producto quedó por encima de su ventana y los
+/// reintentos con gte(cursor) ya no la bajan. El id es la identidad de la
+/// regla de sync 1: se trae por id y se aplica por la MISMA ruta del pull
+/// (merge LWW y convergencia por EAN/auth_uid incluidos). Si el servidor
+/// tampoco lo tiene, no se toca nada: el insert del hijo fallará por FK y
+/// la sesión abortará sin guardar el cursor (R15) — el reintento lo busca
+/// de nuevo.
+Future<void> _asegurarPadreRemoto(
+  BaseDeDatos db,
+  ClienteRemoto cliente,
+  String tabla,
+  Object? id,
+) async {
+  if (id is! String || id.isEmpty) return;
+  if (await _existeFilaLocal(db, tabla, id)) return;
+  final remota = await cliente.traerFila(tabla: tabla, id: id);
+  if (remota == null) return;
+  await _aplicarFilaRemota(db, cliente, tabla, remota);
 }
 
 /// Convergencia de un EAN semilla con el servidor (C2, regla de sync 6 y

@@ -138,7 +138,10 @@ void main() {
 
     final resumen = await sincronizarAhora(db, cliente);
 
-    expect(resumen.filasDescargadas, productos + comercios + precios + 2);
+    // +3 usuarios: los 2 del servidor MÁS el eco propio del dispositivo
+    // (la identidad se sube al inicio de la sesión y vuelve en el pull;
+    // re-aplicarla es un no-op idempotente y cuenta como descargada).
+    expect(resumen.filasDescargadas, productos + comercios + precios + 3);
     final preciosLocales = await db.select(db.precios).get();
     expect(preciosLocales.length, precios);
     final productosLocales = {for (final p in await db.select(db.productos).get()) p.id: p};
