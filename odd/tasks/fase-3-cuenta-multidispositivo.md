@@ -235,3 +235,14 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   Magic Link con {{ .Token }} (el dueño aún no lo pegó), vinculación de email en el teléfono del
   dueño, auth_uid en tabla, sync post-vínculo, T4 (segunda instalación CON la misma cuenta — Noe
   era identidad anónima propia, no restaura), prueba admin.
+- L18 — DECISIÓN DEL DUEÑO: la vinculación de cuenta por email se POSTERGA («No quiero tocar a
+  cuenta google, dejemos lo de confirmar el email para mucho mas adelante, por ahora sigo con un
+  grupo reducido y de confianza para realizar las pruebas»). El bloqueante real: Supabase exige
+  SMTP propio para editar la plantilla (hallazgo de campo: sin SMTP custom el email manda enlace,
+  no código — los campos Subject/Body están deshabilitados en el panel). La app sigue 100%
+  usable: identidades anónimas + sync colaborativa cubren el grupo de confianza (la cuenta siempre
+  fue opcional, R17). POSTERGADOS hasta nueva decisión del dueño: SMTP propio, template Magic
+  Link con {{ .Token }}, vinculación de email, auth_uid en tabla (verificación), sync
+  post-vínculo, T4 (restauración con la misma cuenta), prueba admin. El código T3/T4 queda
+  commiteado y probado (suite verde), listo para activar cuando se retome. Con C1 validado en
+  campo (L17), la validación de campo del alcance vigente de T5 queda COMPLETA.
