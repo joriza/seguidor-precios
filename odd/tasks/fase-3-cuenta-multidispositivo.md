@@ -176,3 +176,26 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   (2) instalar v0.3.3; (3) reintentar la vinculación completa (paso 1 debería pedir el enlace de
   verdad esta vez); resto: auth_uid en tabla, sync post-vínculo, C1 en instalación nueva, T4,
   admin.
+- L14 — VALIDACIÓN DE CAMPO v0.3.3 EQUIPO NUEVO ("Noe", instalación fresca, usuario creado
+  19:11:33 UTC 2026-10-30): primera sync aborta con `SqliteException(787) FOREIGN KEY` al insertar
+  el precio `dc13c0e0` (captura Downloads/Err-equipo-nuevo.jpeg). Datos verificados: (1) SERVIDOR
+  ÍNTEGRO — dump REST con sesión anónima de diagnóstico (app/build/diag/*.json, gitignored):
+  428 productos con EAN únicos y sin borrados, 2 comercios, 7 precios con padres todos presentes y
+  cargado_en IDÉNTICO (19:36:24.051723, trigger por statement), RPC dedup_ean responde el canónico
+  correcto; (2) la tabla local `precios` tiene FK solo a producto y comercio (cargado_por es
+  texto); (3) REPROS QUE PASAN: test/sync_primera_instalacion_test.dart (escenario sintético con
+  volúmenes reales, COMMITTEADO como pin del caso instalación-nueva) y test/tmp_diag_repro_test.dart
+  (dump REAL + semilla REAL del asset, temporal no-commiteado) — la sync fresca de una sola
+  vuelta NO reproduce el fallo; (4) DEDUCCIÓN CLAVE: dc13c0e0 es el ÚLTIMO precio del orden
+  (cargado_en,id) y su gemelo 9dc116b5 (MISMOS padres producto ba129b10 + comercio 4e1614be) Sorta
+  ANTES — la FK es por fila: si 9dc116b5 insertó, dc13c0e0 no puede fallar con los mismos padres
+  ⟹ en el intento que falló el pull RETOMÓ con el cursor del precio ya parado ENTRE ambos (keyset
+  pidió solo dc13c0e0) ⟹ hubo MÚLTIPLES intentos y en uno previo los padres NO estaban cuando se
+  aplicaron los precios 1-6 y se guardó ese cursor, O un padre se borró localmente después de
+  insertarse (únicos borradores de producto: _reApuntarProducto por push y
+  _convergerProductoPorEan por pull, ambos transaccionales). HIPÓTESIS A INVESTIGAR (matriz de
+  multi-intento con crashes de red a mitad de pasada): retomas con cursores por lote + el encolado
+  de canónicos que hace la convergencia del pull (encolarUpsert en _convergerProductoPorEan) + el
+  re-touch de actualizado_en por la trigger del servidor al re-subirlos — verificar ninguna
+  combinación deja un canónico ausente con el cursor del precio avanzado. Diagnóstico delegado a
+  worker con estas premisas; fix y release v0.3.4 en el mismo alcance.
