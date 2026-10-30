@@ -90,6 +90,28 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // S3 (v0.3.5): los códigos internos S-* (productos sin EAN) NUNCA
+  // consultan Open Food Facts, ni con el servicio disponible.
+  testWidgets('S3 v0.3.5: código interno S-* no consulta enriquecimiento',
+      (tester) async {
+    final ServicioFalso servicio = ServicioFalso(datosDulce());
+    await tester.pumpWidget(envolver(
+      EscanerScreen(
+        baseDeDatos: db,
+        mostrarCamara: false,
+        enriquecimiento: servicio,
+      ),
+    ));
+
+    await tester.enterText(find.byType(TextField), 'S-QT-0001');
+    await tester.tap(find.text('Buscar producto'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('No existe'), findsOneWidget);
+    expect(servicio.consultas, 0);
+    expect(find.textContaining('Open Food Facts'), findsNothing);
+  });
+
   testWidgets(
       'S3: precarga nombre/marca/contenido en el formulario y nunca guarda sin confirmación',
       (tester) async {

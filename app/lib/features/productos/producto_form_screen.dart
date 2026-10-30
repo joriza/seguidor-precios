@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/codigo_interno.dart';
 import '../../data/enriquecimiento.dart';
 import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
@@ -7,6 +8,9 @@ import '../../data/productos.dart';
 import '../../data/valoraciones.dart';
 
 /// S5 (R1/R7/R11): alta y edición de producto.
+///
+/// v0.3.5 (S1/S6): en el alta, código vacío = se asigna un código interno
+/// `S-<TOK>-<NNNN>` único por construcción (TOK de la instalación).
 ///
 /// Campos: código (opcional, editable), nombre (obligatorio), marca,
 /// unidad de venta, contenido neto (vacío = 1 para granel, AD-014),
@@ -18,6 +22,7 @@ class ProductoFormScreen extends StatefulWidget {
     this.producto,
     this.codigoBarrasInicial,
     this.datosIniciales,
+    this.tokInterno,
     this.alGuardar,
   });
 
@@ -29,6 +34,11 @@ class ProductoFormScreen extends StatefulWidget {
   /// nuevo. Solo aplican al alta (la edición manda) y el usuario siempre
   /// confirma antes de guardar.
   final DatosEnriquecidos? datosIniciales;
+
+  /// S1 (v0.3.5): TOK del código interno inyectable (pruebas); null = el
+  /// archivo real de la instalación (patrón del archivo de sesión).
+  final Future<String> Function()? tokInterno;
+
   final void Function(Producto producto)? alGuardar;
 
   @override
@@ -132,6 +142,16 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     final neto = _contenidoNetoNormalizado();
 
     try {
+      // S1 (v0.3.5): alta sin código → se asigna el próximo código interno
+      // S-<TOK>-<NNNN> de esta instalación. La edición mantiene su contrato
+      // de siempre: vacío = quita el código.
+      String? codigoBarras = codigo.isEmpty ? null : codigo;
+      if (!_esEdicion && codigo.isEmpty) {
+        final String tok = await (widget.tokInterno ?? tokDeInstalacion)();
+        codigoBarras =
+            await proximoCodigoInterno(widget.baseDeDatos, tok: tok);
+      }
+
       // T4: la escritura es local y queda encolada para la sync (regla de
       // sync 2). Si el código de barras ya existe localmente, el insert
       // lanza y se muestra el error de siempre.
@@ -139,7 +159,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           ? await editarProducto(
               widget.baseDeDatos,
               widget.producto!.id,
-              codigoBarras: codigo.isEmpty ? null : codigo,
+              codigoBarras: codigoBarras,
               nombre: nombre,
               marca: marca.isEmpty ? null : marca,
               unidad: _unidad,
@@ -150,7 +170,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           : await altaProducto(
               widget.baseDeDatos,
               nombre: nombre,
-              codigoBarras: codigo.isEmpty ? null : codigo,
+              codigoBarras: codigoBarras,
               marca: marca.isEmpty ? null : marca,
               unidad: _unidad,
               contenidoNeto: neto,
@@ -199,9 +219,12 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           TextFormField(
               controller: _codigo,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Código de barras (opcional)',
                 hintText: 'Ej.: 7790001001001',
+                helperText: _esEdicion
+                    ? null
+                    : 'Vacío = se asigna un código interno (S-AB-0001)',
               ),
               validator: (String? v) {
                 final t = v?.trim() ?? '';
