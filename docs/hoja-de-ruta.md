@@ -121,12 +121,18 @@ corregidos y validados en campo (v0.3.4, L17 fase-3).*
 1. #8 búsqueda ≥3 caracteres — **HECHA (v0.3.5)**;
 2. #9 escáner como pantalla por defecto + #4 texto del escáner — **HECHA (v0.3.5)**;
 3. #7 producto sin EAN con código interno `S-<TOK>-<NNNN>` — **HECHA (v0.3.5)**;
-4. #1 clasificación en lote + sugerencia de artículo desde OFF;
-5. #5 verificar EAN al abrir el formulario;
-6. #3 «Completar desde OFF»;
-7. #2 catálogo vivo (gran parte ya cubierta por el fix C1: la instalación nueva baja el
+4. #10 packs/combos — evaluación del padre (2026-10-30): el problema real es la corrección del
+   precio normalizado cuando el precio se carga por un pack. Recomendación en dos pasos:
+   **(a) liviano y correcto** — calculadora de pack en el formulario (pack de 10 × 500 g →
+   completa `contenido_neto = 5000`), sin migraciones; **(b) completo después** — campo
+   `unidades_por_pack` en producto (migración local v5 + servidor 0006) para registrar la
+   presentación explícitamente. El artículo ya agrupa presentaciones de un mismo producto;
+5. #1 clasificación en lote + sugerencia de artículo desde OFF;
+6. #5 verificar EAN al abrir el formulario;
+7. #3 «Completar desde OFF»;
+8. #2 catálogo vivo (gran parte ya cubierta por el fix C1: la instalación nueva baja el
 catálogo completo; resta achicar la semilla offline);
-8. #6 foto del producto.
+9. #6 foto del producto.
 Después: tareas Fase 3 (3.1-3.6, 3.8).*
 
 | # | Fricción | Mejora propuesta |
@@ -134,12 +140,13 @@ Después: tareas Fase 3 (3.1-3.6, 3.8).*
 | 1 | Clasificación manual: los productos semilla nacen sin artículo y asignarlos es tarea individual. OFF ya trae categorías que hoy se descartan | Enriquecimiento sugiere artículo (mapeo categoría OFF → artículos propios); pantalla de clasificación en lote |
 | 2 | Semilla congelada: la instalación nueva recibe el pack de v0.1.1 por APK y nunca se actualiza | Con nube activa: instalación nueva = seed mínimo offline + pull del catálogo real del servidor (la semilla queda como plan B sin conexión) |
 | 3 | Enriquecimiento solo al crear: productos viejos o mal cargados nunca se completan desde OFF | Botón “Completar desde OFF” en la ficha de producto (para productos con EAN y datos flojos) |
-| 4 | Mensaje desactualizado del escáner: dice “crealo desde la sección Artículos (Fase 1.5)” pero el escáner ya abre el formulario con precarga | Corregir el texto (trivial) |
+| 4 | Mensaje desactualizado del escáner: dice “crealo desde la sección Artículos (Fase 1.5)” pero el escáner ya abre el formulario con precarga | Corregir el texto (trivial) — **HECHA en v0.3.5** |
 | 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” |
 | 6 | OFF trae más datos útiles que se descartan (imagen del producto, nutrición) | Fase 3+: foto del producto en la ficha |
-| 7 | Artículos sin código de barras (verdulería de barrio): hoy no entran al sistema los productos a granel | Alta de producto sin EAN con código interno secuencial asignado por la app; buscable por ese código o descripción (propuesta del dueño, 2026-10-30) |
+| 7 | Artículos sin código de barras (verdulería de barrio): hoy no entran al sistema los productos a granel | Alta de producto sin EAN con código interno secuencial asignado por la app; buscable por ese código o descripción (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5 con diseño v2 `S-<TOK>-<NNNN>` sin colisiones** |
 | 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
-| 9 | El uso principal es escanear para consultar/agregar, pero la app abre en Inicio | Que el escáner sea la pantalla por defecto al abrir la app (propuesta del dueño, 2026-10-30) — **en curso v0.3.5** |
+| 9 | El uso principal es escanear para consultar/agregar, pero la app abre en Inicio | Que el escáner sea la pantalla por defecto al abrir la app (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
+| 10 | Packs y combos: galletitas sueltas o pack x3/x5; yerba o fideos en pack x10 — el precio publicado es por pack y el precio normalizado sale mal si no se carga el contenido TOTAL del pack | Evaluar y priorizar: (a) calculadora de pack en el formulario (sin migraciones) y/o (b) campo `unidades_por_pack` en producto con migraciones; el artículo ya agrupa presentaciones (propuesta del dueño, 2026-10-30) — **prioridad alta, ver plan ordenado** |
 
 ## Riesgos
 
