@@ -154,3 +154,18 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   definitiva: teléfono por USB + adb logcat -s flutter (debugPrint de v0.3.1+ ya loguea el
   error crudo). PENDIENTES del checklist de campo: template Magic Link con {{ .Token }} (sin
   confirmar), C1 en instalación nueva, auth_uid en tabla, sync post-vínculo, T4, admin.
+- L12 — DIAGNÓSTICO CERRADO + FIX v0.3.3 de la vinculación (paso 1): el dueño instaló v0.3.2 y
+  reportó el tipo exacto: `_AssertionError`. Diagnóstico del padre (fuente de gotrue 2.27.3 en el
+  pub cache + RED reproducible): supabase-dart arma GoTrueClient con flowType PKCE por defecto y
+  exige asyncStorage para el code_verifier; `signInWithOtp` rompía en `_generatePKCECodeChallenge`
+  (`assert(_asyncStorage != null)`, gotrue_client.dart:478) ANTES de tocar la red — por eso el
+  servidor estaba sano (curl 200) y la app nunca mandó el request; en release el assert se compila
+  fuera y rompería distinto (null-check). El nombre `_AssertionError` es el runtimeType real en la
+  VM de Flutter (confirmado en el RED). FIX: `ClienteSupabase` arma el SupabaseClient con
+  `AuthClientOptions(authFlowType: AuthFlowType.implicit)` — el ingreso es por código de 6 dígitos
+  in-app (sin deep links ni redirects), el exchange PKCE nunca ocurre y `verifyOTP` de gotrue
+  2.27.3 no envía code_verifier (verificado en el fuente). TDD: 1 RED (nuevo test del adapter
+  real contra 127.0.0.1:9: esperaba error de red, llegó el AssertionError con el stack exacto del
+  teléfono) → GREEN; suite 229/229 y analyze limpios. Propuestas de producto #7 (artículos sin
+  EAN con código secuencial) y #8 (búsqueda combinada EAN/descripción desde 3 caracteres)
+  anotadas en el backlog de hoja-de-ruta.md. tag v0.3.3 (v0.3.3+12).

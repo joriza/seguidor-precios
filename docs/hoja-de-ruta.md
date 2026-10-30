@@ -71,8 +71,11 @@ vía Supabase Studio (R18).
 
 *Estado: **en curso** — arrancada con los críticos C1/C2 (corregidos en d04dea1) y la cuenta
 multi-dispositivo 3.7 (magic link por email + convergencia de identidad, implementada en d84bf53/b7abaa7
-con migración 0005, pendiente de validación en dispositivo — release v0.3.0). El resto de las tareas
-(3.1-3.6, 3.8 y el backlog de mejoras #1-#6) se prioriza con datos de uso reales.*
+con migración 0005). La validación de campo corrigió la vinculación de cuenta en v0.3.3: el flujo
+PKCE por defecto de supabase-dart exige un storage que la app no provee y `signInWithOtp` rompía
+con AssertionError antes de tocar la red; ahora usa flujo implícito (código de 6 dígitos in-app,
+sin deep links). El resto de las tareas (3.1-3.6, 3.8 y el backlog de mejoras #1-#8) se prioriza
+con datos de uso reales.*
 
 | # | Tarea | Cubre |
 | --- | --- | --- |
@@ -118,6 +121,8 @@ L20 del ODD), que tienen prioridad máxima sobre todo lo de acá.*
 | 4 | Mensaje desactualizado del escáner: dice “crealo desde la sección Artículos (Fase 1.5)” pero el escáner ya abre el formulario con precarga | Corregir el texto (trivial) |
 | 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” |
 | 6 | OFF trae más datos útiles que se descartan (imagen del producto, nutrición) | Fase 3+: foto del producto en la ficha |
+| 7 | Artículos sin código de barras (verdulería de barrio): hoy no entran al sistema los productos a granel | Alta de producto sin EAN con código interno secuencial asignado por la app; buscable por ese código o descripción (propuesta del dueño, 2026-10-30) |
+| 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) |
 
 ## Riesgos
 

@@ -15,8 +15,17 @@ import 'config_backend.dart';
 /// queda en `usuario.auth_uid` a nivel de datos (regla de sync 9), así la
 /// identidad sobrevive incluso si se pierde el archivo de sesión.
 ///
-/// Nunca se instancia en tests: el núcleo de sync se prueba con un
-/// [ClienteRemoto] falso, sin red.
+/// Flujo de auth implícito (correctivo v0.3.3): el PKCE por defecto de
+/// supabase-dart exige un `GotrueAsyncStorage` para el code_verifier y
+/// `signInWithOtp` rompía con AssertionError (assert de gotrue, visible
+/// solo en debug) ANTES de tocar la red. Esta app completa el ingreso con
+/// el código de 6 dígitos dentro de la app (sin deep links ni redirects),
+/// así que el exchange PKCE nunca ocurre: implícito es el flujo correcto
+/// acá.
+///
+/// El núcleo de sync se prueba con un [ClienteRemoto] falso, sin red;
+/// el test de cuenta instancia este adapter solo contra una URL local
+/// sin servidor (sin red real).
 class ClienteSupabase implements ClienteRemoto {
   ClienteSupabase({
     required ConfigBackend config,
@@ -26,7 +35,13 @@ class ClienteSupabase implements ClienteRemoto {
           'Falta configurar la URL o la clave del backend en '
           'data/sync/config_backend.dart',
         ),
-        _cliente = SupabaseClient(config.url, config.claveAnonima),
+        _cliente = SupabaseClient(
+          config.url,
+          config.claveAnonima,
+          authOptions: const AuthClientOptions(
+            authFlowType: AuthFlowType.implicit,
+          ),
+        ),
         _archivoSesion =
             File(p.join(directorio.path, 'supabase_sesion.json'));
 
