@@ -169,3 +169,10 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   teléfono) → GREEN; suite 229/229 y analyze limpios. Propuestas de producto #7 (artículos sin
   EAN con código secuencial) y #8 (búsqueda combinada EAN/descripción desde 3 caracteres)
   anotadas en el backlog de hoja-de-ruta.md. tag v0.3.3 (v0.3.3+12).
+- L13 — RELEASE v0.3.3 PUBLICADA (run de release 41090391769 verde, 6m20s, asset
+  `seguidor-precios-v0.3.3-debug.apk`, 186 MB, en releases/tag/v0.3.3; QR
+  apk-debug/qr-instalar-v0.3.3.png generado). Checklist del dueño: (1) template Magic Link con
+  {{ .Token }} en Supabase Studio — CRÍTICO, sin él el email no muestra el código de 6 dígitos;
+  (2) instalar v0.3.3; (3) reintentar la vinculación completa (paso 1 debería pedir el enlace de
+  verdad esta vez); resto: auth_uid en tabla, sync post-vínculo, C1 en instalación nueva, T4,
+  admin.
