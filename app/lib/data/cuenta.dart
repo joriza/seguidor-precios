@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:supabase/supabase.dart' show AuthException;
 
 import 'local/base_de_datos.dart';
@@ -64,6 +65,9 @@ class AccountService {
     try {
       await cliente!.requestMagicLink(emailNormalizado);
     } catch (e) {
+      // El detalle crudo queda en consola (flutter run / adb logcat) para
+      // diagnosticar en campo lo que el mapeador no clasifique.
+      debugPrint('Cuenta: error al pedir el enlace: $e');
       // El error llega con mensaje humano (accountErrorMessage): el cliente
       // de la UI lo muestra tal cual.
       throw AccountError(accountErrorMessage(e));
@@ -95,6 +99,7 @@ class AccountService {
     } catch (e) {
       // Si la verificación falla, la identidad local queda exactamente como
       // estaba: la vinculación solo ocurre con el OTP verificado.
+      debugPrint('Cuenta: error al completar la vinculación: $e');
       throw AccountError(accountErrorMessage(e));
     }
   }
@@ -145,6 +150,12 @@ String accountErrorMessage(Object error) {
     }
     return 'No se pudo conectar con el servidor de cuentas. Probá de nuevo '
         'en un rato.';
+  }
+  // En el teléfono los cortes de red pueden llegar como ClientException de
+  // package:http u otros errores con texto de red, no solo SocketException.
+  if (_pareceErrorDeRed(error.toString().toLowerCase())) {
+    return 'Sin conexión: para la cuenta hace falta internet; el resto de '
+        'la app funciona igual sin conexión.';
   }
   return 'Algo salió mal con la cuenta. Probá de nuevo.';
 }

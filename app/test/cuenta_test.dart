@@ -161,5 +161,14 @@ void main() {
           accountErrorMessage(const AuthException('boom', code: 'raro'));
       expect(mensaje, isNotEmpty);
     });
+
+    test('corte de red no-socket (ClientException) también explica offline', () {
+      // En el teléfono los cortes de red llegan como ClientException de
+      // package:http, no como SocketException: mismo mensaje humano.
+      final mensaje = accountErrorMessage(Exception(
+          'ClientException: Connection closed before full header was '
+          'received, uri = https://pipoladhxwuhcfjsuzkx.supabase.co'));
+      expect(mensaje, contains('Sin conexión'));
+    });
   });
 }

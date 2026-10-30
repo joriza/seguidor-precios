@@ -112,3 +112,16 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   tag/v0.3.0. Pendiente de T5: instalación sobre la v0.2.2 existente (sin desinstalar), primera
   pull real con keyset (catálogo completo) y vinculación de cuenta en el teléfono del dueño;
   después, la decisión de merge `fase-3` → `main` es del dueño.
+- L8 — VALIDACIÓN DE CAMPO DEL DUEÑO (v0.3.0) + correctivo: (a) sync reportó "subidos 0 /
+  descargados 14" — SALUDABLE: subidos 0 porque no había nada pendiente local (todo ya subió con
+  v0.2.2), descargados 14 es el incremental de la cola (página inicial inclusiva del cursor,
+  acotada e idempotente por LWW, riesgo declarado en L3) — y sobre todo el pull COMPLETÓ sin
+  crash: en v0.2.x el teléfono del dueño subía pero nunca bajaba (C2); la validación completa de
+  C1 (catálogo entero en primera sync) requiere instalación NUEVA. (b) Botón "Enviar enlace" →
+  "Algo salió mal": el padre reprodujo la llamada exacta del teléfono vía API con la clave
+  anónima pública (AD-002) → POST /auth/v1/otp devolvió 200: el servidor está sano (signups
+  habilitados, SMTP despacha); la causa es el fallback del mapeador ante errores de red no-
+  Socket (ClientException de package:http). FIX v0.3.1: mapeo por texto de red para no-Auth
+  + debugPrint del error crudo en consola en ambos catch del servicio (mismo patrón de
+  transparencia que v0.2.2). TDD: 1 RED (mapeo ClientException → "Sin conexión") → GREEN;
+  suite 226/226 y analyze limpios observados inline. Commits: fix v0.3.1+10, tag v0.3.1.
