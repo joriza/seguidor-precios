@@ -16,6 +16,15 @@ import 'sync_arranque_test.dart';
 /// entrada nunca bloquea el uso offline: sin nube configurada no aparece y
 /// el resto de la pantalla funciona igual; con error de red muestra un
 /// mensaje en español y se puede cerrar.
+
+/// S5 (v0.3.5): la app abre en la pestaña Escanear; los botones de Inicio
+/// quedan offstage (IndexedStack) y los finders los omiten por defecto —
+/// navegar a Inicio antes de buscar sus entradas.
+Future<void> irAInicio(WidgetTester tester) async {
+  await tester.tap(find.text('Inicio'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets(
       'con nube configurada, la entrada aparece y vincula con el código del '
@@ -39,6 +48,7 @@ void main() {
       gestorSync: gestor,
     ));
     await tester.pumpAndSettle();
+    await irAInicio(tester);
 
     // Entrada opcional visible en Inicio, aún sin cuenta vinculada.
     expect(find.byKey(const ValueKey('btn-cuenta')), findsOneWidget);
@@ -90,6 +100,7 @@ void main() {
       gestorSync: gestor,
     ));
     await tester.pumpAndSettle();
+    await irAInicio(tester);
 
     // La cuenta es opcional (R17): sin nube no hay entrada, pero el resto
     // de la pantalla está intacto (la app nunca se bloquea).
@@ -120,6 +131,7 @@ void main() {
       gestorSync: gestor,
     ));
     await tester.pumpAndSettle();
+    await irAInicio(tester);
 
     await tester.tap(find.byKey(const ValueKey('btn-cuenta')));
     await tester.pumpAndSettle();
