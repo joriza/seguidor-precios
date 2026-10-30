@@ -183,6 +183,25 @@ void main() {
     expect(find.text('Sin resultados'), findsOneWidget);
   });
 
+  testWidgets('no busca hasta que la consulta llega a 3 caracteres (propuesta #8)',
+      (tester) async {
+    await insertarProducto(id: 'p1', nombre: 'Mayonesa');
+
+    await tester.pumpWidget(envolver(BusquedaScreen(baseDeDatos: db)));
+
+    // Con 1 o 2 caracteres no hay búsqueda (ni resultados fantasma).
+    await escribir(tester, 'ma');
+    expect(find.byType(ListTile), findsNothing);
+    expect(find.text('Ingresá al menos 3 caracteres para buscar'),
+        findsOneWidget);
+
+    // Al llegar a 3, busca y encuentra (el producto y también el artículo
+    // Mayonesas: la búsqueda es combinada por producto y artículo).
+    await escribir(tester, 'may');
+    expect(find.text('Mayonesa'), findsOneWidget);
+    expect(find.text('Mayonesas'), findsOneWidget);
+  });
+
   testWidgets('productos con borrado lógico no aparecen', (tester) async {
     await insertarProducto(
         id: 'p1', nombre: 'Jabón', borradoEn: '2026-01-06T00:00:00');

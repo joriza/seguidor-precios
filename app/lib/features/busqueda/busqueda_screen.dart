@@ -8,8 +8,10 @@ import '../precios/producto_comparacion_screen.dart';
 /// S12 (R1): búsqueda y listado por producto y por artículo.
 ///
 /// Busca por nombre, marca o código (EAN) de producto y por nombre de
-/// artículo. Cada producto muestra su último precio conocido (R1); el tap
-/// lleva a la comparación (R13) o al detalle del artículo.
+/// artículo, combinado en una sola caja; arranca recién con 3 caracteres
+/// (propuesta #8 del dueño). Cada producto muestra su último precio
+/// conocido (R1); el tap lleva a la comparación (R13) o al detalle del
+/// artículo.
 class BusquedaScreen extends StatefulWidget {
   const BusquedaScreen({super.key, required this.baseDeDatos});
 
@@ -66,6 +68,15 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
   Future<void> _buscar(String consulta) async {
     final String q = consulta.trim();
     setState(() => _consulta = q);
+    // Propuesta #8 del dueño: la búsqueda arranca recién con 3 caracteres
+    // (menos que eso genera ruido y consultas inútiles en cada tecla).
+    if (q.length < 3) {
+      setState(() {
+        _productos = <_ResultadoProductos>[];
+        _articulos = <Articulo>[];
+      });
+      return;
+    }
     if (q.isEmpty) {
       setState(() {
         _productos = <_ResultadoProductos>[];
@@ -137,8 +148,9 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
   @override
   Widget build(BuildContext context) {
     final bool sinConsulta = _consulta.isEmpty;
+    final bool muyCorta = !sinConsulta && _consulta.length < 3;
     final bool sinResultados =
-        !sinConsulta && _productos.isEmpty && _articulos.isEmpty;
+        !sinConsulta && !muyCorta && _productos.isEmpty && _articulos.isEmpty;
 
     return Column(
       children: <Widget>[
@@ -159,9 +171,12 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
           child: sinConsulta
               ? const Center(
                   child: Text('Escribí para buscar por producto o artículo'))
-              : sinResultados
-                  ? const Center(child: Text('Sin resultados'))
-                  : ListView(
+              : muyCorta
+                  ? const Center(
+                      child: Text('Ingresá al menos 3 caracteres para buscar'))
+                  : sinResultados
+                      ? const Center(child: Text('Sin resultados'))
+                      : ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       children: <Widget>[
                         if (_productos.isNotEmpty) ...<Widget>[
