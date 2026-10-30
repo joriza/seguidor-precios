@@ -125,3 +125,9 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   + debugPrint del error crudo en consola en ambos catch del servicio (mismo patrón de
   transparencia que v0.2.2). TDD: 1 RED (mapeo ClientException → "Sin conexión") → GREEN;
   suite 226/226 y analyze limpios observados inline. Commits: fix v0.3.1+10, tag v0.3.1.
+- L9 — RELEASE v0.3.1 PUBLICADA: run de CI 40995225310 verde (8m10s), asset
+  `seguidor-precios-v0.3.1-debug.apk` en releases/tag/v0.3.1; QR generado en
+  apk-debug/qr-instalar-v0.3.1.png (PNG; el print ASCII a terminal falla por encoding cp1252
+  — irrelevante, sobra con el PNG). Pendiente de T5 (dueño): instalar v0.3.1 sobre v0.3.0,
+  completar template Magic Link con {{ .Token }} y reintentar vinculación; resto del checklist
+  L8 (C1 en instalación nueva, auth_uid en tabla, sync post-vínculo, T4, admin).
