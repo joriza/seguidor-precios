@@ -131,3 +131,14 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   — irrelevante, sobra con el PNG). Pendiente de T5 (dueño): instalar v0.3.1 sobre v0.3.0,
   completar template Magic Link con {{ .Token }} y reintentar vinculación; resto del checklist
   L8 (C1 en instalación nueva, auth_uid en tabla, sync post-vínculo, T4, admin).
+- L10 — MERGE `fase-3` → `main` POR FAST-FORWARD (7717e89..42595ed, 10 commits, 1925 líneas)
+  con autorización del dueño ("mergee fase-3"); la rama queda como referencia histórica y main
+  pasa a ser la línea de release. MISMO ERROR en campo con v0.3.1 ("Algo salió mal" al validar
+  el correo): análisis de código del padre — el diálogo es limpio (muestra accountErrorMessage
+  tal cual) y el único camino que produce el fallback EXACTO en el paso 2 es el
+  `StateError('Supabase no devolvió sesión al verificar el código')` de completeMagicLink
+  (no es AuthException/SocketException y su texto no tiene palabras de red). FIX v0.3.2:
+  (a) StateError mapeado a mensaje específico de reintentar; (b) el fallback genérico ahora
+  incluye el runtimeType del error — cualquier error no clasificado se reporta desde la
+  pantalla y se diagnostica sin USB. TDD: 2 RED → GREEN (StateError específico; fallback con
+  tipo); suite 228/228 y analyze limpios observados inline. tag v0.3.2 (v0.3.2+11).

@@ -129,6 +129,12 @@ String accountErrorMessage(Object error) {
     return 'Sin conexión: para la cuenta hace falta internet; el resto de '
         'la app funciona igual sin conexión.';
   }
+  if (error is StateError) {
+    // El servidor verificó el código pero no devolvió sesión (cliente
+    // supabase): error determinado, no de red.
+    return 'El servidor verificó el código pero no devolvió sesión. Pedí '
+        'el enlace de nuevo y probá otra vez.';
+  }
   if (error is AuthException) {
     switch (error.code) {
       case 'otp_expired':
@@ -157,7 +163,10 @@ String accountErrorMessage(Object error) {
     return 'Sin conexión: para la cuenta hace falta internet; el resto de '
         'la app funciona igual sin conexión.';
   }
-  return 'Algo salió mal con la cuenta. Probá de nuevo.';
+  // El tipo entre paréntesis permite diagnosticar desde la pantalla un
+  // error que el mapeador aún no clasifica (se reporta tal cual).
+  return 'Algo salió mal con la cuenta (${error.runtimeType}). Probá de '
+      'nuevo.';
 }
 
 bool _pareceErrorDeRed(String detalleMensaje) =>

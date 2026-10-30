@@ -12,6 +12,9 @@ import 'package:seguidor_precios/data/sync/config_backend.dart';
 import 'cliente_remoto_falso.dart';
 import 'sync_arranque_test.dart';
 
+/// Error de tipo desconocido para probar el fallback con tipo visible.
+class _Raro implements Exception {}
+
 /// S3 (R17/AD-003): cuenta opcional por email con enlace mágico. La
 /// vinculación convierte la identidad anónima en cuenta real SIN migrar
 /// datos: `auth_uid` del usuario local pasa al uid de la cuenta (misma
@@ -169,6 +172,20 @@ void main() {
           'ClientException: Connection closed before full header was '
           'received, uri = https://pipoladhxwuhcfjsuzkx.supabase.co'));
       expect(mensaje, contains('Sin conexión'));
+    });
+
+    test('verificación sin sesión da un mensaje específico', () {
+      // completeMagicLink: el servidor verificó pero no devolvió sesión —
+      // hoy cae en el fallback genérico y no se puede diagnosticar.
+      final mensaje = accountErrorMessage(
+          StateError('Supabase no devolvió sesión al verificar el código'));
+      expect(mensaje, contains('no devolvió sesión'));
+    });
+
+    test('el fallback genérico incluye el tipo del error para diagnosticar', () {
+      final mensaje = accountErrorMessage(_Raro());
+      expect(mensaje, contains('Algo salió mal'));
+      expect(mensaje, contains('_Raro'));
     });
   });
 }
