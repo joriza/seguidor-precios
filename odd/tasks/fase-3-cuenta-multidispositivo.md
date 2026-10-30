@@ -142,3 +142,15 @@ apk-debug/judgment-fase2-ledger.json (gitignored, local).
   incluye el runtimeType del error — cualquier error no clasificado se reporta desde la
   pantalla y se diagnostica sin USB. TDD: 2 RED → GREEN (StateError específico; fallback con
   tipo); suite 228/228 y analyze limpios observados inline. tag v0.3.2 (v0.3.2+11).
+- L11 — RELEASE v0.3.2 PUBLICADA (run 40997055692 verde, asset
+  seguidor-precios-v0.3.2-debug.apk, QR apk-debug/qr-instalar-v0.3.2.png abierto). El dueño
+  confirmó que el fallo es en el paso 1 ("Enviar enlace", signInWithOtp) → el StateError del
+  paso 2 no era el camino. Hipótesis AuthApiException DESCARTADA: en gotrue 2.27.3
+  (pubspec.lock) AuthApiException extends AuthException → los errores de API sí se mapean. El
+  error real es un tipo aún no clasificado (candidatos: FormatException por respuesta no-JSON
+  en red interceptada, HandshakeException TLS, ClientException sin palabras de red). PRÓXIMA
+  SESIÓN: dueño instala v0.3.2, reintenta "Enviar enlace" y reporta el texto completo que
+  ahora incluye el tipo entre paréntesis — eso nombra la clase exacta y define el fix; opción
+  definitiva: teléfono por USB + adb logcat -s flutter (debugPrint de v0.3.1+ ya loguea el
+  error crudo). PENDIENTES del checklist de campo: template Magic Link con {{ .Token }} (sin
+  confirmar), C1 en instalación nueva, auth_uid en tabla, sync post-vínculo, T4, admin.
