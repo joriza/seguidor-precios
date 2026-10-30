@@ -119,8 +119,8 @@ corregidos y validados en campo (v0.3.4, L17 fase-3).*
 
 ***Orden acordado (2026-10-30, el dueño delega la priorización):**
 1. #8 búsqueda ≥3 caracteres — **HECHA (v0.3.5)**;
-2. #9 escáner como pantalla por defecto + #4 texto del escáner — **en curso (v0.3.5)**;
-3. #7 producto sin EAN con código interno `S-<TOK>-<NNNN>` — **en curso (v0.3.5)**;
+2. #9 escáner como pantalla por defecto + #4 texto del escáner — **HECHA (v0.3.5)**;
+3. #7 producto sin EAN con código interno `S-<TOK>-<NNNN>` — **HECHA (v0.3.5)**;
 4. #1 clasificación en lote + sugerencia de artículo desde OFF;
 5. #5 verificar EAN al abrir el formulario;
 6. #3 «Completar desde OFF»;
