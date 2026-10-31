@@ -87,3 +87,27 @@ Future<Producto> editarProducto(
   return await (db.select(db.productos)..where((t) => t.id.equals(id)))
       .getSingle();
 }
+
+/// v0.3.9 (S2/S3): asigna el artículo a un producto — clasificación desde
+/// la pantalla «Sin clasificar», individual o en lote (un llamado por
+/// producto). Toca SOLO articulo_id (+ actualizadoEn, convención de sync
+/// de toda escritura) y renueva la entrada del outbox (regla de sync 2:
+/// misma clave tabla+fila, última intención gana). Devuelve la fila
+/// actualizada.
+Future<Producto> asignarArticulo(
+  BaseDeDatos db,
+  String id, {
+  required String articuloId,
+  DateTime? ahora,
+}) async {
+  final DateTime momento = ahora ?? DateTime.now();
+  await (db.update(db.productos)..where((t) => t.id.equals(id))).write(
+        ProductosCompanion(
+          articuloId: Value(articuloId),
+          actualizadoEn: Value(momento.toUtc().toIso8601String()),
+        ),
+      );
+  await encolarUpsert(db, 'producto', id, ahora: momento);
+  return await (db.select(db.productos)..where((t) => t.id.equals(id)))
+      .getSingle();
+}

@@ -156,4 +156,50 @@ void main() {
         .get();
     expect(entradas, hasLength(1));
   });
+
+  // v0.3.9 (S2/S3): la asignación toca SOLO articulo_id (+ actualizadoEn,
+  // convención de sync de toda escritura) y renueva la entrada del outbox
+  // (misma clave tabla+fila: última intención gana).
+  test('asignarArticulo cambia solo articulo_id y encola para la sync',
+      () async {
+    final db = BaseDeDatos.memoria();
+    addTearDown(db.close);
+    await crearUsuarioConEtiqueta(db, 'Vale');
+    final articulo = await altaArticulo(db, nombre: 'Galletitas', unidadBase: 'kg');
+    final producto = await altaProducto(
+      db,
+      nombre: 'Pepas de membrillo',
+      marca: 'Bagley',
+      unidad: 'g',
+      contenidoNeto: 350,
+      categoria: 'Snacks',
+    );
+    final antes = await (db.select(db.productos)
+          ..where((p) => p.id.equals(producto.id)))
+        .getSingle();
+
+    final asignado = await asignarArticulo(
+      db,
+      producto.id,
+      articuloId: articulo.id,
+      ahora: DateTime.parse('2026-02-01T00:00:00Z'),
+    );
+
+    expect(asignado.articuloId, articulo.id);
+    // S3: nada más del producto cambia.
+    expect(asignado.nombre, antes.nombre);
+    expect(asignado.marca, antes.marca);
+    expect(asignado.categoria, antes.categoria);
+    expect(asignado.unidad, antes.unidad);
+    expect(asignado.contenidoNeto, antes.contenidoNeto);
+    expect(asignado.codigoBarras, antes.codigoBarras);
+    expect(asignado.creadoEn, antes.creadoEn);
+    // Viaja por la sync normal: misma clave tabla+fila renovada (regla 2).
+    final entradas = await (db.select(db.outbox)
+          ..where((e) => e.tabla.equals('producto') &
+              e.filaId.equals(producto.id)))
+        .get();
+    expect(entradas, hasLength(1)); // alta + asignación = una entrada
+    expect(entradas.single.operacion, 'upsert');
+  });
 }

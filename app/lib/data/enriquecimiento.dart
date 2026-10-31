@@ -23,6 +23,7 @@ class DatosEnriquecidos {
     this.marca,
     this.contenidoNeto,
     this.unidad,
+    this.categorias,
   });
 
   final String nombre;
@@ -32,6 +33,11 @@ class DatosEnriquecidos {
   /// Unidad de venta reconocida (de [unidadesDeVenta]) o null si `quantity`
   /// no declara una unidad utilizable.
   final String? unidad;
+
+  /// v0.3.9 (S1): string crudo de categorías de OFF (ej.: «Snacks, Sweet
+  /// snacks, Biscuits, Cookies»), precargado en producto.categoria; es la
+  /// materia prima del motor de sugerencia (data/clasificacion.dart).
+  final String? categorias;
 }
 
 /// Puerto: consulta datos de un producto por código EAN. Null = sin datos
@@ -118,11 +124,16 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
     final String marcasBrutas = (producto['brands'] ?? '').toString();
     final String marca = marcasBrutas.split(',').first.trim();
     final (double? neto, String? unidad) = _cantidad(producto['quantity']);
+    // v0.3.9 (S1): la categoría cruda de OFF ya no se descarta: precarga
+    // producto.categoria y alimenta la sugerencia de artículo.
+    final String categoriasBrutas =
+        (producto['categories'] ?? '').toString().trim();
     return DatosEnriquecidos(
       nombre: nombre,
       marca: marca.isEmpty ? null : marca,
       contenidoNeto: neto,
       unidad: unidad,
+      categorias: categoriasBrutas.isEmpty ? null : categoriasBrutas,
     );
   }
 

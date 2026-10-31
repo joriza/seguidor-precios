@@ -237,6 +237,53 @@ void main() {
     }
   });
 
+  test('mapea categories a categorias (string crudo de OFF, v0.3.9 S1)',
+      () async {
+    final (http.Client cliente, _) = clienteQueResponde(
+        200,
+        cuerpoOFF(product: <String, dynamic>{
+          'product_name': 'Pepas de membrillo',
+          'brands': 'Bagley',
+          'categories': 'Snacks, Sweet snacks, Biscuits, Cookies',
+        }));
+
+    final DatosEnriquecidos? datos = await ServicioEnriquecimientoOFF(
+      cliente: cliente,
+    ).consultar(ean);
+
+    expect(datos!.categorias, 'Snacks, Sweet snacks, Biscuits, Cookies');
+  });
+
+  test('sin categories en OFF: categorias es null', () async {
+    final (http.Client cliente, _) = clienteQueResponde(
+        200,
+        cuerpoOFF(product: <String, dynamic>{
+          'product_name': 'Dulce de leche',
+          'quantity': '500 g',
+        }));
+
+    final DatosEnriquecidos? datos = await ServicioEnriquecimientoOFF(
+      cliente: cliente,
+    ).consultar(ean);
+
+    expect(datos!.categorias, isNull);
+  });
+
+  test('categories vacío: categorias es null', () async {
+    final (http.Client cliente, _) = clienteQueResponde(
+        200,
+        cuerpoOFF(product: <String, dynamic>{
+          'product_name': 'Dulce de leche',
+          'categories': '',
+        }));
+
+    final DatosEnriquecidos? datos = await ServicioEnriquecimientoOFF(
+      cliente: cliente,
+    ).consultar(ean);
+
+    expect(datos!.categorias, isNull);
+  });
+
   test('ServicioEnriquecimientoNulo nunca consulta ni devuelve datos',
       () async {
     expect(await const ServicioEnriquecimientoNulo().consultar(ean), isNull);
