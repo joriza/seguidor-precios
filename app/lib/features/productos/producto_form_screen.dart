@@ -9,6 +9,7 @@ import '../../data/local/normalizacion.dart';
 import '../../data/productos.dart';
 import '../../data/valoraciones.dart';
 import '../precios/producto_comparacion_screen.dart';
+import '../sync/red.dart';
 
 /// S5 (R1/R7/R11): alta y edición de producto.
 ///
@@ -28,6 +29,7 @@ class ProductoFormScreen extends StatefulWidget {
     this.datosIniciales,
     this.tokInterno,
     this.alGuardar,
+    this.enriquecimiento,
   });
 
   final BaseDeDatos baseDeDatos;
@@ -44,6 +46,13 @@ class ProductoFormScreen extends StatefulWidget {
   final Future<String> Function()? tokInterno;
 
   final void Function(Producto producto)? alGuardar;
+
+  /// v0.3.11 (S3): servicio de enriquecimiento inyectable — el escáner pasa
+  /// el SUYO al abrir «Editar datos». Si no viene, el estado crea el cliente
+  /// OFF por defecto (con el gate de conectividad de red.dart) la primera
+  /// vez que se necesita: el botón funciona desde cualquier punto de
+  /// entrada. Las pruebas inyectan fakes (sin red real).
+  final ServicioEnriquecimiento? enriquecimiento;
 
   @override
   State<ProductoFormScreen> createState() => _ProductoFormScreenState();
@@ -63,6 +72,28 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   bool _guardando = false;
   String? _error;
 
+  /// v0.3.11 (S3): servicio de enriquecimiento; lazy, igual que el del
+  /// escáner, para no construir el cliente OFF salvo que se use.
+  late final ServicioEnriquecimiento _enriquecimiento =
+      widget.enriquecimiento ??
+          ServicioEnriquecimientoOFF(hayConexion: _hayConexion);
+
+  /// v0.3.11: conectividad para el servicio OFF por defecto (patrón del
+  /// escáner: cualquier tipo alcanza; solo sin interfaces no consulta).
+  Future<bool> _hayConexion() async =>
+      await detectarConexion() != TipoConexion.ninguna;
+
+  /// v0.3.11 (S2): estado del botón «Completar desde OFF».
+  bool _consultandoOFF = false;
+  String? _mensajeOFF;
+
+  /// v0.3.11 (S2): la unidad se aplica también al dropdown visible (el
+  /// DropdownButtonFormField guarda su propio estado tras el initialValue;
+  /// su State concreto es privado, así que se usa el FormFieldState público
+  /// y su didChange).
+  final GlobalKey<FormFieldState<String>> _unidadKey =
+      GlobalKey<FormFieldState<String>>();
+
   /// v0.3.10 (S1/S2): detección temprana de EAN duplicado — sólo modo
   /// alta. La edición nunca muestra el aviso (S3).
   Producto? _duplicado;
@@ -81,6 +112,17 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   final TextEditingController _observacion = TextEditingController();
 
   bool get _esEdicion => widget.producto != null;
+
+  /// v0.3.11 (S1): el botón «Completar desde OFF» sólo aparece en EDICIÓN
+  /// con código no vacío que no sea interno `S-*` (los internos nunca
+  /// consultan OFF, S3 de v0.3.5). En el alta no aparece (ya existe la
+  /// precarga del escáner).
+  bool get _puedeCompletarOFF {
+    if (!_esEdicion) return false;
+    final String codigo = _codigo.text.trim();
+    if (codigo.isEmpty) return false;
+    return !codigo.startsWith('S-');
+  }
 
   @override
   void initState() {
@@ -164,7 +206,12 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   /// v0.3.10 (S1): re-chequeo con debounce al editar el campo código (sólo
   /// modo alta). Cambiar el código re-activa el aviso.
   void _onCodigoCambio(String texto) {
-    if (_esEdicion) return;
+    if (_esEdicion) {
+      // v0.3.11 (S1): refresca la visibilidad del botón OFF al editar el
+      // código (el aviso de duplicado sigue siendo sólo del alta).
+      setState(() {});
+      return;
+    }
     _ignorarDuplicado = false;
     _debounceCodigo?.cancel();
     _debounceCodigo =
@@ -209,6 +256,66 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
         producto: existente,
       ),
     ));
+  }
+
+  /// v0.3.11 (S2): consulta OFF para el código del producto y completa
+  /// SOLO los campos vacíos. Nunca guarda solo: el usuario confirma con
+  /// «Guardar cambios». Null (sin datos/sin conexión) o error → mensaje en
+  /// español sin bloquear; el botón queda disponible para reintentar.
+  Future<void> _completarDesdeOFF() async {
+    if (_consultandoOFF || !_puedeCompletarOFF) return;
+    final String codigo = _codigo.text.trim();
+    setState(() {
+      _consultandoOFF = true;
+      _mensajeOFF = null;
+    });
+    final DatosEnriquecidos? datos;
+    try {
+      datos = await _enriquecimiento.consultar(codigo);
+    } catch (_) {
+      // OFF caído, timeout o sin conexión: mensaje sin bloquear.
+      if (!mounted) return;
+      setState(() {
+        _consultandoOFF = false;
+        _mensajeOFF = 'Sin conexión: no se pudo consultar Open Food Facts.';
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _consultandoOFF = false;
+      if (datos == null) {
+        _mensajeOFF = 'Open Food Facts no trajo datos para este código.';
+      } else {
+        _aplicarEnriquecimiento(datos);
+      }
+    });
+  }
+
+  /// v0.3.11 (S2): nunca pisa datos cargados — sólo controladores vacíos.
+  /// La unidad entra sólo si el valor de OFF es una unidad de venta
+  /// aceptada y el campo sigue en el default «unidad» (el equivalente de
+  /// vacío en el dropdown). El pack jamás se toca (OFF no informa pack).
+  /// Nada escribe en la base: el usuario confirma con «Guardar cambios».
+  void _aplicarEnriquecimiento(DatosEnriquecidos datos) {
+    if (_nombre.text.trim().isEmpty) {
+      _nombre.text = datos.nombre;
+    }
+    if (_marca.text.trim().isEmpty && datos.marca != null) {
+      _marca.text = datos.marca!;
+    }
+    if (_contenido.text.trim().isEmpty && datos.contenidoNeto != null) {
+      _contenido.text = datos.contenidoNeto.toString();
+    }
+    if (datos.unidad != null &&
+        unidadesDeVenta.contains(datos.unidad) &&
+        _unidad == 'unidad') {
+      _unidad = datos.unidad!;
+      _unidadKey.currentState?.didChange(_unidad);
+    }
+    if (datos.categorias != null && _categoria.text.trim().isEmpty) {
+      _categoria.text = datos.categorias!;
+    }
   }
 
   double? _contenidoNetoNormalizado() {
@@ -382,6 +489,26 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                     : 'Solo dígitos (8 a 13)';
               },
             ),
+            // v0.3.11 (S1/S2): «Completar desde OFF» — sólo edición con
+            // código no interno. Completa SOLO los vacíos y nunca guarda
+            // solo: el usuario confirma con «Guardar cambios» (S2).
+            if (_puedeCompletarOFF) ...<Widget>[
+              const SizedBox(height: 8),
+              FilledButton.tonal(
+                key: const ValueKey('btn-completar-off'),
+                onPressed: _consultandoOFF ? null : _completarDesdeOFF,
+                child: Text(_consultandoOFF
+                    ? 'Consultando Open Food Facts…'
+                    : 'Completar desde OFF'),
+              ),
+              if (_mensajeOFF != null) ...<Widget>[
+                const SizedBox(height: 4),
+                Text(
+                  _mensajeOFF!,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ],
             const SizedBox(height: 12),
             TextFormField(
               controller: _nombre,
@@ -400,6 +527,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
+              key: _unidadKey,
               initialValue: _unidad,
               decoration:
                   const InputDecoration(labelText: 'Unidad de venta *'),

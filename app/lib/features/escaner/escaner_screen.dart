@@ -235,6 +235,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
         builder: (_) => ProductoFormScreen(
           baseDeDatos: widget.baseDeDatos,
           producto: producto,
+          // v0.3.11 (S3): el escáner pasa SU servicio (gate de red incluido)
+          // para que «Completar desde OFF» en la ficha use el mismo puerto.
+          enriquecimiento: _enriquecimiento,
         ),
       ),
     );
