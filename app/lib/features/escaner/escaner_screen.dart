@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/enriquecimiento.dart';
 import '../../data/local/normalizacion.dart';
+import '../../data/productos.dart';
 import '../../data/valoraciones.dart';
 
 import '../../data/local/base_de_datos.dart';
@@ -172,7 +173,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
       _datosEnriquecidos = null; // cada búsqueda parte de cero
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo con el botón de abajo.'
-          : 'Producto encontrado: ${producto.nombre}';
+          // S5 (v0.3.8): «Pack ×N» desambigua la presentación (N > 1).
+          : 'Producto encontrado: ${producto.nombre}'
+              '${sufijoPack(producto.pack)}';
     });
     // T5 (S3): con el producto inexistente, consulta OFF en segundo plano
     // (si hay conectividad) y precarga para confirmación del usuario.
@@ -254,6 +257,9 @@ class _EscanerScreenState extends State<EscanerScreen> {
             unidad: p.unidad,
             unidadBase: base,
             contenidoNeto: p.contenidoNeto,
+            // S2 (v0.3.8): el precio se normaliza por todo el contenido
+            // de la presentación (pack × contenido por unidad).
+            pack: p.pack,
           );
     final String sufijo = estandar == null
         ? ''

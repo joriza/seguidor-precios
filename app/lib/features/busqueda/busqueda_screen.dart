@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../../data/local/base_de_datos.dart';
+import '../../../data/productos.dart';
 import '../articulos/articulo_detalle_screen.dart';
 import '../precios/producto_comparacion_screen.dart';
 
@@ -200,15 +201,20 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
         (p.marca == null || p.marca!.isEmpty) ? p.nombre : '${p.nombre} · ${p.marca}';
     final String codigo = p.codigoBarras ?? '';
     final ultimo = r.ultimoPrecio;
+    // S5 (v0.3.8): «Pack ×N» solo cuando N > 1; con N = 1 los subtítulos
+    // quedan exactamente como antes.
+    final String pack = sufijoPack(p.pack);
     return ListTile(
       leading: const Icon(Icons.inventory_2_outlined),
       title: Text(titulo),
       subtitle: Text(
         ultimo == null
-            ? (codigo.isEmpty ? 'Sin precios registrados' : '$codigo · sin precios')
+            ? (codigo.isEmpty
+                ? 'Sin precios registrados$pack'
+                : '$codigo · sin precios$pack')
             : '${codigo.isEmpty ? '' : '$codigo · '}'
                 'Último: \$${ultimo.precio.toStringAsFixed(2)} · '
-                '${ultimo.comercio} · ${ultimo.fecha}',
+                '${ultimo.comercio} · ${ultimo.fecha}$pack',
       ),
       onTap: () => Navigator.of(context).push<void>(
         MaterialPageRoute<void>(

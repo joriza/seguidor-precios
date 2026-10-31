@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../../data/productos.dart';
 import '../productos/producto_form_screen.dart';
 
 /// S9 (R13): comparación de UN producto (mismo EAN) entre comercios —
@@ -83,7 +84,8 @@ class _ProductoComparacionScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_producto.nombre),
+        // S5 (v0.3.8): «Pack ×N» desambigua la presentación (N > 1).
+        title: Text('${_producto.nombre}${sufijoPack(_producto.pack)}'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.edit_outlined),

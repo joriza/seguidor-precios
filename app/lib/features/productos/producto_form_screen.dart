@@ -14,7 +14,8 @@ import '../../data/valoraciones.dart';
 ///
 /// Campos: código (opcional, editable), nombre (obligatorio), marca,
 /// unidad de venta, contenido neto (vacío = 1 para granel, AD-014),
-/// categoría y artículo (opcional).
+/// unidades por pack (v0.3.8, S5: default 1, entero ≥ 1), categoría y
+/// artículo (opcional).
 class ProductoFormScreen extends StatefulWidget {
   const ProductoFormScreen({
     super.key,
@@ -51,6 +52,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   late final TextEditingController _nombre;
   late final TextEditingController _marca;
   late final TextEditingController _contenido;
+  late final TextEditingController _pack;
   late final TextEditingController _categoria;
   late String _unidad;
   String? _articuloId;
@@ -81,6 +83,10 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           widget.datosIniciales?.contenidoNeto?.toString() ??
           '',
     );
+    // S5 (v0.3.8): default 1; Open Food Facts no informa pack.
+    _pack = TextEditingController(
+      text: widget.producto?.pack.toString() ?? '1',
+    );
     _categoria = TextEditingController(text: widget.producto?.categoria ?? '');
     _unidad =
         widget.producto?.unidad ?? widget.datosIniciales?.unidad ?? 'unidad';
@@ -97,6 +103,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _nombre.dispose();
     _marca.dispose();
     _contenido.dispose();
+    _pack.dispose();
     _categoria.dispose();
     _observacion.dispose();
     super.dispose();
@@ -128,6 +135,14 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     return (valor * 100).roundToDouble() / 100;
   }
 
+  /// S5 (v0.3.8): unidades por pack — vacío = 1 (el validador garantiza
+  /// que lo ingresado sea un entero ≥ 1).
+  int _packNormalizado() {
+    final texto = _pack.text.trim();
+    if (texto.isEmpty) return 1;
+    return int.parse(texto);
+  }
+
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
@@ -140,6 +155,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     final marca = _marca.text.trim();
     final categoria = _categoria.text.trim();
     final neto = _contenidoNetoNormalizado();
+    final pack = _packNormalizado();
 
     try {
       // S1 (v0.3.5): alta sin código → se asigna el próximo código interno
@@ -164,6 +180,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
               marca: marca.isEmpty ? null : marca,
               unidad: _unidad,
               contenidoNeto: neto,
+              pack: pack,
               categoria: categoria.isEmpty ? null : categoria,
               articuloId: _articuloId,
             )
@@ -174,6 +191,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
               marca: marca.isEmpty ? null : marca,
               unidad: _unidad,
               contenidoNeto: neto,
+              pack: pack,
               categoria: categoria.isEmpty ? null : categoria,
               articuloId: _articuloId,
             );
@@ -278,6 +296,28 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
                 final n = double.tryParse(t.replaceAll(',', '.'));
                 if (n == null) return 'Número inválido';
                 if (n <= 0) return 'Debe ser mayor a 0';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _pack,
+              keyboardType: TextInputType.number,
+              // S5 (v0.3.8): el pack es cuántas unidades del contenido neto
+              // trae la presentación; solo sirve para normalizar el precio.
+              decoration: const InputDecoration(
+                labelText: 'Unidades por pack',
+                helperText:
+                    'Cuántas unidades trae la presentación. Precio '
+                    'normalizado = precio ÷ (pack × contenido por unidad). '
+                    'Default: 1.',
+              ),
+              validator: (String? v) {
+                final t = v?.trim() ?? '';
+                if (t.isEmpty) return null; // vacío = 1
+                final n = int.tryParse(t);
+                if (n == null) return 'Ingresá un número entero';
+                if (n < 1) return 'Debe ser 1 o más';
                 return null;
               },
             ),
