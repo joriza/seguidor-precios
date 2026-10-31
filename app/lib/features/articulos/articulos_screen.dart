@@ -7,6 +7,7 @@ import '../../data/local/normalizacion.dart';
 import '../sync/gestor_sync.dart';
 import '../sync/refresco.dart';
 import 'articulo_detalle_screen.dart';
+import 'sin_clasificar_screen.dart';
 
 /// S6 (R11): administración de artículos — alta, renombre y conteo de
 /// productos asignados. La asignación producto ↔ artículo también puede
@@ -28,6 +29,10 @@ class ArticulosScreen extends StatefulWidget {
 class _ArticulosScreenState extends State<ArticulosScreen> {
   List<Articulo> _articulos = <Articulo>[];
   Map<String, int> _productosPorArticulo = <String, int>{};
+
+  /// v0.3.9 (S2): conteo de productos sin artículo (sin borrados) para la
+  /// entrada «Sin clasificar (N)».
+  int _sinClasificar = 0;
   bool _cargando = true;
 
   @override
@@ -50,6 +55,14 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
       readsFrom: {widget.baseDeDatos.productos},
     ).get();
 
+    // v0.3.9 (S2): N de la entrada «Sin clasificar» — mismo criterio que
+    // la pantalla: articulo_id NULL y sin baja (S3: los borrados no cuentan).
+    final conteoSinClasificar = await widget.baseDeDatos.customSelect(
+      'SELECT COUNT(*) AS c FROM productos '
+      'WHERE articulo_id IS NULL AND borrado_en IS NULL',
+      readsFrom: {widget.baseDeDatos.productos},
+    ).getSingle();
+
     if (!mounted) return;
     setState(() {
       _articulos = articulos;
@@ -57,8 +70,20 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
         for (final fila in conteos)
           fila.read<String>('articulo_id'): fila.read<int>('c'),
       };
+      _sinClasificar = conteoSinClasificar.read<int>('c');
       _cargando = false;
     });
+  }
+
+  /// v0.3.9 (S2): abre la pantalla de clasificación; al volver, el conteo
+  /// puede haber cambiado — recarga.
+  Future<void> _abrirSinClasificar() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => SinClasificarScreen(baseDeDatos: widget.baseDeDatos),
+      ),
+    );
+    await _cargar();
   }
 
   Future<void> _dialogoArticulo({Articulo? existente}) async {
@@ -159,6 +184,18 @@ class _ArticulosScreenState extends State<ArticulosScreen> {
             onPressed: () => _dialogoArticulo(),
             icon: const Icon(Icons.add),
             label: const Text('Nuevo artículo'),
+          ),
+        ),
+        // v0.3.9 (S2): entrada a la clasificación — lista los productos sin
+        // artículo y permite asignarlos individualmente o en lote.
+        Card(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: ListTile(
+            leading: const Icon(Icons.category_outlined),
+            title: Text('Sin clasificar ($_sinClasificar)'),
+            subtitle: const Text('Productos sin artículo asignado'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _abrirSinClasificar,
           ),
         ),
         Expanded(

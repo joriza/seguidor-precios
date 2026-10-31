@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/features/articulos/articulos_screen.dart';
+import 'package:seguidor_precios/features/articulos/sin_clasificar_screen.dart';
 
 void main() {
   late BaseDeDatos db;
@@ -111,5 +112,70 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('2 producto(s)'), findsOneWidget);
+  });
+
+  // v0.3.9 (S2): entrada desde Artículos con el conteo N de productos sin
+  // artículo (sin borrados).
+  testWidgets('muestra la entrada Sin clasificar (N) sin contar borrados',
+      (tester) async {
+    await db.into(db.articulos).insert(
+          ArticulosCompanion.insert(
+            id: 'a1',
+            nombre: 'Mayonesa',
+            unidadBase: 'kg',
+            creadoPor: 'u1',
+            creadoEn: '2026-01-01T00:00:00',
+            actualizadoEn: '2026-01-01T00:00:00',
+          ),
+        );
+    await db.into(db.productos).insert(
+          ProductosCompanion.insert(
+            id: 'p1',
+            nombre: 'Clasificado',
+            unidad: 'g',
+            articuloId: const Value('a1'),
+            creadoPor: 'u1',
+            creadoEn: '2026-01-01T00:00:00',
+            actualizadoEn: '2026-01-01T00:00:00',
+          ),
+        );
+    await db.into(db.productos).insert(
+          ProductosCompanion.insert(
+            id: 'p2',
+            nombre: 'Sin clasificar',
+            unidad: 'g',
+            creadoPor: 'u1',
+            creadoEn: '2026-01-01T00:00:00',
+            actualizadoEn: '2026-01-01T00:00:00',
+          ),
+        );
+    await db.into(db.productos).insert(
+          ProductosCompanion.insert(
+            id: 'p3',
+            nombre: 'Borrado sin clasificar',
+            unidad: 'g',
+            creadoPor: 'u1',
+            creadoEn: '2026-01-01T00:00:00',
+            actualizadoEn: '2026-01-01T00:00:00',
+            borradoEn: const Value('2026-01-02T00:00:00'),
+          ),
+        );
+
+    await tester.pumpWidget(envolver(ArticulosScreen(baseDeDatos: db)));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sin clasificar (1)'), findsOneWidget);
+  });
+
+  testWidgets('la entrada Sin clasificar abre la pantalla de clasificación',
+      (tester) async {
+    await tester.pumpWidget(envolver(ArticulosScreen(baseDeDatos: db)));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining('Sin clasificar'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SinClasificarScreen), findsOneWidget);
+    expect(find.text('No hay productos sin clasificar'), findsOneWidget);
   });
 }

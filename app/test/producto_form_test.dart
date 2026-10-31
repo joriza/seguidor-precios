@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:seguidor_precios/data/enriquecimiento.dart';
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 
@@ -282,5 +283,42 @@ void main() {
 
     final filas = await db.select(db.productos).get();
     expect(filas.single.unidad, 'g');
+  });
+
+  // S1 (v0.3.9): la categoría de OFF viaja en DatosEnriquecidos y se
+  // precarga en el campo categoría del formulario; el usuario SIEMPRE
+  // confirma antes de guardar (la fila se crea recién al guardar).
+  testWidgets('alta: precarga la categoría de OFF y la guarda al confirmar',
+      (tester) async {
+    superficieGrande(tester);
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      // Alta sin código: el TOK interno se inyecta como en los demás tests
+      // (S1 v0.3.5) para no depender del archivo real de la instalación.
+      tokInterno: () async => 'QT',
+      datosIniciales: const DatosEnriquecidos(
+        nombre: 'Pepas de membrillo',
+        marca: 'Bagley',
+        categorias: 'Snacks, Sweet snacks, Biscuits, Cookies',
+      ),
+    )));
+
+    // Precarga visible en el campo categoría antes de guardar (el valor
+    // del campo es EditableText: find.text lo matchea).
+    expect(
+      find.text('Snacks, Sweet snacks, Biscuits, Cookies'),
+      findsOneWidget,
+    );
+    expect(await db.select(db.productos).get(), isEmpty);
+
+    await tester.tap(find.text('Guardar producto'));
+    await tester.pumpAndSettle();
+
+    final filas = await db.select(db.productos).get();
+    expect(filas, hasLength(1));
+    expect(filas.single.categoria, 'Snacks, Sweet snacks, Biscuits, Cookies');
+    expect(filas.single.nombre, 'Pepas de membrillo');
+    expect(filas.single.marca, 'Bagley');
+    expect(filas.single.codigoBarras, 'S-QT-0001');
   });
 }

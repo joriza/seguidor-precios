@@ -87,7 +87,14 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _pack = TextEditingController(
       text: widget.producto?.pack.toString() ?? '1',
     );
-    _categoria = TextEditingController(text: widget.producto?.categoria ?? '');
+    // S1 (v0.3.9): la categoría cruda de OFF precarga el campo en el alta;
+    // en la edición manda el producto guardado. El usuario confirma antes
+    // de guardar (S3): la fila se crea/recién se cambia al guardar.
+    _categoria = TextEditingController(
+      text: widget.producto?.categoria ??
+          widget.datosIniciales?.categorias ??
+          '',
+    );
     _unidad =
         widget.producto?.unidad ?? widget.datosIniciales?.unidad ?? 'unidad';
     _articuloId = widget.producto?.articuloId;
