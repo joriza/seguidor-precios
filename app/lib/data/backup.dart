@@ -158,7 +158,12 @@ Future<ResumenImportacion> importarBackup(
               .getSingleOrNull() !=
           null,
       (p) => db.into(db.productos).insert(p),
-      Producto.fromJson,
+      // v0.3.8 (S6): los backups viejos no traen la clave `pack`; la
+      // importación no la exige y las filas entran con el default 1.
+      (Map<String, dynamic> fila) => Producto.fromJson(<String, dynamic>{
+            ...fila,
+            'pack': fila['pack'] ?? 1,
+          }),
     );
     await importarTabla<Precio>(
       dinamicas['precios']!,

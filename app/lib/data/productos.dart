@@ -11,6 +11,11 @@ import 'sync/cola_saliente.dart';
 /// (regla de sync 6): acá solo se valida la unicidad local, que si falla
 /// lanza y la pantalla muestra su error de siempre.
 
+/// Sufijo «Pack ×N» (v0.3.8, S5): desambigua presentaciones cuando el
+/// producto trae más de una unidad. N = 1 devuelve vacío: el producto sin
+/// pack renderiza exactamente igual que antes (S6).
+String sufijoPack(int pack) => pack > 1 ? ' · Pack ×$pack' : '';
+
 /// Da de alta un producto y devuelve la fila guardada.
 Future<Producto> altaProducto(
   BaseDeDatos db, {
@@ -19,6 +24,7 @@ Future<Producto> altaProducto(
   String? marca,
   required String unidad,
   double? contenidoNeto,
+  int pack = 1,
   String? categoria,
   String? articuloId,
   String? id,
@@ -36,6 +42,7 @@ Future<Producto> altaProducto(
           marca: Value(marca),
           unidad: unidad,
           contenidoNeto: Value(contenidoNeto),
+          pack: Value(pack),
           categoria: Value(categoria),
           articuloId: Value(articuloId),
           creadoPor: usuario.id,
@@ -57,6 +64,7 @@ Future<Producto> editarProducto(
   String? marca,
   required String unidad,
   double? contenidoNeto,
+  int pack = 1,
   String? categoria,
   String? articuloId,
   DateTime? ahora,
@@ -69,6 +77,7 @@ Future<Producto> editarProducto(
           marca: Value(marca),
           unidad: Value(unidad),
           contenidoNeto: Value(contenidoNeto),
+          pack: Value(pack),
           categoria: Value(categoria),
           articuloId: Value(articuloId),
           actualizadoEn: Value(momento.toUtc().toIso8601String()),

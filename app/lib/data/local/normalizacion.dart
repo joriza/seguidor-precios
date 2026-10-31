@@ -1,9 +1,12 @@
 /// Normalización de precios por unidad de medida (R11/R12, AD-014).
 ///
-/// `precio_unitario = precio / (contenido_neto × factor(unidad → unidad_base))`.
-/// Granel (AD-014): si no hay contenido neto y la unidad coincide con la base,
-/// se asume 1 (el precio ya es por unidad). Devuelve null cuando el producto
-/// no es comparable (sin contenido neto utilizable o conversión imposible).
+/// `precio_unitario = precio / (pack × contenido_neto × factor(unidad →
+/// unidad_base))`. Granel (AD-014): si no hay contenido neto y la unidad
+/// coincide con la base, se asume 1 (el precio ya es por unidad). El pack
+/// (v0.3.8, S2) es cuántas unidades trae la presentación: el unitario
+/// (pack 1) y el pack se normalizan al mismo $/kg si el precio es
+/// proporcional. Devuelve null cuando el producto no es comparable (sin
+/// contenido neto utilizable o conversión imposible).
 library;
 
 /// Unidades de venta aceptadas en formularios (S5).
@@ -38,6 +41,7 @@ double? precioPorUnidad({
   required String unidad,
   required String unidadBase,
   double? contenidoNeto,
+  int pack = 1,
 }) {
   final double? factor = factorConversion(unidad);
   if (factor == null || _unidadBase[unidad] != unidadBase) return null;
@@ -47,7 +51,12 @@ double? precioPorUnidad({
   // sin contenido neto declarado NO es comparable.
   final double? neto = contenidoNeto ?? (unidad == unidadBase ? 1.0 : null);
   if (neto == null || neto <= 0) return null;
-  return precio / (neto * factor);
+
+  // S2 (v0.3.8): el precio se normaliza por TODO el contenido de la
+  // presentación (pack × contenido por unidad). Un pack inválido (< 1,
+  // la columna no tiene CHECK) se trata como 1 para no dividir por cero.
+  final int unidadesPorPack = pack < 1 ? 1 : pack;
+  return precio / (unidadesPorPack * neto * factor);
 }
 
 /// Variación porcentual entre dos tomas consecutivas (R8).

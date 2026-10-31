@@ -194,6 +194,7 @@ Producto productoActual() {
     nombre: 'Mayonesa',
     unidad: 'g',
     contenidoNeto: 500,
+    pack: 1,
     creadoPor: 'u1',
     creadoEn: '2026-01-01T00:00:00',
     actualizadoEn: '2026-01-01T00:00:00',

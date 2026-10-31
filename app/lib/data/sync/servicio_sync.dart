@@ -743,6 +743,7 @@ Future<Map<String, dynamic>?> _leerFilaLocal(
         'categoria': p.categoria,
         'unidad': p.unidad,
         'contenido_neto': p.contenidoNeto,
+        'pack': p.pack,
         'notas': p.notas,
         'creado_por': p.creadoPor,
         'creado_en': p.creadoEn,
@@ -841,6 +842,9 @@ ProductosCompanion _companionProductoDesdeRemota(Map<String, dynamic> fila) =>
       categoria: Value(fila['categoria'] as String?),
       unidad: fila['unidad'] as String? ?? 'unidad',
       contenidoNeto: Value((fila['contenido_neto'] as num?)?.toDouble()),
+      // S6 (v0.3.8): filas del servidor sin la clave pack (SQL 0006 aún no
+      // aplicado) entran con el default 1.
+      pack: Value((fila['pack'] as num?)?.toInt() ?? 1),
       notas: Value(fila['notas'] as String?),
       creadoPor: fila['creado_por'] as String? ?? '',
       creadoEn: fila['creado_en'] as String? ?? cursorInicial,
@@ -857,6 +861,7 @@ ProductosCompanion _companionProductoParaActualizar(Map<String, dynamic> fila) =
       categoria: Value(fila['categoria'] as String?),
       unidad: Value(fila['unidad'] as String? ?? 'unidad'),
       contenidoNeto: Value((fila['contenido_neto'] as num?)?.toDouble()),
+      pack: Value((fila['pack'] as num?)?.toInt() ?? 1),
       notas: Value(fila['notas'] as String?),
       actualizadoEn: Value(fila['actualizado_en'] as String? ?? cursorInicial),
       borradoEn: Value(fila['borrado_en'] as String?),

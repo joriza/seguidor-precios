@@ -50,7 +50,8 @@ class _ArticuloDetalleScreenState extends State<ArticuloDetalleScreen> {
     final filas = await widget.baseDeDatos.customSelect(
       'SELECT p.nombre AS producto_nombre, p.marca AS producto_marca, '
       'c.nombre AS comercio_nombre, pr.precio AS precio, p.unidad AS unidad, '
-      'p.contenido_neto AS contenido_neto, a.unidad_base AS unidad_base, '
+      'p.contenido_neto AS contenido_neto, p.pack AS pack, '
+      'a.unidad_base AS unidad_base, '
       'pr.fecha_toma AS fecha_toma, pr.comercio_id AS comercio_id '
       'FROM precios pr '
       'JOIN productos p ON pr.producto_id = p.id '
@@ -76,6 +77,7 @@ class _ArticuloDetalleScreenState extends State<ArticuloDetalleScreen> {
         unidad: fila.read<String>('unidad'),
         unidadBase: fila.read<String>('unidad_base'),
         contenidoNeto: fila.read<double?>('contenido_neto'),
+        pack: fila.read<int>('pack'),
       );
       if (precioUnitario == null) continue;
       final String comercioId = fila.read<String>('comercio_id');

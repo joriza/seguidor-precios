@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 
-/// Migración local v2 → versión actual (v4): agrega las tablas de sync
+/// Migración local v2 → versión actual (v5): agrega las tablas de sync
 /// (outbox, cursores por tabla y marca global) sin perder datos existentes,
 /// y el backfill v4 encola las filas pre-existentes (T2 + correctivo de
 /// campo).
@@ -86,8 +86,8 @@ void main() {
     expect(await db.select(db.estadoSync).get(), isEmpty);
 
     // El esquema quedó en la versión actual.
-    expect(db.schemaVersion, 4);
+    expect(db.schemaVersion, 5);
     final version = await db.customSelect('PRAGMA user_version').getSingle();
-    expect(version.data['user_version'], 4);
+    expect(version.data['user_version'], 5);
   });
 }

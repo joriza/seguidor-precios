@@ -46,6 +46,12 @@ class Productos extends Table {
   TextColumn get unidad => text()();
   RealColumn get contenidoNeto => real().nullable()();
 
+  /// v0.3.8 (S1/S2): cuántas unidades del contenido neto trae la
+  /// presentación (fideos: contenido 500 g + pack 10 → el pack trae 5 kg).
+  /// Sirve SOLO para normalizar el precio (precio ÷ (pack × contenido_neto));
+  /// la identificación no cambia (S3: cada pack tiene su propio código).
+  IntColumn get pack => integer().withDefault(const Constant(1))();
+
   /// 'semilla' si vino del pack de Open Food Facts; null si lo cargó un usuario.
   TextColumn get origen => text().nullable()();
 
