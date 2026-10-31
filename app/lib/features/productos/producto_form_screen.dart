@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../data/codigo_interno.dart';
@@ -6,6 +8,7 @@ import '../../data/local/base_de_datos.dart';
 import '../../data/local/normalizacion.dart';
 import '../../data/productos.dart';
 import '../../data/valoraciones.dart';
+import '../precios/producto_comparacion_screen.dart';
 
 /// S5 (R1/R7/R11): alta y edición de producto.
 ///
@@ -60,6 +63,19 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   bool _guardando = false;
   String? _error;
 
+  /// v0.3.10 (S1/S2): detección temprana de EAN duplicado — sólo modo
+  /// alta. La edición nunca muestra el aviso (S3).
+  Producto? _duplicado;
+  Timer? _debounceCodigo;
+
+  /// «Cargar de todos modos»: cierra el aviso; cambiar el código lo
+  /// re-activa. El error UNIQUE de guardado sigue de red de seguridad.
+  bool _ignorarDuplicado = false;
+
+  /// Último código cuyo lookup ya se hizo (evita re-consultas del mismo
+  /// contenido); cambiar el texto vuelve a disparar el lookup.
+  String? _codigoVerificado;
+
   /// v0.1.5: valoración personal — neutro por defecto.
   String _gusto = 'neutro';
   final TextEditingController _observacion = TextEditingController();
@@ -101,11 +117,22 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     _cargarArticulos();
     if (_esEdicion) {
       _cargarValoracion();
+    } else if ((widget.producto?.codigoBarras ??
+                widget.codigoBarrasInicial ??
+                '')
+            .isNotEmpty) {
+      // v0.3.10 (S1): al abrir el formulario en alta con un código (del
+      // escáner o del ingreso manual), se verifica temprano contra la base
+      // local. postFrame: el setState necesita el árbol montado.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _verificarDuplicado();
+      });
     }
   }
 
   @override
   void dispose() {
+    _debounceCodigo?.cancel();
     _codigo.dispose();
     _nombre.dispose();
     _marca.dispose();
@@ -132,6 +159,56 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           ..where((t) => t.borradoEn.isNull()))
         .get();
     if (mounted) setState(() => _articulos = lista);
+  }
+
+  /// v0.3.10 (S1): re-chequeo con debounce al editar el campo código (sólo
+  /// modo alta). Cambiar el código re-activa el aviso.
+  void _onCodigoCambio(String texto) {
+    if (_esEdicion) return;
+    _ignorarDuplicado = false;
+    _debounceCodigo?.cancel();
+    _debounceCodigo =
+        Timer(const Duration(milliseconds: 500), _verificarDuplicado);
+  }
+
+  /// v0.3.10 (S1/S3): lookup local (milisegundos, sin red) —
+  /// codigoBarras == codigo AND borradoEn IS NULL AND id != fila propia.
+  /// Sólo modo alta; sin coincidencia no aparece nada.
+  Future<void> _verificarDuplicado() async {
+    final String codigo = _codigo.text.trim();
+    if (_esEdicion || codigo.isEmpty) {
+      if (mounted && _duplicado != null) {
+        setState(() => _duplicado = null);
+      }
+      return;
+    }
+    if (codigo == _codigoVerificado) return; // ya verificado
+    final Producto? existente = await (widget.baseDeDatos
+            .select(widget.baseDeDatos.productos)
+          ..where((t) => t.codigoBarras.equals(codigo))
+          ..where((t) => t.borradoEn.isNull())
+          ..where((t) => t.id.isNotIn(<String>[
+              if (widget.producto != null) widget.producto!.id,
+            ])))
+        .getSingleOrNull();
+    if (!mounted || codigo != _codigo.text.trim()) return;
+    _codigoVerificado = codigo;
+    setState(() => _duplicado = existente);
+  }
+
+  /// v0.3.10 (S2): cierra el formulario y abre la comparación del producto
+  /// existente. El navigator se captura antes del pop (el context del
+  /// formulario queda desmontado).
+  void _irAlProductoExistente() {
+    final Producto existente = _duplicado!;
+    final NavigatorState nav = Navigator.of(context);
+    nav.pop();
+    nav.push(MaterialPageRoute<void>(
+      builder: (BuildContext contexto) => ProductoComparacionScreen(
+        baseDeDatos: widget.baseDeDatos,
+        producto: existente,
+      ),
+    ));
   }
 
   double? _contenidoNetoNormalizado() {
@@ -234,6 +311,49 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
         children: <Widget>[
+          // v0.3.10 (S1/S2/S3): aviso temprano de EAN duplicado. Sólo alta;
+          // «Cargar de todos modos» lo cierra y el error UNIQUE del guardado
+          // sigue de red de seguridad.
+          if (_duplicado != null &&
+              !_ignorarDuplicado &&
+              !_esEdicion) ...<Widget>[
+            Card(
+              key: const ValueKey('aviso-duplicado'),
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'Ese código ya existe: «${_duplicado!.nombre}». '
+                          '¿Seguro que querés cargar otro igual?',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: <Widget>[
+                        TextButton(
+                          key: const ValueKey('btn-ir-producto'),
+                          onPressed: _irAlProductoExistente,
+                          child: const Text('Ir al producto existente'),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton(
+                          key: const ValueKey('btn-cargar-igual'),
+                          onPressed: () =>
+                              setState(() => _ignorarDuplicado = true),
+                          child: const Text('Cargar de todos modos'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (widget.datosIniciales != null) ...<Widget>[
             Text(
               'Datos precargados desde Open Food Facts — revisalos y confirmá antes de guardar.',
@@ -242,8 +362,11 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
             const SizedBox(height: 12),
           ],
           TextFormField(
+              key: const ValueKey('campo-codigo'),
               controller: _codigo,
               keyboardType: TextInputType.number,
+              // v0.3.10 (S1): re-chequeo con debounce al editar el código.
+              onChanged: _onCodigoCambio,
               decoration: InputDecoration(
                 labelText: 'Código de barras (opcional)',
                 hintText: 'Ej.: 7790001001001',
