@@ -128,11 +128,13 @@ corregidos y validados en campo (v0.3.4, L17 fase-3).*
    `unidades_por_pack` en producto (migración local v5 + servidor 0006) para registrar la
    presentación explícitamente. El artículo ya agrupa presentaciones de un mismo producto;
 5. #1 clasificación en lote + sugerencia de artículo desde OFF — **HECHA (v0.3.9)**;
-6. #5 verificar EAN al abrir el formulario;
+6. #5 verificar EAN al abrir el formulario — **HECHA (v0.3.10)**;
 7. #3 «Completar desde OFF»;
 8. #2 catálogo vivo (gran parte ya cubierta por el fix C1: la instalación nueva baja el
 catálogo completo; resta achicar la semilla offline);
 9. #6 foto del producto.
+10. **Modo conectado permanente** (C1 sync silenciosa — requiere relajar R15/AD-010 — y/o C2
+consulta remota en vivo): evaluar cerca de la Fase 4 público; la base ya está (v0.3.10).
 Después: tareas Fase 3 (3.1-3.6, 3.8).*
 
 | # | Fricción | Mejora propuesta |
@@ -141,7 +143,7 @@ Después: tareas Fase 3 (3.1-3.6, 3.8).*
 | 2 | Semilla congelada: la instalación nueva recibe el pack de v0.1.1 por APK y nunca se actualiza | Con nube activa: instalación nueva = seed mínimo offline + pull del catálogo real del servidor (la semilla queda como plan B sin conexión) |
 | 3 | Enriquecimiento solo al crear: productos viejos o mal cargados nunca se completan desde OFF | Botón “Completar desde OFF” en la ficha de producto (para productos con EAN y datos flojos) |
 | 4 | Mensaje desactualizado del escáner: dice “crealo desde la sección Artículos (Fase 1.5)” pero el escáner ya abre el formulario con precarga | Corregir el texto (trivial) — **HECHA en v0.3.5** |
-| 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” |
+| 5 | EAN duplicado se descubre tarde: el aviso llega recién al guardar | Verificar el EAN al abrir el formulario y ofrecer “ir al producto existente” — **HECHA en v0.3.10** (lookup local al abrir + re-chequeo con debounce al tipear; aviso con «Ir al producto existente» / «Cargar de todos modos») |
 | 6 | OFF trae más datos útiles que se descartan (imagen del producto, nutrición) | Fase 3+: foto del producto en la ficha |
 | 7 | Artículos sin código de barras (verdulería de barrio): hoy no entran al sistema los productos a granel | Alta de producto sin EAN con código interno secuencial asignado por la app; buscable por ese código o descripción (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5 con diseño v2 `S-<TOK>-<NNNN>` sin colisiones** |
 | 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
