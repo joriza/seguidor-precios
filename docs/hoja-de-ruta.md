@@ -113,7 +113,7 @@ migrados; backups y monitoreo activos.
 
 ## Backlog de mejoras de producto (propuestas, pendientes de priorizar)
 
-*Propuestas del 2026-10-28 (más #9 del 2026-10-30), pendientes de priorizar. Fuera de este
+*Propuestas del 2026-10-28 (más #9-#10 del 2026-10-30 y #11-#14 del 2026-11-06), pendientes de priorizar. Fuera de este
 backlog quedan los 2 críticos del pull confirmados por el juicio (C1/C2, Log L20 del ODD), ya
 corregidos y validados en campo (v0.3.4, L17 fase-3).*
 
@@ -137,6 +137,19 @@ catálogo completo; resta achicar la semilla offline);
 consulta remota en vivo): evaluar cerca de la Fase 4 público; la base ya está (v0.3.10).
 Después: tareas Fase 3 (3.1-3.6, 3.8).*
 
+***Orden de las nuevas propuestas #11-#14 (2026-11-06, el dueño delega la priorización):**
+1. **#11 cámara con pausa tras lectura** — fricción del flujo diario (batería + lecturas falsas
+de un segundo código) con un cambio contenido en el escáner;
+2. **#12 comercio preseleccionado** — misma fricción diaria al registrar precios; hoy solo se
+preselecciona cuando existe exactamente un comercio;
+3. **#13 error con la base Open Food** — defecto: primero diagnóstico (reproducir y delimitar
+el eslabón: semilla, precarga de EAN o «Completar desde OFF»); si el diagnóstico muestra datos
+mal cargados, pasa al primer lugar;
+4. **#14 datos históricos más compactos** — requiere un análisis/diseño de presentación antes
+de implementar.
+Detrás siguen los pendientes del orden anterior: #2 catálogo vivo (restante), #6 foto del
+producto, modo conectado permanente y las tareas de Fase 3 (3.1-3.6, 3.8).*
+
 | # | Fricción | Mejora propuesta |
 | --- | --- | --- |
 | 1 | Clasificación manual: los productos semilla nacen sin artículo y asignarlos es tarea individual. OFF ya trae categorías que hoy se descartan | Enriquecimiento sugiere artículo (mapeo categoría OFF → artículos propios); pantalla de clasificación en lote — **HECHA en v0.3.9** (pantalla «Sin clasificar (N)» con sugerencias por tokens y lote) |
@@ -149,6 +162,10 @@ Después: tareas Fase 3 (3.1-3.6, 3.8).*
 | 8 | Búsqueda solo por escaneo de EAN: no hay búsqueda manual de producto | Búsqueda combinada por número de EAN o descripción, que arranca a partir de 3 caracteres (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
 | 9 | El uso principal es escanear para consultar/agregar, pero la app abre en Inicio | Que el escáner sea la pantalla por defecto al abrir la app (propuesta del dueño, 2026-10-30) — **HECHA en v0.3.5** |
 | 10 | Packs y combos: galletitas sueltas o pack x3/x5; yerba o fideos en pack x10 — el precio publicado es por pack y el precio normalizado sale mal si no se carga el contenido TOTAL del pack. Casos extra del debate (2026-10-30): packs SIN código propio (escanear el unitario y querer registrar el precio del pack) y papel higiénico (packs de 2/4/6/12 con rollos de distinta longitud → normalizar en METROS) | **DISEÑO CERRADO (2026-10-30):** `pack` (unidades por pack, default 1) como atributo del producto; precio normalizado = precio ÷ (pack × contenido_neto); identificación por EAN propio de cada presentación; packs ocasionales y oferta temporal fuera del modelo (decisión del dueño); papel higiénico/metros queda como extensión de unidades independiente — **HECHA en v0.3.8** (migración v5 local + SQL 0006 servidor aplicado y verificado) |
+| 11 | El escáner queda leyendo: tras reconocer un código la cámara sigue activa y, con un pequeño movimiento de la mano, lee otro código que esté a la vista; además gasta batería mientras sigue apuntando (propuesta del dueño, 2026-11-06) | Al reconocer un código, desactivar automáticamente el cuadro de la cámara (pausar preview y detección); el escaneo se reactiva solo al pulsar el botón «Escanear». Al abrir la app el escaneo sigue activo por defecto (pantalla inicial desde v0.3.5) |
+| 12 | El negocio suele ser siempre el mismo, pero el registro de precio pide elegir el comercio cada vez: hoy solo queda preseleccionado cuando existe exactamente uno (propuesta del dueño, 2026-11-06) | Recordar el último comercio usado y preseleccionarlo en el próximo registro; cambiarlo sigue siendo fácil con un toque desde el selector. Que «siempre el mismo» sea el default sin volverlo rígido |
+| 13 | «Error en el cableado con la base Open Food» (propuesta textual del dueño, 2026-11-06): falta delimitar dónde falla la integración — import del pack semilla, precarga de EAN desconocido con red o «Completar desde OFF» | Diagnóstico primero: reproducir el error y aislar el eslabón culpable; luego corrección puntual. Pendiente: que el dueño pase el mensaje/síntoma exacto y dónde lo vio |
+| 14 | La ficha del producto muestra poco de un vistazo: al encontrarlo no se ven más datos ni más comercios de forma compacta («datos históricos más compactos… mostrar más datos y más contactos», propuesta del dueño, 2026-11-06) | Análisis/diseño primero: qué presentar al encontrar el producto (más historial, más comercios con su precio actual, variación %, precio por unidad) y en qué formato compacto; validar la propuesta con el dueño y después implementar |
 
 ## Riesgos
 
