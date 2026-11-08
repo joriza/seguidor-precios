@@ -136,9 +136,13 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
           widget.datosIniciales?.contenidoNeto?.toString() ??
           '',
     );
-    // S5 (v0.3.8): default 1; Open Food Facts no informa pack.
+    // S5 (v0.3.8): default 1. v0.3.15 (S7): un multipack de OFF
+    // («2 x 475 ml») precarga el pack sólo en el alta, cuando el campo
+    // arranca en su default 1 — regla fill-only-empty v0.3.11; en la
+    // edición manda el producto guardado.
     _pack = TextEditingController(
-      text: widget.producto?.pack.toString() ?? '1',
+      text: widget.producto?.pack.toString() ??
+          (widget.datosIniciales?.pack?.toString() ?? '1'),
     );
     // S1 (v0.3.9): la categoría cruda de OFF precarga el campo en el alta;
     // en la edición manda el producto guardado. El usuario confirma antes
@@ -287,8 +291,11 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
         case ResultadoNoEncontrado():
           _mensajeOFF = 'Open Food Facts no trajo datos para este código.';
         case ResultadoErrorConectividad():
-        case ResultadoErrorServidor():
           _mensajeOFF = 'Sin conexión: no se pudo consultar Open Food Facts.';
+        case ResultadoErrorServidor():
+          // v0.3.15 (S6): OFF no respondió ≠ falta de conexión — mensaje
+          // propio, alineado con el advisory del verificador v0.3.14.
+          _mensajeOFF = 'Open Food no respondió. Reintentá más tarde.';
       }
     });
   }
@@ -296,8 +303,10 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   /// v0.3.11 (S2): nunca pisa datos cargados — sólo controladores vacíos.
   /// La unidad entra sólo si el valor de OFF es una unidad de venta
   /// aceptada y el campo sigue en el default «unidad» (el equivalente de
-  /// vacío en el dropdown). El pack jamás se toca (OFF no informa pack).
-  /// Nada escribe en la base: el usuario confirma con «Guardar cambios».
+  /// vacío en el dropdown). El pack (v0.3.15 S7, multipack de OFF) sólo
+  /// completa el campo si sigue en su default 1 — fill-only-empty
+  /// v0.3.11; nunca pisa lo que cargó el usuario. Nada escribe en la
+  /// base: el usuario confirma con «Guardar cambios».
   void _aplicarEnriquecimiento(DatosEnriquecidos datos) {
     if (_nombre.text.trim().isEmpty) {
       _nombre.text = datos.nombre;
@@ -316,6 +325,12 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     }
     if (datos.categorias != null && _categoria.text.trim().isEmpty) {
       _categoria.text = datos.categorias!;
+    }
+    // v0.3.15 (S7): el pack de OFF (multipack) sólo completa el campo si
+    // sigue en su default 1 (vacío cuenta como 1); nunca pisa al usuario.
+    final int packActual = int.tryParse(_pack.text.trim()) ?? 1;
+    if (datos.pack != null && packActual == 1) {
+      _pack.text = datos.pack.toString();
     }
   }
 

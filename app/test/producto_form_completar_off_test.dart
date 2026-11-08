@@ -49,6 +49,21 @@ class ServicioDeCola implements ServicioEnriquecimiento {
   }
 }
 
+/// Servicio falso que devuelve un resultado fijo del puerto (v0.3.15 T3:
+/// el formulario distingue errorServidor de errorConectividad).
+class ServicioFalsoDeResultado implements ServicioEnriquecimiento {
+  ServicioFalsoDeResultado(this.resultado);
+
+  final ResultadoEnriquecimiento resultado;
+  int consultas = 0;
+
+  @override
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
+    consultas++;
+    return resultado;
+  }
+}
+
 /// Servicio falso que simula OFF caído / timeout.
 class ServicioQueLanza implements ServicioEnriquecimiento {
   int consultas = 0;
@@ -92,6 +107,7 @@ void main() {
     double? contenidoNeto,
     String unidad = 'unidad',
     String? categoria,
+    int pack = 1,
   }) {
     return db.into(db.productos).insertReturning(
           ProductosCompanion.insert(
@@ -102,6 +118,7 @@ void main() {
             unidad: unidad,
             contenidoNeto: Value(contenidoNeto),
             categoria: Value(categoria),
+            pack: Value(pack),
             creadoPor: 'u1',
             creadoEn: '2026-01-01T00:00:00',
             actualizadoEn: '2026-01-01T00:00:00',
@@ -121,6 +138,7 @@ void main() {
     double? contenidoNeto = 400,
     String? unidad = 'g',
     String? categorias = 'Snacks, Dulces',
+    int? pack,
   }) =>
       DatosEnriquecidos(
         nombre: nombre,
@@ -128,6 +146,7 @@ void main() {
         contenidoNeto: contenidoNeto,
         unidad: unidad,
         categorias: categorias,
+        pack: pack,
       );
 
   Finder botonOFF() => find.byKey(const ValueKey('btn-completar-off'));
@@ -382,6 +401,154 @@ void main() {
     // Sin bloqueo: el resto del formulario (y Guardar) sigue disponible.
     expect(find.text('Guardar cambios'), findsOneWidget);
     expect(await cantidadProductos(), 1);
+  });
+
+  // v0.3.15 (T1/S7): el pack de OFF (multipack) precarga el campo sólo
+  // si está en su default 1 — regla fill-only-empty v0.3.11 intacta.
+  testWidgets(
+      'S7: pack de OFF (multipack) precarga el campo cuando está en el '
+      'default 1', (tester) async {
+    superficieGrande(tester);
+    await insertarProducto(id: 'p1', codigoBarras: '7790001001001');
+    final producto = await productoGuardado('p1');
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      producto: producto,
+      enriquecimiento: ServicioFalso(datosOFF(pack: 6)),
+    )));
+
+    await tester.tap(botonOFF());
+    await tester.pumpAndSettle();
+
+    expect(find.text('6'), findsOneWidget);
+  });
+
+  testWidgets(
+      'S7: pack de OFF no pisa un pack ya cargado (campo ≠ default 1)',
+      (tester) async {
+    superficieGrande(tester);
+    await insertarProducto(id: 'p1', codigoBarras: '7790001001001', pack: 3);
+    final producto = await productoGuardado('p1');
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      producto: producto,
+      enriquecimiento: ServicioFalso(datosOFF(pack: 6)),
+    )));
+
+    await tester.tap(botonOFF());
+    await tester.pumpAndSettle();
+
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('6'), findsNothing);
+  });
+
+  testWidgets(
+      'S7: alta con datosIniciales de multipack precarga el pack (el campo '
+      'arranca en su default 1)', (tester) async {
+    superficieGrande(tester);
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      codigoBarrasInicial: '7790001001999',
+      datosIniciales: datosOFF(pack: 2),
+      enriquecimiento: ServicioFalso(null),
+    )));
+
+    expect(find.text('2'), findsOneWidget);
+  });
+
+  testWidgets(
+      'S7: alta sin pack en OFF deja el campo en el default 1',
+      (tester) async {
+    superficieGrande(tester);
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      codigoBarrasInicial: '7790001001999',
+      datosIniciales: datosOFF(), // sin pack
+      enriquecimiento: ServicioFalso(null),
+    )));
+
+    expect(find.text('1'), findsOneWidget);
+  });
+
+  testWidgets(
+      'S7: el pack precargado desde OFF persiste sólo al guardar (nada '
+      'guarda solo)', (tester) async {
+    superficieGrande(tester);
+    await insertarProducto(id: 'p1', codigoBarras: '7790001001001');
+    final producto = await productoGuardado('p1');
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      producto: producto,
+      enriquecimiento: ServicioFalso(datosOFF(pack: 6)),
+    )));
+
+    await tester.tap(botonOFF());
+    await tester.pumpAndSettle();
+
+    // El tap NO escribe: la fila conserva pack 1.
+    expect((await productoGuardado('p1')).pack, 1);
+
+    await tester.tap(find.text('Guardar cambios'));
+    await tester.pumpAndSettle();
+
+    expect((await productoGuardado('p1')).pack, 6);
+  });
+
+  // v0.3.15 (T3/S6): el error de servidor de OFF se distingue de la falta
+  // de conexión en el formulario.
+  testWidgets(
+      'S6: errorServidor muestra «Open Food no respondió. Reintentá más '
+      'tarde.» sin bloquear el formulario', (tester) async {
+    superficieGrande(tester);
+    await insertarProducto(id: 'p1', codigoBarras: '7790001001001');
+    final producto = await productoGuardado('p1');
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      producto: producto,
+      enriquecimiento:
+          ServicioFalsoDeResultado(const ResultadoErrorServidor()),
+    )));
+
+    await tester.tap(botonOFF());
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Open Food no respondió. Reintentá más tarde.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Sin conexión: no se pudo consultar Open Food Facts.'),
+      findsNothing,
+    );
+    // Sin bloqueo: el resto del formulario (y Guardar) sigue disponible.
+    expect(find.text('Guardar cambios'), findsOneWidget);
+    expect(await cantidadProductos(), 1);
+  });
+
+  testWidgets(
+      'S6: errorConectividad mantiene «Sin conexión: no se pudo consultar '
+      'Open Food Facts.»', (tester) async {
+    superficieGrande(tester);
+    await insertarProducto(id: 'p1', codigoBarras: '7790001001001');
+    final producto = await productoGuardado('p1');
+    await tester.pumpWidget(envolver(ProductoFormScreen(
+      baseDeDatos: db,
+      producto: producto,
+      enriquecimiento:
+          ServicioFalsoDeResultado(const ResultadoErrorConectividad()),
+    )));
+
+    await tester.tap(botonOFF());
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Sin conexión: no se pudo consultar Open Food Facts.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Open Food no respondió. Reintentá más tarde.'),
+      findsNothing,
+    );
   });
 
   testWidgets(

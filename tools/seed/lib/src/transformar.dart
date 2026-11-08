@@ -13,10 +13,31 @@ library;
 import 'package:csv/csv.dart';
 
 /// Regex de cantidades OFF: valor (con decimal por coma o punto) + unidad.
+/// v0.3.15 (S5): se toleran sufijos informativos tras la unidad — la «e»
+/// del estiario europeo ('500 g e') ya no descarta la fila.
 final RegExp _regexCantidad = RegExp(
-  r'^\s*(\d+(?:[.,]\d+)?)\s*(kg|g|cl|ml|l|unidades|unidad)\s*$',
+  r'^\s*(\d+(?:[.,]\d+)?)\s*(kg|g|cl|ml|l|unidades|unidad)\s*(?:e|℮)*\s*$',
   caseSensitive: false,
 );
+
+/// Multipack OFF (v0.3.15 S5): «N x M unidad» o «N unidades de M
+/// unidad» métrica. La semilla no tiene campo pack (el JSON v1 no lo
+/// lleva) → contenido TOTAL (N×M) en unidad canónica.
+final RegExp _regexMultipack = RegExp(
+  r'^\s*(\d+)\s*(?:x|unidades?\s+de)\s*(\d+(?:[.,]\d+)?)\s*(kg|g|cl|ml|l)\s*(?:e|℮)*\s*$',
+  caseSensitive: false,
+);
+
+/// Valor en unidad métrica cruda → canónica {g, mL}. Null si la unidad
+/// no es una de las soportadas.
+(double, String)? _aCanonica(double valor, String unidad) => switch (unidad) {
+      'kg' => (valor * 1000, 'g'),
+      'g' => (valor, 'g'),
+      'cl' => (valor * 10, 'mL'),
+      'ml' => (valor, 'mL'),
+      'l' => (valor * 1000, 'mL'),
+      _ => null,
+    };
 
 /// ¿El código es un EAN-13 válido (13 dígitos)?
 bool esEan13(String codigo) => RegExp(r'^\d{13}$').hasMatch(codigo);
@@ -37,28 +58,33 @@ String? extraerCategoria(String categorias) {
 
 /// Cantidad OFF normalizada a (contenido neto, unidad) — unidad en
 /// {g, mL, unidad}; kg/L/cl se convierten. Null si no es interpretable.
+/// v0.3.15 (S5): multipack «N x M unidad» / «N unidades de M unidad» →
+/// contenido TOTAL (N×M) en canónica {g, mL} (sin descartes evitables);
+/// '10 unidades' → (unidad, N); sufijos informativos ('500 g e') se
+/// toleran.
 (double, String)? parsearCantidad(String? cantidad) {
   if (cantidad == null) return null;
+  final RegExpMatch? multi = _regexMultipack.firstMatch(cantidad);
+  if (multi != null) {
+    final double? pack = double.tryParse(multi.group(1)!);
+    final double? porUnidad =
+        double.tryParse(multi.group(2)!.replaceAll(',', '.'));
+    final (double, String)? canonica = porUnidad == null
+        ? null
+        : _aCanonica(porUnidad, multi.group(3)!.toLowerCase());
+    if (pack == null || pack <= 0 || canonica == null) return null;
+    return (pack * canonica.$1, canonica.$2);
+  }
   final match = _regexCantidad.firstMatch(cantidad);
   if (match == null) return null;
   final valor = double.tryParse(match.group(1)!.replaceAll(',', '.'));
   if (valor == null || valor <= 0) return null;
   switch (match.group(2)!.toLowerCase()) {
-    case 'kg':
-      return (valor * 1000, 'g');
-    case 'g':
-      return (valor, 'g');
-    case 'l':
-      return (valor * 1000, 'mL');
-    case 'ml':
-      return (valor, 'mL');
-    case 'cl':
-      return (valor * 10, 'mL');
     case 'unidades':
     case 'unidad':
-      return (valor, 'unidad');
+      return (valor, 'unidad'); // v0.3.15 (S5): (unidad, N)
   }
-  return null;
+  return _aCanonica(valor, match.group(2)!.toLowerCase());
 }
 
 /// Convierte el contenido CSV completo en la lista de productos del pack.

@@ -96,8 +96,8 @@ void main() {
     expect(datos.unidad, 'mL');
   });
 
-  test('quantity con formato raro toma el número con unidad (mejor esfuerzo)',
-      () async {
+  test('quantity multipack «6 x 355 ml» precarga pack + contenido por '
+      'unidad (v0.3.15 S3; antes 355 sin el ×6)', () async {
     final (http.Client cliente, _) = clienteQueResponde(
         200,
         cuerpoOFF(product: <String, dynamic>{
@@ -111,6 +111,7 @@ void main() {
 
     expect(datos!.contenidoNeto, 355);
     expect(datos.unidad, 'mL');
+    expect(datos.pack, 6);
   });
 
   test('quantity sin unidad precarga el número y deja la unidad en null',

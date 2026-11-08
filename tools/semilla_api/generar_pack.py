@@ -35,14 +35,50 @@ PREFIJOS_ARGENTINA = ("777", "778", "779")
 
 _CANTIDAD = re.compile(r"^([0-9]+(?:[.,][0-9]+)?)\s*([a-zA-Z]*)")
 
+# Multipack OFF (v0.3.15, S5): «N x M unidad» / «N unidades de M unidad»
+# métrica. La semilla no tiene campo pack (el JSON v1 no lo lleva) →
+# contenido TOTAL (N×M) en unidad canónica.
+_MULTIPACK = re.compile(
+    r"^\s*([0-9]+)\s*(?:x|unidades?\s+de)\s*([0-9]+(?:[.,][0-9]+)?)\s*"
+    r"(kg|g|cl|ml|l)\s*(?:e|℮)?\s*$"
+)
+
+# Unidad métrica cruda → (canónica {g, mL}, factor de conversión).
+_METRICAS = {
+    "kg": ("g", 1000),
+    "g": ("g", 1),
+    "cl": ("mL", 10),
+    "ml": ("mL", 1),
+    "l": ("mL", 1000),
+}
+
 
 def normalizar_cantidad(quantity: str):
-    """Devuelve (unidad, contenido_neto) o None si no es interpretable."""
-    m = _CANTIDAD.match((quantity or "").strip().lower())
+    """Devuelve (unidad, contenido_neto) o None si no es interpretable.
+
+    v0.3.15 (S5): multipack «N x M unidad» / «N unidades de M unidad» →
+    contenido TOTAL (N×M) en unidad canónica {g, mL}; '10 unidades' →
+    ('unidad', N) (antes se perdía N); sufijos informativos como la «e»
+    del estiario europeo ('500 g e') se toleran.
+    """
+    texto = (quantity or "").strip().lower()
+    multi = _MULTIPACK.match(texto)
+    if multi:
+        pack = float(multi.group(1))
+        por_unidad = float(multi.group(2).replace(",", "."))
+        metrica = _METRICAS.get(multi.group(3))
+        if pack <= 0 or por_unidad <= 0 or metrica is None:
+            return None
+        canonica, factor = metrica
+        return (canonica, round(pack * por_unidad * factor, 2))
+    m = _CANTIDAD.match(texto)
     if not m:
         return None
     valor = float(m.group(1).replace(",", "."))
     unidad = m.group(2)
+    if unidad in ("u", "un", "uni", "unidades", "unidad"):
+        # v0.3.15 (S5): ('unidad', N) — antes se devolvía 1.0 fijo.
+        return ("unidad", valor)
     if unidad in ("g", "gr", "grs", "gramos"):
         return ("g", round(valor, 2))
     if unidad == "kg":
@@ -51,10 +87,8 @@ def normalizar_cantidad(quantity: str):
         return ("mL", round(valor, 2))
     if unidad in ("l", "lt", "lts", "litros"):
         return ("mL", round(valor * 1000, 2))
-    if unidad in ("cl",):
+    if unidad == "cl":
         return ("mL", round(valor * 10, 2))
-    if unidad in ("u", "un", "uni", "unidades", "unidad"):
-        return ("unidad", 1.0)
     return None
 
 
