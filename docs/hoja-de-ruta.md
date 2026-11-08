@@ -142,7 +142,8 @@ Después: tareas Fase 3 (3.1-3.6, 3.8).*
 de un segundo código) con un cambio contenido en el escáner — **HECHA (v0.3.12)** (la cámara
 se pausa al leer y reanuda con «Escanear de nuevo»; el flujo manual no cambia);
 2. **#12 comercio preseleccionado** — misma fricción diaria al registrar precios; hoy solo se
-preselecciona cuando existe exactamente un comercio;
+preselecciona cuando existe exactamente un comercio — **HECHA (v0.3.13)** (preselección del
+comercio del último precio registrado; sin precios rige la regla del comercio único);
 3. **#13 error con la base Open Food** — defecto: primero diagnóstico (reproducir y delimitar
 el eslabón: semilla, precarga de EAN o «Completar desde OFF»); si el diagnóstico muestra datos
 mal cargados, pasa al primer lugar;
