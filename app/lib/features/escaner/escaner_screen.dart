@@ -36,10 +36,10 @@ class EscanerScreen extends StatefulWidget {
   final ServicioEnriquecimiento? enriquecimiento;
 
   @override
-  State<EscanerScreen> createState() => _EscanerScreenState();
+  State<EscanerScreen> createState() => EscanerScreenState();
 }
 
-class _EscanerScreenState extends State<EscanerScreen> {
+class EscanerScreenState extends State<EscanerScreen> {
   final TextEditingController _controladorCodigo = TextEditingController();
   final FocusNode _focusCodigo = FocusNode();
   bool _buscando = false;
@@ -89,6 +89,12 @@ class _EscanerScreenState extends State<EscanerScreen> {
   MobileScannerController? _controladorCamara;
   bool _linterna = false;
 
+  /// #11 (v0.3.12): pausa tras una lectura válida de cámara — ahorra
+  /// batería y evita lecturas falsas de un segundo código mientras el
+  /// teléfono sigue apuntando. El flujo manual nunca se pausa: es solo
+  /// de la cámara.
+  bool _camaraPausada = false;
+
   @override
   void initState() {
     super.initState();
@@ -110,12 +116,48 @@ class _EscanerScreenState extends State<EscanerScreen> {
     if (mounted) setState(() => _linterna = !_linterna);
   }
 
+  /// #11 (v0.3.12): punto de entrada de detección de cámara. En pruebas
+  /// (sin hardware) el mismo camino se ejercita con este método.
+  @visibleForTesting
+  void simularDeteccion(String codigo) => _procesarLectura(codigo);
+
   void _alDetectar(BarcodeCapture captura) {
     final barcodes = captura.barcodes;
     final codigo = barcodes.isEmpty ? null : barcodes.first.rawValue;
     if (codigo == null || codigo.isEmpty) return;
+    _procesarLectura(codigo);
+  }
+
+  /// #11 (v0.3.12): una lectura válida pausa la cámara y dispara la
+  /// búsqueda una sola vez. Mientras está pausada se ignoran nuevas
+  /// detecciones (un producto por vez); reanuda «Escanear de nuevo».
+  void _procesarLectura(String codigo) {
+    if (_camaraPausada) return;
+    unawaited(_controladorCamara?.stop());
+    if (!mounted) return;
+    setState(() => _camaraPausada = true);
     _controladorCodigo.text = codigo;
     _buscar();
+  }
+
+  /// #11 (v0.3.12): reanuda la cámara con una lectura limpia: descarta
+  /// el resultado anterior (producto, precio, valoración y precarga OFF)
+  /// y deja el escáner listo para el siguiente código. El torch se apaga
+  /// con el stop de la pausa: el icono vuelve a su estado apagado.
+  Future<void> _reanudarCamara() async {
+    unawaited(_controladorCamara?.start());
+    if (!mounted) return;
+    setState(() {
+      _camaraPausada = false;
+      _linterna = false;
+      _buscando = false;
+      _mensaje = null;
+      _productoEncontrado = null;
+      _ultimoPrecio = null;
+      _valoracion = null;
+      _datosEnriquecidos = null;
+    });
+    _controladorCodigo.clear();
   }
 
   /// Conectividad para el enriquecimiento (R14: cualquier tipo alcanza;
@@ -332,6 +374,24 @@ class _EscanerScreenState extends State<EscanerScreen> {
                       onPressed: _alternarLinterna,
                     ),
                   ),
+                  // #11 (v0.3.12): pausa visible sobre la vista previa;
+                  // tocarla reanuda.
+                  if (_camaraPausada)
+                    Positioned.fill(
+                      child: GestureDetector(
+                        onTap: _reanudarCamara,
+                        child: const ColoredBox(
+                          color: Colors.black45,
+                          child: Center(
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              color: Colors.white,
+                              size: 48,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -367,6 +427,15 @@ class _EscanerScreenState extends State<EscanerScreen> {
           icon: const Icon(Icons.search),
           label: const Text('Buscar producto'),
         ),
+        if (_camaraPausada) ...<Widget>[
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            key: const ValueKey('btn-reanudar'),
+            onPressed: _reanudarCamara,
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('Escanear de nuevo'),
+          ),
+        ],
         if (_mensaje != null) ...<Widget>[
           const SizedBox(height: 16),
           Text(_mensaje!),
