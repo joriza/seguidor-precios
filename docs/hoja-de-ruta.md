@@ -139,7 +139,8 @@ Después: tareas Fase 3 (3.1-3.6, 3.8).*
 
 ***Orden de las nuevas propuestas #11-#14 (2026-11-06, el dueño delega la priorización):**
 1. **#11 cámara con pausa tras lectura** — fricción del flujo diario (batería + lecturas falsas
-de un segundo código) con un cambio contenido en el escáner;
+de un segundo código) con un cambio contenido en el escáner — **HECHA (v0.3.12)** (la cámara
+se pausa al leer y reanuda con «Escanear de nuevo»; el flujo manual no cambia);
 2. **#12 comercio preseleccionado** — misma fricción diaria al registrar precios; hoy solo se
 preselecciona cuando existe exactamente un comercio;
 3. **#13 error con la base Open Food** — defecto: primero diagnóstico (reproducir y delimitar
