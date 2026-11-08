@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
+import 'package:seguidor_precios/data/normalizacion.dart';
 import 'package:seguidor_precios/features/articulos/articulo_detalle_screen.dart';
 import 'package:seguidor_precios/features/busqueda/busqueda_screen.dart';
 import 'package:seguidor_precios/features/precios/producto_comparacion_screen.dart';
@@ -110,11 +111,27 @@ void main() {
     expect(find.text('Productos'), findsOneWidget);
     expect(find.text('Mayonesa · Marca A'), findsOneWidget);
     // R1: último precio conocido = la toma más reciente.
+    // v0.3.16 (S2): la fecha se muestra corta, no ISO crudo.
     expect(find.textContaining('120.00'), findsOneWidget);
     expect(find.textContaining('100.00'), findsNothing);
     expect(find.textContaining('Almacén'), findsOneWidget);
-    expect(find.textContaining('2026-01-05'), findsOneWidget);
+    expect(find.textContaining(fechaCorta('2026-01-05')), findsOneWidget);
+    expect(find.textContaining('2026-01-05'), findsNothing);
     expect(find.textContaining('7791234567890'), findsOneWidget);
+  });
+
+  testWidgets('la fecha del último precio muestra el año si no es el actual (S2)',
+      (tester) async {
+    await insertarProducto(id: 'p1', nombre: 'Yerba');
+    await insertarPrecio(
+        id: 'pr1', productoId: 'p1', precio: 45, fechaToma: '2020-05-10');
+
+    await tester.pumpWidget(envolver(BusquedaScreen(baseDeDatos: db)));
+    await escribir(tester, 'yerba');
+
+    // Año pasado → dd/mm/aaaa; el ISO crudo desaparece.
+    expect(find.textContaining('10/05/2020'), findsOneWidget);
+    expect(find.textContaining('2020-05-10'), findsNothing);
   });
 
   testWidgets('busca por marca y por código EAN', (tester) async {

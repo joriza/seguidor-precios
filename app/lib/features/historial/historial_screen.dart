@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/local/base_de_datos.dart';
+import '../../data/normalizacion.dart';
 import '../sync/gestor_sync.dart';
 import '../sync/refresco.dart';
 import 'historial_producto_screen.dart';
@@ -79,7 +80,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
           leading: const Icon(Icons.receipt_long),
           title: Text(nombre),
           subtitle: Text(
-            '${p['cantidad']} precio(s) · última toma: ${p['ultima']}',
+            // S2 (v0.3.16): fecha corta, no ISO crudo.
+            '${p['cantidad']} precio(s) · última toma: ${fechaCorta(p['ultima'] as String?)}',
           ),
           onTap: () {
             Navigator.of(context).push<void>(

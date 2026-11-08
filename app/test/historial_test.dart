@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
 import 'package:seguidor_precios/data/local/normalizacion.dart';
+import 'package:seguidor_precios/data/normalizacion.dart';
 import 'package:seguidor_precios/features/historial/historial_producto_screen.dart';
 import 'package:seguidor_precios/features/historial/historial_screen.dart';
 
@@ -134,13 +135,50 @@ void main() {
 
       expect(subtitulos, hasLength(2));
       // p1 tiene última toma 2026-01-05 > p2 2026-01-03 → primero.
+      // v0.3.16 (S2): la fecha se muestra corta, no ISO crudo.
       expect(subtitulos[0], contains('2 precio(s)'));
-      expect(subtitulos[0], contains('2026-01-05'));
+      expect(subtitulos[0], contains('última toma: ${fechaCorta('2026-01-05')}'));
+      expect(subtitulos[0], isNot(contains('2026-01-05')));
       expect(subtitulos[1], contains('1 precio(s)'));
-      expect(subtitulos[1], contains('2026-01-03'));
+      expect(subtitulos[1], contains('última toma: ${fechaCorta('2026-01-03')}'));
+      expect(subtitulos[1], isNot(contains('2026-01-03')));
       // Nombre con marca cuando la tiene.
       expect(find.text('Mayonesa · Marca A'), findsOneWidget);
       expect(find.text('Arroz'), findsOneWidget);
+    });
+
+    testWidgets('fecha corta en el índice: el año solo si no es el actual (S2)',
+        (tester) async {
+      await insertarProducto(id: 'p1', nombre: 'Reciente');
+      await insertarProducto(id: 'p2', nombre: 'Viejo');
+      await insertarComercio(id: 'c1', nombre: 'Almacén');
+      final int anio = DateTime.now().year;
+      await insertarPrecio(
+          id: 'pr1',
+          productoId: 'p1',
+          comercioId: 'c1',
+          precio: 100,
+          fechaToma: '$anio-03-07');
+      await insertarPrecio(
+          id: 'pr2',
+          productoId: 'p2',
+          comercioId: 'c1',
+          precio: 50,
+          fechaToma: '2020-05-10');
+
+      await tester.pumpWidget(envolver(HistorialScreen(baseDeDatos: db)));
+      await tester.pumpAndSettle();
+
+      final subtitulos = tester
+          .widgetList(find.byType(ListTile))
+          .map((w) => ((w as ListTile).subtitle as Text).data!)
+          .toList();
+
+      // El más reciente primero: misma año → sin año.
+      expect(subtitulos[0], contains('última toma: 07/03'));
+      expect(subtitulos[0], isNot(contains('/$anio')));
+      // Año pasado → con año.
+      expect(subtitulos[1], contains('última toma: 10/05/2020'));
     });
 
     testWidgets('excluye productos con borrado lógico', (tester) async {

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../../data/local/base_de_datos.dart';
+import '../../../data/normalizacion.dart';
 import '../../../data/productos.dart';
 import '../articulos/articulo_detalle_screen.dart';
 import '../precios/producto_comparacion_screen.dart';
@@ -214,7 +215,7 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
                 : '$codigo · sin precios$pack')
             : '${codigo.isEmpty ? '' : '$codigo · '}'
                 'Último: \$${ultimo.precio.toStringAsFixed(2)} · '
-                '${ultimo.comercio} · ${ultimo.fecha}$pack',
+                '${ultimo.comercio} · ${fechaCorta(ultimo.fecha)}$pack',
       ),
       onTap: () => Navigator.of(context).push<void>(
         MaterialPageRoute<void>(

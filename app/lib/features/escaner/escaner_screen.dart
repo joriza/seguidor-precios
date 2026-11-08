@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/enriquecimiento.dart';
 import '../../data/local/normalizacion.dart';
+import '../../data/normalizacion.dart';
 import '../../data/productos.dart';
 import '../../data/valoraciones.dart';
 
@@ -328,7 +329,8 @@ class EscanerScreenState extends State<EscanerScreen> {
         ? ''
         : ' (${estandar.toStringAsFixed(2)} / $base)';
     return 'Último precio: \$${u.precio.toStringAsFixed(2)}'
-        ' · ${u.comercio} · ${u.fecha}$sufijo';
+        // S2 (v0.3.16): fecha corta, no ISO crudo.
+        ' · ${u.comercio} · ${fechaCorta(u.fecha)}$sufijo';
   }
 
   Future<void> _compararPrecios() async {

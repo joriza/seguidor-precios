@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
+import 'package:seguidor_precios/data/normalizacion.dart';
 import 'package:seguidor_precios/features/busqueda/busqueda_screen.dart';
 import 'package:seguidor_precios/features/escaner/escaner_screen.dart';
 
@@ -136,7 +137,7 @@ void main() {
       // S2: el pack trae 10 × 500 g = 5 kg → 7500 / 5 = 1500.00 / kg.
       // Sin el pack, la línea mostraría 15000.00 / kg.
       expect(
-        find.text('Último precio: \$7500.00 · Almacén · 2026-01-02 '
+        find.text('Último precio: \$7500.00 · Almacén · ${fechaCorta('2026-01-02')} '
             '(1500.00 / kg)'),
         findsOneWidget,
       );
@@ -172,7 +173,7 @@ void main() {
 
       // Pack: el subtítulo agrega la marca al final.
       expect(
-        find.text('7791234567890 · Último: \$7500.00 · Almacén · 2026-01-02'
+        find.text('7791234567890 · Último: \$7500.00 · Almacén · ${fechaCorta('2026-01-02')}'
             ' · Pack ×10'),
         findsOneWidget,
       );
