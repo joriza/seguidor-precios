@@ -4,9 +4,9 @@ Aplicación Android para llevar el control personal de precios de productos de c
 (almacén, carnicería, verdulería, ferretería, etc.), con **datos locales sin conexión**,
 **comparación de precios por artículo** y un **repositorio colaborativo** centralizado en la web.
 
-> **Estado del proyecto:** 🚧 **Fase 2 — colaborativa (Supabase + sync)** con código completo
-> (suite de tests 199/199) y backend operativo con el semillero cargado (424 productos).
-> Pendiente: validación en dispositivo y release v0.2.0. Detalle completo en la
+> **Estado del proyecto:** 🚧 **Fase 3 — valor agregado** sobre la base colaborativa operativa:
+> sync multi-dispositivo validada en campo y releases periódicos (última: **v0.3.13**, 2026-11-08).
+> Suite de tests 316/316 en verde; mejoras de producto priorizadas en la
 > [hoja de ruta](docs/hoja-de-ruta.md).
 
 ## Características
@@ -34,6 +34,26 @@ Aplicación Android para llevar el control personal de precios de productos de c
 | Backend colaborativo | Supabase (Postgres + Auth + RLS), plan gratuito | $0 |
 | Distribución | APK vía GitHub Releases | $0 |
 | Código e integración continua | GitHub + GitHub Actions | $0 |
+
+## Tamaño del proyecto
+
+Snapshot al **2026-11-08 (v0.3.13)**, sin contar código generado por herramientas:
+
+| Área | Líneas |
+| --- | --- |
+| App Flutter — código propio (`app/lib`, sin `.g.dart`) | 7.461 |
+| App Flutter — código generado por drift (`base_de_datos.g.dart`) | 7.189 |
+| Tests de la app (`app/test`) | 10.294 |
+| Herramienta de semilla Dart (`tools/seed`) | 281 |
+| Herramientas Python (`tools/*.py`, `tools/semilla_api`) | 650 |
+| SQL de Supabase (migraciones + RLS) | 1.344 |
+| **Total propio (sin generado)** | **20.030** |
+
+Los ~10.300 líneas de tests cubren la suite completa (316 tests en verde). Para recontar:
+
+```bash
+find app/lib -name "*.dart" ! -name "*.g.dart" | xargs wc -l
+```
 
 ## Escala y despliegue a futuro
 
