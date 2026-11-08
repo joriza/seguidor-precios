@@ -21,6 +21,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'categorias.dart';
 import 'local/normalizacion.dart';
 
 /// Datos precargados para el formulario de producto (confirmables).
@@ -241,6 +242,8 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
         _cantidad(producto['quantity']);
     // v0.3.9 (S1): la categoría cruda de OFF ya no se descarta: precarga
     // producto.categoria y alimenta la sugerencia de artículo.
+    // v0.3.17 (S2-a): entra canónica (diccionario del dueño en
+    // data/categorias.dart); lo desconocido queda tal cual (S6).
     final String categoriasBrutas =
         (producto['categories'] ?? '').toString().trim();
     return DatosEnriquecidos(
@@ -249,7 +252,9 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
       contenidoNeto: neto,
       unidad: unidad,
       pack: pack,
-      categorias: categoriasBrutas.isEmpty ? null : categoriasBrutas,
+      categorias: categoriasBrutas.isEmpty
+          ? null
+          : categoriaCanonica(categoriasBrutas),
     );
   }
 

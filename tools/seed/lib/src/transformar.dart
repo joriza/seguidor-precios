@@ -12,6 +12,65 @@ library;
 
 import 'package:csv/csv.dart';
 
+/// v0.3.17 (S1): diccionario de sinónimos de categorías, curado por el
+/// dueño (variante país → canónico argentino; crece con un edit).
+/// ESPEJO de app/lib/data/categorias.dart — paquete Dart separado que no
+/// importa código de la app: mantener las dos listas en sync a mano.
+const Map<String, String> _sinonimosCategorias = <String, String>{
+  'guisantes': 'arvejas',
+  'chicharos': 'arvejas', // «chícharos»
+};
+
+/// Prefijo de tag de idioma de OFF ('en:guisantes'): 2-3 letras + ':'
+/// al inicio del término (el mismo patrón que venía usándose aquí).
+final RegExp _prefijoTag = RegExp(r'^[a-z]{2,3}:');
+
+/// Espeja el mapeo de acentos de la app (clasificacion.dart y
+/// categorias.dart): misma forma canónica de comparación en ambos lados.
+const Map<String, String> _acentos = <String, String>{
+  'á': 'a', 'à': 'a', 'ä': 'a', 'â': 'a', 'ã': 'a', 'å': 'a',
+  'é': 'e', 'è': 'e', 'ë': 'e', 'ê': 'e',
+  'í': 'i', 'ì': 'i', 'ï': 'i', 'î': 'i',
+  'ó': 'o', 'ò': 'o', 'ö': 'o', 'ô': 'o', 'õ': 'o',
+  'ú': 'u', 'ù': 'u', 'ü': 'u', 'û': 'u',
+  'ñ': 'n', 'ç': 'c',
+};
+
+/// Forma canónica de comparación: minúsculas y sin acentos.
+String _normalizar(String texto) {
+  final StringBuffer normalizado = StringBuffer();
+  for (final int codigo in texto.toLowerCase().runes) {
+    final String letra = String.fromCharCode(codigo);
+    normalizado.write(_acentos[letra] ?? letra);
+  }
+  return normalizado.toString();
+}
+
+/// Categoría cruda → canónica (S1/S2). Igual semántica que
+/// `categoriaCanonica` en app/lib/data/categorias.dart: matchea el
+/// término completo o cada segmento separado por comas,
+/// case/acento-insensitive; quita el prefijo de tag 'en:'/'xx:'; lo
+/// desconocido vuelve tal cual; null → null.
+String? categoriaCanonica(String? cruda) {
+  if (cruda == null) return null;
+  final StringBuffer resultado = StringBuffer();
+  var cambio = false;
+  var primero = true;
+  for (final segmento in cruda.split(',')) {
+    final String recortado = segmento.trim();
+    final String termino = recortado.replaceFirst(_prefijoTag, '');
+    if (!primero) resultado.write(', ');
+    resultado.write(_sinonimosCategorias[_normalizar(termino)] ?? termino);
+    if (termino != recortado ||
+        _sinonimosCategorias.containsKey(_normalizar(termino))) {
+      cambio = true;
+    }
+    primero = false;
+  }
+  // Sin match y sin tag que quitar: devuelvo la entrada EXACTA.
+  return cambio ? resultado.toString() : cruda;
+}
+
 /// Regex de cantidades OFF: valor (con decimal por coma o punto) + unidad.
 /// v0.3.15 (S5): se toleran sufijos informativos tras la unidad — la «e»
 /// del estiario europeo ('500 g e') ya no descarta la fila.
@@ -50,10 +109,12 @@ String? extraerMarca(String brands) {
 
 /// Primera categoría legible de `categories_tags` ("en:mayonnaises,...")
 /// o de `categories` ("Mayonesas, Untables"); null si está vacía.
+/// v0.3.17 (S2-c): el pack sale con la categoría canónica (S1, espejo
+/// del diccionario del dueño); lo desconocido sigue igual.
 String? extraerCategoria(String categorias) {
   final primera = categorias.split(',').first.trim();
   if (primera.isEmpty) return null;
-  return primera.replaceFirst(RegExp(r'^[a-z]{2,3}:'), '');
+  return categoriaCanonica(primera.replaceFirst(_prefijoTag, ''));
 }
 
 /// Cantidad OFF normalizada a (contenido neto, unidad) — unidad en

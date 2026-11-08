@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../categorias.dart';
 import 'base_de_datos.dart';
 
 class ResultadoImportacion {
@@ -66,8 +67,13 @@ Future<ResultadoImportacion> importarPackSemilla(
               unidad: unidad,
               contenidoNeto: Value(contenido),
               marca: Value((marca == null || marca.isEmpty) ? null : marca),
-              categoria:
-                  Value((categoria == null || categoria.isEmpty) ? null : categoria),
+              categoria: Value(
+                (categoria == null || categoria.isEmpty)
+                    ? null
+                    // v0.3.17 (S2-b): al almacenamiento entra canónica
+                    // (diccionario del dueño); lo desconocido tal cual (S6).
+                    : categoriaCanonica(categoria),
+              ),
               origen: const Value('semilla'),
               creadoPor: usuarioId,
               creadoEn: instantanea,

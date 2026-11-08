@@ -175,6 +175,20 @@ void main() {
       expect(sugerencias.single.coincidencias, 1);
     });
 
+    test('v0.3.17 (S4): «guisantes» de OFF sugiere el artículo «Arvejas»',
+        () {
+      // La canonización (data/categorias.dart) corre ANTES de extraer
+      // tokens: sin ella, «guisantes» y «arvejas» no comparten token.
+      final sugerencias = sugerirArticulos(
+        categoria: 'Guisantes',
+        nombre: 'Bolsa 500 g',
+        articulos: <Articulo>[articuloDePrueba('a1', 'Arvejas')],
+      );
+
+      expect(sugerencias, hasLength(1));
+      expect(sugerencias.single.articulo.id, 'a1');
+    });
+
     test('nunca sugiere artículos borrados (S3)', () {
       final sugerencias = sugerirArticulos(
         categoria: null,

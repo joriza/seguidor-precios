@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'data/categorias.dart';
 import 'data/local/base_de_datos.dart';
 import 'data/identidad.dart';
 import 'data/semilla.dart';
@@ -81,6 +82,12 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
+    // v0.3.17 (S3): normalización retroactiva de categorías guardadas.
+    // Corre al arrancar — la base abre con la primera consulta, y por
+    // viajar por la misma conexión serializada sus UPDATE se ven antes
+    // de que las pantallas pidan datos. Idempotente, no encola outbox
+    // (S3) y no hace nada si no hay variantes crudas.
+    unawaited(normalizarCategoriasGuardadas(widget.baseDeDatos));
     WidgetsBinding.instance.addPostFrameCallback((_) => _pedirEtiquetaSiFalta());
   }
 

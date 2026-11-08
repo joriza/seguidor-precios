@@ -13,6 +13,7 @@
 /// pantalla de clasificación).
 library;
 
+import 'categorias.dart';
 import 'local/base_de_datos.dart';
 
 /// Una sugerencia: el artículo y cuántos tokens coincidieron.
@@ -95,8 +96,11 @@ List<SugerenciaArticulo> sugerirArticulos({
   String? marca,
   required List<Articulo> articulos,
 }) {
+  // v0.3.17 (S4): la categoría entra canónica (diccionario del dueño en
+  // data/categorias.dart) ANTES de extraer tokens: «guisantes» y afines
+  // matchean el artículo «Arvejas» sin cambiar el algoritmo de tokens.
   final Set<String> tokensProducto = <String>{
-    ...tokensDeClasificacion(categoria),
+    ...tokensDeClasificacion(categoriaCanonica(categoria)),
     ...tokensDeClasificacion(nombre),
     ...tokensDeClasificacion(marca),
   };
