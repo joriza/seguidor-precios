@@ -146,7 +146,10 @@ preselecciona cuando existe exactamente un comercio — **HECHA (v0.3.13)** (pre
 comercio del último precio registrado; sin precios rige la regla del comercio único);
 3. **#13 error con la base Open Food** — defecto: primero diagnóstico (reproducir y delimitar
 el eslabón: semilla, precarga de EAN o «Completar desde OFF»); si el diagnóstico muestra datos
-mal cargados, pasa al primer lugar;
+mal cargados, pasa al primer lugar — **PARCIALMENTE HECHA: el síntoma reportado ( fallos
+silenciosos de OFF en vivo) arreglado en v0.3.14** (resultado honesto por causa + «Reintentar»
++ gate tolerante a excepciones de detección); las trampas de parsers confirmadas por el
+diagnóstico (multipacks, '35 cl', filas descartadas en semilla) van en **v0.3.15**;
 4. **#14 datos históricos más compactos** — requiere un análisis/diseño de presentación antes
 de implementar.
 Detrás siguen los pendientes del orden anterior: #2 catálogo vivo (restante), #6 foto del
