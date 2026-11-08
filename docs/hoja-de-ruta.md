@@ -153,7 +153,10 @@ por el diagnóstico corregidas en v0.3.15 (multipacks → modelo pack, cl→mL, 
 descartes). Pendiente operativa aparte: regenerar el pack semilla con los parsers nuevos +
 recarga de Supabase, con validación previa;
 4. **#14 datos históricos más compactos** — requiere un análisis/diseño de presentación antes
-de implementar.
+de implementar — **HECHA (v0.3.16, diseño B elegido por el dueño)**: fechas cortas en todas
+las pantallas, filas densas de 1 línea con detalle a un tap, encabezado de tendencia (mín/
+prom/máx + Δ% + sparkline de las últimas ~10 tomas) y ficha con último precio por comercio
+con el mínimo destacado;
 Detrás siguen los pendientes del orden anterior: #2 catálogo vivo (restante), #6 foto del
 producto, modo conectado permanente y las tareas de Fase 3 (3.1-3.6, 3.8).*
 
