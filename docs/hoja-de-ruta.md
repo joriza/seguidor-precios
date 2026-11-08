@@ -158,7 +158,13 @@ las pantallas, filas densas de 1 línea con detalle a un tap, encabezado de tend
 prom/máx + Δ% + sparkline de las últimas ~10 tomas) y ficha con último precio por comercio
 con el mínimo destacado;
 Detrás siguen los pendientes del orden anterior: #2 catálogo vivo (restante), #6 foto del
-producto, modo conectado permanente y las tareas de Fase 3 (3.1-3.6, 3.8).*
+producto, modo conectado permanente y las tareas de Fase 3 (3.1-3.6, 3.8).
+
+**Plan jerarquía + categorías (aprobado por el dueño, 2026-11-08):** Fase A categorías canónicas
+**HECHA (v0.3.17)** — diccionario curado (guisantes/chícharos→arvejas) en los 3 puntos de entrada
++ pass retroactivo local + sugerencias mejoradas; Fase B jerarquía categoría+tipo+subtipo
+(v0.3.18, specs finos pendientes del OK del dueño): 2 columnas nuevas, nombre encadenado de los
+3 campos con dedup y override manual, estadísticas por categoría / categoría+tipo / completa.*
 
 | # | Fricción | Mejora propuesta |
 | --- | --- | --- |
