@@ -13,6 +13,12 @@ enum TipoConexion {
 
   /// Conectividad WiFi: la única que habilita el aviso de sync (R15).
   wifi,
+
+  /// v0.3.14 (S7): la detección falló (excepción del sistema). NO es
+  /// «ninguna»: el gate de consulta NO bloquea (la consulta ya tiene su
+  /// propio timeout de 6 s); el aviso de sync automático sigue exigiendo
+  /// WiFi explícito (R15).
+  desconocida,
 }
 
 /// Clasifica una interfaz de red por su nombre. Heurística sin dependencias
@@ -30,11 +36,23 @@ TipoConexion conexionDesdeNombreInterfaz(String nombre) {
   return TipoConexion.movil;
 }
 
+/// Firma de la enumeración de interfaces, inyectable para las pruebas (con
+/// [NetworkInterface.list] no se pueden fabricar interfaces falsas).
+typedef ListadorInterfaces = Future<List<NetworkInterface>> Function({
+  bool includeLoopback,
+  bool includeLinkLocal,
+});
+
 /// Detecta la conectividad actual enumerando las interfaces del sistema.
-/// Nunca lanza: ante un error del sistema devuelve [TipoConexion.ninguna].
-Future<TipoConexion> detectarConexion() async {
+/// Nunca lanza. v0.3.14 (S7): ante un error del sistema devuelve
+/// [TipoConexion.desconocida] — una excepción de detección no es «sin red»:
+/// la consulta OFF consulta igual (tiene su propio timeout) y el aviso de
+/// sync automático sigue requiriendo WiFi explícito (R15).
+/// [listarInterfaces] inyecta la enumeración (pruebas); null = la real.
+Future<TipoConexion> detectarConexion({ListadorInterfaces? listarInterfaces}) async {
+  final ListadorInterfaces listar = listarInterfaces ?? NetworkInterface.list;
   try {
-    final List<NetworkInterface> interfaces = await NetworkInterface.list(
+    final List<NetworkInterface> interfaces = await listar(
       includeLoopback: false,
       includeLinkLocal: false,
     );
@@ -48,6 +66,14 @@ Future<TipoConexion> detectarConexion() async {
     }
     return resultado;
   } catch (_) {
-    return TipoConexion.ninguna;
+    return TipoConexion.desconocida; // S7: desconocido ≠ ninguna
   }
 }
+
+/// v0.3.14 (S7): gate de conectividad para la consulta OFF (R14: cualquier
+/// tipo alcanza; sólo «ninguna» — cero interfaces — bloquea). La excepción
+/// de detección se clasifica como desconocida: se consulta igual. Heurística
+/// única compartida por el escáner y «Completar desde OFF».
+Future<bool> hayConexionParaConsulta({ListadorInterfaces? listarInterfaces}) async =>
+    await detectarConexion(listarInterfaces: listarInterfaces) !=
+    TipoConexion.ninguna;

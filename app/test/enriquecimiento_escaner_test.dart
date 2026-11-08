@@ -13,7 +13,8 @@ import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 /// T5 (S3): flujo del escáner con enriquecimiento OFF — precarga en el
 /// formulario para confirmación del usuario; NUNCA guarda solo. Sin red:
 /// servicios falsos o cliente http mockeado.
-/// Servicio falso que cuenta consultas y devuelve datos fijos.
+/// Servicio falso que cuenta consultas y devuelve datos fijos (null =
+/// «no está en OFF», el caso más frecuente en pruebas).
 class ServicioFalso implements ServicioEnriquecimiento {
   ServicioFalso(this.datos);
 
@@ -21,16 +22,19 @@ class ServicioFalso implements ServicioEnriquecimiento {
   int consultas = 0;
 
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
     consultas++;
-    return datos;
+    return datos == null
+        ? const ResultadoNoEncontrado()
+        : ResultadoDatos(datos!);
   }
 }
 
-/// Servicio falso que simula un timeout de OFF.
+/// Servicio falso que viola el contrato del puerto (lanza): ejercita la
+/// defensa del escáner ante un servicio defectuoso.
 class ServicioQueLanza implements ServicioEnriquecimiento {
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
     throw TimeoutException('OFF no responde');
   }
 }

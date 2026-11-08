@@ -48,6 +48,11 @@ class EscanerScreenState extends State<EscanerScreen> {
   /// alternable a alfabético desde el propio campo.
   bool _tecladoNumerico = true;
   String? _mensaje;
+
+  /// v0.3.14 (S3/S4): resultado honesto de la consulta OFF — «sin
+  /// conexión» o «OFF no respondió», mostrado con «Reintentar» (S6).
+  /// «No está en OFF» no muestra nada (S5, comportamiento actual).
+  String? _mensajeOFF;
   Producto? _productoEncontrado;
 
   /// Cambia el tipo de teclado del ingreso manual. Android NO reconstruye
@@ -77,7 +82,8 @@ class EscanerScreenState extends State<EscanerScreen> {
   late final ServicioEnriquecimiento _enriquecimiento =
       widget.enriquecimiento ??
           (widget.mostrarCamara
-              ? ServicioEnriquecimientoOFF(hayConexion: _hayConexion)
+              ? ServicioEnriquecimientoOFF(
+                  hayConexion: hayConexionParaConsulta)
               : const ServicioEnriquecimientoNulo());
 
   /// S4 (v0.1.2): último precio conocido del producto encontrado — propio o
@@ -156,37 +162,48 @@ class EscanerScreenState extends State<EscanerScreen> {
       _ultimoPrecio = null;
       _valoracion = null;
       _datosEnriquecidos = null;
+      _mensajeOFF = null;
     });
     _controladorCodigo.clear();
   }
 
-  /// Conectividad para el enriquecimiento (R14: cualquier tipo alcanza;
-  /// solo sin interfaces no consulta).
-  Future<bool> _hayConexion() async =>
-      await detectarConexion() != TipoConexion.ninguna;
-
-  /// T5 (S3): consulta OFF en segundo plano tras un EAN sin resultado.
-  /// Nunca lanza y nunca escribe: el resultado solo se muestra como
-  /// precarga; el usuario confirma creando el producto.
+  /// T5 (S3) + v0.3.14 (#13): consulta OFF en segundo plano tras un EAN
+  /// sin resultado. Nunca lanza y nunca escribe: los datos se muestran
+  /// como precarga (el usuario confirma creando el producto) y los
+  /// errores muestran su causa — sin conexión (S3) u OFF caído (S4) —
+  /// con «Reintentar» (S6); «no está en OFF» no muestra nada (S5).
   Future<void> _enriquecer(String ean) async {
     // S3 (v0.3.5): los códigos internos S-* nunca consultan OFF; solo
     // EANs reales se enriquecen.
     if (ean.startsWith('S-')) return;
-    final DatosEnriquecidos? datos;
+    final ResultadoEnriquecimiento resultado;
     try {
-      datos = await _enriquecimiento.consultar(ean);
+      resultado = await _enriquecimiento.consultarConResultado(ean);
     } catch (_) {
-      return; // OFF caído o timeout: flujo manual como hoy
+      return; // el puerto no lanza; defensa extra ante fakes defectuosos
     }
     if (!mounted) return;
-    if (datos == null) return; // sin resultado: formulario vacío como hoy
     // El resultado puede llegar tarde: solo vale si sigue el mismo EAN
     // pendiente de crear.
     if (_productoEncontrado != null) return;
     if (_controladorCodigo.text.trim() != ean) return;
-    setState(() {
-      _datosEnriquecidos = datos;
-    });
+    switch (resultado) {
+      case ResultadoDatos(:final datos):
+        setState(() {
+          _datosEnriquecidos = datos;
+        });
+      case ResultadoErrorConectividad():
+        setState(() {
+          _mensajeOFF =
+              'Sin conexión: no se pudo consultar Open Food. Conectate y volvé a buscar.';
+        });
+      case ResultadoErrorServidor():
+        setState(() {
+          _mensajeOFF = 'Open Food no respondió. Reintentá la búsqueda.';
+        });
+      case ResultadoNoEncontrado():
+        break; // S5: formulario vacío y mensaje actual, sin prometer datos
+    }
   }
 
   Future<void> _buscar() async {
@@ -213,6 +230,7 @@ class EscanerScreenState extends State<EscanerScreen> {
       _ultimoPrecio = ultimo;
       _valoracion = valoracion;
       _datosEnriquecidos = null; // cada búsqueda parte de cero
+      _mensajeOFF = null; // ídem el aviso de conectividad / OFF caído
       _mensaje = producto == null
           ? 'No existe un producto con ese código — crealo con el botón de abajo.'
           // S5 (v0.3.8): «Pack ×N» desambigua la presentación (N > 1).
@@ -445,6 +463,19 @@ class EscanerScreenState extends State<EscanerScreen> {
           FilledButton.tonal(
             onPressed: _crearProducto,
             child: const Text('Crear producto'),
+          ),
+        ],
+        // v0.3.14 (S3/S4): resultado honesto de la consulta OFF, con
+        // «Reintentar» (S6) al lado: repite la búsqueda completa (local +
+        // OFF) sin reescribir el código.
+        if (_mensajeOFF != null) ...<Widget>[
+          const SizedBox(height: 12),
+          Text(_mensajeOFF!),
+          const SizedBox(height: 8),
+          FilledButton.tonal(
+            key: const ValueKey('btn-reintentar-off'),
+            onPressed: _buscando ? null : _buscar,
+            child: const Text('Reintentar'),
           ),
         ],
         if (_datosEnriquecidos != null) ...<Widget>[

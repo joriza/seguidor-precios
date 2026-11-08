@@ -16,7 +16,8 @@ import 'package:seguidor_precios/features/productos/producto_form_screen.dart';
 /// abrir «Editar datos»); S4: el flujo de guardar queda idéntico. Sin red
 /// real: fakes del puerto [ServicioEnriquecimiento].
 
-/// Servicio falso que cuenta consultas y devuelve datos fijos.
+/// Servicio falso que cuenta consultas y devuelve datos fijos (null =
+/// «no está en OFF», el caso más frecuente en pruebas).
 class ServicioFalso implements ServicioEnriquecimiento {
   ServicioFalso(this.datos);
 
@@ -24,9 +25,11 @@ class ServicioFalso implements ServicioEnriquecimiento {
   int consultas = 0;
 
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
     consultas++;
-    return datos;
+    return datos == null
+        ? const ResultadoNoEncontrado()
+        : ResultadoDatos(datos!);
   }
 }
 
@@ -37,9 +40,12 @@ class ServicioDeCola implements ServicioEnriquecimiento {
       Completer<DatosEnriquecidos?>();
 
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
     consultas++;
-    return completer.future;
+    final DatosEnriquecidos? datos = await completer.future;
+    return datos == null
+        ? const ResultadoNoEncontrado()
+        : ResultadoDatos(datos);
   }
 }
 
@@ -48,7 +54,7 @@ class ServicioQueLanza implements ServicioEnriquecimiento {
   int consultas = 0;
 
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
     consultas++;
     throw TimeoutException('OFF no responde');
   }

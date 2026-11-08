@@ -4,8 +4,12 @@
 /// (API v2, endpoint `product/{ean}.json`). Con conectividad, la consulta
 /// precarga nombre, marca y contenido neto para el formulario del producto:
 /// el usuario SIEMPRE confirma antes de guardar (nunca se guarda solo).
-/// Sin conexión, sin resultado, timeout u OFF caído devuelve null y el
-/// flujo manual sigue como hoy. Única dependencia nueva: `http`.
+/// v0.3.14 (#13): el resultado es honesto ([ResultadoEnriquecimiento]) —
+/// distingue sin conexión ([ResultadoErrorConectividad]), OFF caído
+/// ([ResultadoErrorServidor]) y producto inexistente
+/// ([ResultadoNoEncontrado]); el flujo manual sigue como hoy. La forma
+/// plana `consultar` (null = sin datos, sin causa) queda como
+/// compatibilidad. Única dependencia nueva: `http`.
 /// La atribución ODbL de OFF ya está cubierta en docs (R10).
 library;
 
@@ -40,10 +44,44 @@ class DatosEnriquecidos {
   final String? categorias;
 }
 
-/// Puerto: consulta datos de un producto por código EAN. Null = sin datos
-/// (sin conexión, sin resultado, timeout u OFF caído).
+/// v0.3.14 (S2-S5): resultado honesto de la consulta OFF. La causa viaja
+/// en el resultado y nunca se traga: el escáner puede mostrar «sin
+/// conexión», «OFF no respondió» o «no está en OFF» en vez de un mismo
+/// silencio (S3/S4/S5).
+sealed class ResultadoEnriquecimiento {
+  const ResultadoEnriquecimiento();
+}
+
+/// Se consultó y OFF trajo datos precargables (el usuario SIEMPRE
+/// confirma antes de guardar, regla v0.3.11).
+class ResultadoDatos extends ResultadoEnriquecimiento {
+  const ResultadoDatos(this.datos);
+
+  final DatosEnriquecidos datos;
+}
+
+/// Se consultó y el producto no está en OFF (status != 1, sin `product`
+/// o sin nombre utilizable). Flujo manual intacto (S5).
+class ResultadoNoEncontrado extends ResultadoEnriquecimiento {
+  const ResultadoNoEncontrado();
+}
+
+/// La consulta se OMITIÓ: el gate de conectividad no detectó interfaces
+/// (S3).
+class ResultadoErrorConectividad extends ResultadoEnriquecimiento {
+  const ResultadoErrorConectividad();
+}
+
+/// Se consultó y OFF falló: HTTP != 200, timeout o respuesta inválida
+/// (S4).
+class ResultadoErrorServidor extends ResultadoEnriquecimiento {
+  const ResultadoErrorServidor();
+}
+
+/// Puerto: consulta datos de un producto por código EAN con resultado
+/// honesto (v0.3.14, S2). Nunca lanza: la causa viaja en el resultado.
 abstract interface class ServicioEnriquecimiento {
-  Future<DatosEnriquecidos?> consultar(String ean);
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean);
 }
 
 /// Servicio que no consulta nada: lo usa el escáner cuando la cámara está
@@ -53,11 +91,15 @@ class ServicioEnriquecimientoNulo implements ServicioEnriquecimiento {
   const ServicioEnriquecimientoNulo();
 
   @override
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async =>
+      const ResultadoNoEncontrado();
+
+  /// Compatibilidad (v0.3.14): forma plana histórica del puerto.
   Future<DatosEnriquecidos?> consultar(String ean) async => null;
 }
 
-/// Cliente de Open Food Facts (API v2). La consulta nunca lanza: cualquier
-/// error se traduce en null (flujo manual intacto).
+/// Cliente de Open Food Facts (API v2). La consulta nunca lanza: la causa
+/// viaja en [ResultadoEnriquecimiento] (v0.3.14), flujo manual intacto.
 class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
   ServicioEnriquecimientoOFF({
     http.Client? cliente,
@@ -81,9 +123,15 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
   final String urlBase;
 
   @override
-  Future<DatosEnriquecidos?> consultar(String ean) async {
-    if (!RegExp(r'^\d{8,13}$').hasMatch(ean)) return null;
-    if (_hayConexion != null && !await _hayConexion()) return null;
+  Future<ResultadoEnriquecimiento> consultarConResultado(String ean) async {
+    if (!RegExp(r'^\d{8,13}$').hasMatch(ean)) {
+      return const ResultadoNoEncontrado(); // EAN inválido: nada que consultar
+    }
+    if (_hayConexion != null && !await _hayConexion()) {
+      // S3 (v0.3.14): la consulta se omitió por conectividad — causa
+      // explícita, no un null que confunde con «no está en OFF».
+      return const ResultadoErrorConectividad();
+    }
     final http.Client cliente = _cliente ?? http.Client();
     try {
       final http.Response respuesta = await cliente
@@ -94,20 +142,41 @@ class ServicioEnriquecimientoOFF implements ServicioEnriquecimiento {
             },
           )
           .timeout(timeout);
-      if (respuesta.statusCode != 200) return null; // 404 = no encontrado
+      // S4 (v0.3.14): cualquier HTTP != 200 es OFF que no respondió bien
+      // (la API v2 responde 200 con status 0 si el producto no existe).
+      if (respuesta.statusCode != 200) return const ResultadoErrorServidor();
       final Object? cuerpo = jsonDecode(respuesta.body);
-      if (cuerpo is! Map<String, dynamic>) return null;
-      if (cuerpo['status'] != 1) return null; // 0 = producto inexistente
+      if (cuerpo is! Map<String, dynamic>) {
+        return const ResultadoErrorServidor(); // respondió basura
+      }
+      if (cuerpo['status'] != 1) return const ResultadoNoEncontrado();
       final Object? producto = cuerpo['product'];
-      if (producto is! Map<String, dynamic>) return null;
-      return _mapear(producto);
+      if (producto is! Map<String, dynamic>) {
+        return const ResultadoNoEncontrado();
+      }
+      final DatosEnriquecidos? datos = _mapear(producto);
+      if (datos == null) return const ResultadoNoEncontrado();
+      return ResultadoDatos(datos);
     } catch (_) {
-      // Timeout, OFF caído, JSON inválido: null y flujo manual como hoy.
-      return null;
+      // Timeout, OFF caído, JSON inválido: errorServidor (S4), nunca lanza.
+      return const ResultadoErrorServidor();
     } finally {
       // El cliente propio (no inyectado) se cierra tras cada consulta.
       if (_cliente == null) cliente.close();
     }
+  }
+
+  /// Compatibilidad (v0.3.14): forma plana histórica del puerto — null =
+  /// sin datos, sin distinción de causa. El escáner y el formulario ya
+  /// usan [consultarConResultado]; el método queda para el contrato
+  /// anterior (pruebas unitarias existentes).
+  Future<DatosEnriquecidos?> consultar(String ean) async {
+    final ResultadoEnriquecimiento resultado =
+        await consultarConResultado(ean);
+    return switch (resultado) {
+      ResultadoDatos(:final datos) => datos,
+      _ => null,
+    };
   }
 
   /// Mapea el objeto `product` de OFF a los campos del formulario. Null si

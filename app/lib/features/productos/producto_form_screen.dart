@@ -76,12 +76,7 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
   /// escáner, para no construir el cliente OFF salvo que se use.
   late final ServicioEnriquecimiento _enriquecimiento =
       widget.enriquecimiento ??
-          ServicioEnriquecimientoOFF(hayConexion: _hayConexion);
-
-  /// v0.3.11: conectividad para el servicio OFF por defecto (patrón del
-  /// escáner: cualquier tipo alcanza; solo sin interfaces no consulta).
-  Future<bool> _hayConexion() async =>
-      await detectarConexion() != TipoConexion.ninguna;
+          ServicioEnriquecimientoOFF(hayConexion: hayConexionParaConsulta);
 
   /// v0.3.11 (S2): estado del botón «Completar desde OFF».
   bool _consultandoOFF = false;
@@ -260,8 +255,9 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
 
   /// v0.3.11 (S2): consulta OFF para el código del producto y completa
   /// SOLO los campos vacíos. Nunca guarda solo: el usuario confirma con
-  /// «Guardar cambios». Null (sin datos/sin conexión) o error → mensaje en
-  /// español sin bloquear; el botón queda disponible para reintentar.
+  /// «Guardar cambios». Error o sin datos → mensaje en español sin
+  /// bloquear (v0.3.14: el resultado del puerto es honesto — la conducta
+  /// del formulario no cambia); el botón queda disponible para reintentar.
   Future<void> _completarDesdeOFF() async {
     if (_consultandoOFF || !_puedeCompletarOFF) return;
     final String codigo = _codigo.text.trim();
@@ -269,11 +265,12 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
       _consultandoOFF = true;
       _mensajeOFF = null;
     });
-    final DatosEnriquecidos? datos;
+    final ResultadoEnriquecimiento resultado;
     try {
-      datos = await _enriquecimiento.consultar(codigo);
+      resultado = await _enriquecimiento.consultarConResultado(codigo);
     } catch (_) {
-      // OFF caído, timeout o sin conexión: mensaje sin bloquear.
+      // El puerto no lanza; defensa extra ante fakes defectuosos:
+      // mensaje sin bloquear.
       if (!mounted) return;
       setState(() {
         _consultandoOFF = false;
@@ -284,10 +281,14 @@ class _ProductoFormScreenState extends State<ProductoFormScreen> {
     if (!mounted) return;
     setState(() {
       _consultandoOFF = false;
-      if (datos == null) {
-        _mensajeOFF = 'Open Food Facts no trajo datos para este código.';
-      } else {
-        _aplicarEnriquecimiento(datos);
+      switch (resultado) {
+        case ResultadoDatos(:final datos):
+          _aplicarEnriquecimiento(datos);
+        case ResultadoNoEncontrado():
+          _mensajeOFF = 'Open Food Facts no trajo datos para este código.';
+        case ResultadoErrorConectividad():
+        case ResultadoErrorServidor():
+          _mensajeOFF = 'Sin conexión: no se pudo consultar Open Food Facts.';
       }
     });
   }
