@@ -54,13 +54,35 @@ class _RegistroPrecioScreenState extends State<RegistroPrecioScreen> {
           ..where((t) => t.borradoEn.isNull())
           ..orderBy([(t) => OrderingTerm(expression: t.nombre)]))
         .get();
+
+    // #12 (v0.3.13): el comercio del último precio registrado queda
+    // preseleccionado — en la recorrida de compras se cargan varios
+    // productos del mismo comercio, uno atrás del otro. Si el comercio
+    // del último precio ya no existe (borrado), no se preselecciona.
+    final ultimo = await widget.baseDeDatos.customSelect(
+      'SELECT pr.comercio_id AS comercio_id '
+      'FROM precios pr JOIN comercios c ON pr.comercio_id = c.id '
+      'WHERE c.borrado_en IS NULL '
+      'ORDER BY pr.fecha_toma DESC, pr.cargado_en DESC LIMIT 1',
+      readsFrom: {
+        widget.baseDeDatos.precios,
+        widget.baseDeDatos.comercios,
+      },
+    ).get();
+    String? preseleccionado =
+        ultimo.isEmpty ? null : ultimo.first.read<String>('comercio_id');
+    if (preseleccionado != null &&
+        !lista.any((Comercio c) => c.id == preseleccionado)) {
+      preseleccionado = null;
+    }
+
     if (!mounted) return;
     setState(() {
       _comercios = lista;
-      // Comodidad: si hay un único comercio, queda preseleccionado.
-      if (_comercioId == null && lista.length == 1) {
-        _comercioId = lista.single.id;
-      }
+      // Comodidad previa: sin precios registrados, si hay un único
+      // comercio queda preseleccionado.
+      _comercioId ??=
+          preseleccionado ?? (lista.length == 1 ? lista.single.id : null);
     });
   }
 

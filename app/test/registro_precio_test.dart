@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seguidor_precios/data/local/base_de_datos.dart';
+import 'package:seguidor_precios/data/precios.dart';
 import 'package:seguidor_precios/features/precios/registro_precio_screen.dart';
 
 void main() {
@@ -53,6 +54,39 @@ void main() {
     final DateTime hoy = DateTime.now();
     return '${hoy.year.toString().padLeft(4, '0')}-${hoy.month.toString().padLeft(2, '0')}-${hoy.day.toString().padLeft(2, '0')}';
   }
+
+  testWidgets('preselecciona el comercio del último precio registrado (#12)', (tester) async {
+    superficieGrande(tester);
+    final Producto producto = await insertarProductoYComercio(); // p1 + c1
+    await db.into(db.comercios).insert(
+          ComerciosCompanion.insert(
+            id: 'c2',
+            nombre: 'El Chino',
+            creadoPor: 'u1',
+            creadoEn: '2026-01-01T00:00:00',
+            actualizadoEn: '2026-01-01T00:00:00',
+          ),
+        );
+
+    // Recorrida de compras: ayer cargó en El Almacén (c1), hoy en
+    // El Chino (c2). El formulario debe abrirse con c2 preseleccionado.
+    final ayer = DateTime.now().subtract(const Duration(days: 1));
+    final fechaAyer =
+        '${ayer.year.toString().padLeft(4, '0')}-${ayer.month.toString().padLeft(2, '0')}-${ayer.day.toString().padLeft(2, '0')}';
+    await registrarPrecio(db,
+        productoId: 'p1', comercioId: 'c1', precio: 100, fechaToma: fechaAyer);
+    await registrarPrecio(db,
+        productoId: 'p1', comercioId: 'c2', precio: 200, fechaToma: fechaDeHoy());
+
+    await tester.pumpWidget(MaterialApp(
+      home: RegistroPrecioScreen(baseDeDatos: db, producto: producto),
+    ));
+    await tester.pumpAndSettle();
+
+    final dropdown = tester.widget<DropdownButtonFormField<String>>(
+        find.byType(DropdownButtonFormField<String>));
+    expect(dropdown.initialValue, 'c2');
+  });
 
   testWidgets('guarda el precio de hoy con el comercio preseleccionado', (tester) async {
     superficieGrande(tester);
