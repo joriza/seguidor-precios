@@ -132,20 +132,45 @@ void main() {
       home: RegistroPrecioScreen(baseDeDatos: db, producto: producto),
     ));
 
+    // El picker no admite fechas futuras (lastDate: hoy, sin fechas
+    // futuras): el día a elegir debe ser hoy o anterior. Los primeros
+    // 14 días del mes el '15' está deshabilitado y el tap no hace nada.
+    // Elegimos un día determinista distinto de hoy siempre que se pueda:
+    // el 15 si ya pasó; ayer si estamos entre el 2 y el 15; el propio 1
+    // cuando hoy es día 1 (único día habilitado del mes: el flujo se
+    // ejercita igual, aunque no cambia el valor visible).
+    final hoy = DateTime.now();
+    final int dia;
+    if (hoy.day >= 16) {
+      dia = 15;
+    } else if (hoy.day >= 2) {
+      dia = hoy.day - 1;
+    } else {
+      dia = 1;
+    }
+    final esperado = '-${dia.toString().padLeft(2, '0')}';
+    // Los días 25..31 pueden duplicarse con los días "fuera de mes"
+    // iniciales (antes del 1) y los días 1..6 con los finales (después
+    // del 28..30); en la grilla los días corren en orden cronológico,
+    // así que el elegido (del mes actual) es el primero si es chico y el
+    // último si es grande. 7..24 nunca se duplican.
+    final Finder celdaDia =
+        dia >= 25 ? find.text('$dia').last : find.text('$dia').first;
+
     await tester.tap(find.byIcon(Icons.calendar_today));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('15'));
+    await tester.tap(celdaDia);
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('-15'), findsOneWidget);
+    expect(find.textContaining(esperado), findsOneWidget);
 
     await tester.enterText(find.byType(TextFormField).first, '1800');
     await tester.tap(find.widgetWithText(FilledButton, 'Registrar precio'));
     await tester.pumpAndSettle();
 
     final precios = await db.select(db.precios).get();
-    expect(precios.single.fechaToma.endsWith('-15'), isTrue);
+    expect(precios.single.fechaToma.endsWith(esperado), isTrue);
   });
 }
